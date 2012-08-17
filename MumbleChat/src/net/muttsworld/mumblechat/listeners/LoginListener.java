@@ -9,10 +9,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 
 import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
 import net.muttsworld.mumblechat.MumbleChat;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -30,9 +27,7 @@ import org.bukkit.metadata.MetadataValue;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
-//import DurpChat.chatChannel;
-//import DurpChat.chatChannelInfo;
-//import DurpChat.durpChat;
+
 
 public class LoginListener implements Listener {
 
@@ -195,22 +190,21 @@ public class LoginListener implements Listener {
     prefix.replaceAll(c.hashCode(), ChatColor.)
     }
     }*/
+    
+   //Move this to the top... 
+
+    
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerLogin(PlayerLoginEvent plog) {
         String curChannel;
         Player pl = plog.getPlayer();
 
-        if (cc.usePexPrefix) {
-
-            PermissionUser user = PermissionsEx.getUser(pl);
-            String pPrefix = user.getPrefix();
-            //&.[0123456789]?
-            //	String fix;
-            //	fix = pPrefix;
-            pPrefix = "[" + pPrefix + pl.getPlayerListName() + "] ";
-            pl.setDisplayName(pPrefix);
-        }
-
+        PermissionUser user = PermissionsEx.getUser(pl);
+        String pFormatted = cc.FormatPlayerName(user.getPrefix(),pl.getPlayerListName(),user.getSuffix());
+         //pPrefix = "[" + pPrefix + pl.getPlayerListName() + "] ::";
+         pl.setDisplayName(pFormatted);
+       
+       
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
 

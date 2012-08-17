@@ -1,6 +1,7 @@
 package net.muttsworld.mumblechat;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,6 +17,7 @@ public class ChatChannelInfo {
     public String mutepermissions;
     public Boolean saveplayerdata;
     public Boolean usePexPrefix;
+    public Boolean usePexSuffix;
 
     @SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
@@ -40,6 +42,7 @@ public class ChatChannelInfo {
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         usePexPrefix = plugin.getConfig().getBoolean("usePexPrefix", false);
+        usePexSuffix = plugin.getConfig().getBoolean("usePexPrefix", false);
 
         int len = (cs.getKeys(false)).size();
         cc = new ChatChannel[len];
@@ -120,6 +123,24 @@ public class ChatChannelInfo {
         }
 
         return null;
+    }
+    
+    //This will fix the color on a player's name with PEX format.
+    // it has to be put into the SetFormat method on the chat event.
+    protected static Pattern chatColorPattern = Pattern.compile("(?i)&([0-9A-F])");
+    
+    public String FormatPlayerName(String playerPrefix,String playerDisplayName,String playerSuffix)
+    {
+    	 if (usePexPrefix) {
+
+            playerPrefix = chatColorPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+         }
+    	 if (usePexSuffix) {
+
+             playerSuffix = chatColorPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+         }
+    	 return playerPrefix+playerDisplayName.trim()+playerSuffix;
+
     }
 
     List<String> getFilters() {

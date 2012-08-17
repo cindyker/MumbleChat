@@ -23,10 +23,7 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 import java.util.List;
 import java.util.StringTokenizer;
 import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
 import net.muttsworld.mumblechat.MumbleChat;
 
 public class ChatListener implements Listener {
@@ -87,17 +84,16 @@ public class ChatListener implements Listener {
 
         Player p = event.getPlayer();
 
-        if (cc.usePexPrefix) {
-
-            PermissionUser user = PermissionsEx.getUser(p);
-            String pPrefix = user.getPrefix();
-            pPrefix = "[" + pPrefix + p.getPlayerListName() + "] ";
-            p.setDisplayName(pPrefix);
-        }
-
-        //		mama.getServer().getLogger().info("["+mama.getName()+"]"+" chatting --- I:" +  getMetadataString(p,"insertchannel",mama));
-        //		mama.getServer().getLogger().info("["+mama.getName()+"]"+" chatting --- C:" +  getMetadataString(p,"currentchannel",mama));
-
+        // this gets the player's prefix and suffix from PEx.. but with every chat
+        // with the async chat, I am not sure if calling permissionsEx here is a good thing.
+        // Next thing to look at is to move this to Login with a metatag added with this info for
+        // use here. 
+        PermissionUser user = PermissionsEx.getUser(p);
+        String pFormatted = cc.FormatPlayerName(user.getPrefix(),p.getPlayerListName(),user.getSuffix());
+        p.setDisplayName(pFormatted);
+         
+        plugin.getServer().getLogger().info(pFormatted);
+    
         int t = 0;
         evMessage = event.getMessage();
 
@@ -244,7 +240,8 @@ public class ChatListener implements Listener {
             p.sendMessage(ChatColor.GOLD + "No one is listening to you");
         }
 
-        event.setMessage(evMessage);
+        event.setFormat(pFormatted+" "+evMessage);
+       // event.setMessage(evMessage);
         // p.setMetadata("durpGlobal",new FixedMetadataValue(mama,false));
         return;
 

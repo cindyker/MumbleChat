@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 //TODO: Make channel stick configurable
 //TODO: Add SQL so player data can be stored there
 //TODO: Implement /chwho [channel] to show online players in a channel
+@SuppressWarnings("unused")
 public class MumbleChat extends JavaPlugin {
 
     public ChatListener cl;
