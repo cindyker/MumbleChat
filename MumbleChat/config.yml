@@ -1,25 +1,11 @@
 filters:
 - ahole,donuts
 - anus,donuts
-- ash0le,donuts
-- ash0les,donuts
-- asholes,donuts
 - ass,donuts
-- Ass Monkey,donuts
-- Assface,donuts
-- assh0le,donuts
-- assh0lez,donuts
-- asshole,donuts
-- assholes,donuts
-- assholz,donuts
-- asswipe,donuts
-- azzhole,donuts
 - Biatch,puppy
 - bitch,puppy
 - bitches,puppy
 - c0ck,rooster
-- c0cks,rooster
-- c0k,rooster
 - Carpet Muncher,rooster
 - cawk,rooster
 - cawks,rooster
@@ -27,11 +13,6 @@ filters:
 - cnts,peach
 - cntz,peach
 - cock,rooster
-- cockhead,rooster
-- cock-head,rooster
-- cocks,rooster
-- CockSucker,rooster
-- cock-sucker,rooster
 - crap,poo
 - cum,bake brownies
 - cunt,peach
@@ -41,92 +22,33 @@ filters:
 - dild0,rooster
 - dild0s,rooster
 - dildo,rooster
-- dildos,rooster
-- dilld0,rooster
-- dilld0s,rooster
 - f u c k,nono
 - f u c k e r,nono
 - fag,cigarette
-- fag1t,cigarette
-- faget,cigarette
-- fagg1t,cigarette
-- faggit,cigarette
-- faggot,cigarette
-- fagit,cigarette
-- fags,cigarettes
-- fagz,cigarette
-- faig,cigarette
 - faigs,cigarette
 - fuck,oh dear
-- fucker,oh dear
-- fuckin,oh dear
-- fucking,oh dear
-- fucks,oh dear
-- Fudge Packer,oh dear
 - fuk,oh dear
-- Fukah,oh dear
-- Fuken,oh dear
-- fuker,oh dear
-- Fukin,oh dear
-- Fukk,oh dear
-- Fukkah,oh dear
-- Fukken,oh dear
-- Fukker,oh dear
-- Fukkin,oh dear
-- jackoff,bake brownies
-- jisim,bake brownies
-- jiss,bake brownies
-- jizm,bake brownies
-- jizz,bake brownies
 - kunt,peach
-- kunts,peach
-- kuntz,peach
-- massterbait,bake brownies
-- masstrbait,bake brownies
-- masstrbate,bake brownies
-- masterbaiter,bake brownies
 - masterbate,bake brownies
 - masterbates,bake brownies
 - orafis,rooster
 - peeenus,rooster
 - peeenusss,rooster
 - peenus,rooster
-- peinus,rooster
 - pen1s,rooster
-- penas,rooster
 - penis,rooster
 - penus,rooster
 - penuus,rooster
 - Phuc,oh dear
-- Phuck,oh dear
 - Phuk,oh dear
-- Phuker,oh dear
-- Phukker,oh dear
 - Sh!t,dumb
 - sh1t,dumb
-- sh1ter,dumb
-- sh1ts,dumb
-- sh1tter,dumb
-- sh1tz,dumb
 - shit,dumb
-- shits,dumb
-- shitter,dumb
-- Shitty,dumb
-- Shity,dumb
-- shitz,dumb
 - Shyt,dumb
-- Shyte,dumb
-- Shytty,dumb
-- Shyty,dumb
-- va1jina,peach
 - vag1na,peach
-- vagiina,peach
-- vagina,peach
-- vaj1na,peach
-- vajina,peach
 - vullva,peach
 - vulva,peach
-- lag,awesome
+- \blag,awesome
 - rain,sunshine
 - planet minecraft,another dimension
 - planetminecraft,another dimension
@@ -139,7 +61,7 @@ filterexceptions:
 - villager
 - villagers
 mute:
-  permissions: durpchat.canmute
+  permissions: mumblechat.canmute
 saveplayerdata: true
 usePexPrefix: false
 channels:
@@ -148,13 +70,13 @@ channels:
     muteable: true
     alias: g
   staff:
-    permissions: durpchat.adminchannel
+    permissions: mumblechat.adminchannel
     color: green
     muteable: false
     filter: false
     alias: st
   diplo:
-    permissions: durpchat.diplochannel
+    permissions: mumblechat.diplochannel
     color: light_purple
     muteable: true
     alias: d
