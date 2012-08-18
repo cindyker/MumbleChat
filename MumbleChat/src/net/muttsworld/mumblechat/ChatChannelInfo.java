@@ -3,6 +3,8 @@ package net.muttsworld.mumblechat;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.muttsworld.mumblechat.sql.SqlCommands;
+
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -18,6 +20,17 @@ public class ChatChannelInfo {
     public Boolean saveplayerdata;
     public Boolean usePexPrefix;
     public Boolean usePexSuffix;
+    
+    //////////////////////////////
+    // For SQL Connection
+    public Boolean useSQL;
+    public String hostname;
+    public String port;
+    public String username;
+    public String password;
+    public SqlCommands sqlcom;
+    ////////////////////////////////
+        
     public String defaultChannel; //There can be only one :)
 
     @SuppressWarnings("unchecked")
@@ -38,17 +51,36 @@ public class ChatChannelInfo {
         ConfigurationSection cs = plugin.getConfig().getConfigurationSection("channels");
 
 
-        mutepermissions = plugin.getConfig().getString("mute.permissions");
-        //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
-
+        mutepermissions = plugin.getConfig().getString("mute.permissions","");
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         usePexPrefix = plugin.getConfig().getBoolean("usePexPrefix", false);
         usePexSuffix = plugin.getConfig().getBoolean("usePexPrefix", false);
+        
+        ///////////////////////////////
+        // SQL Configuration
+        ///////////////////////////////
+        useSQL = plugin.getConfig().getBoolean("useSQL", false);
+        if(useSQL)
+        {
+        	  hostname = plugin.getConfig().getString("SqlConfig.hostname","");
+        	  port =  plugin.getConfig().getString("SqlConfig.port","");
+        	  username =  plugin.getConfig().getString("SqlConfig.username","");
+        	  password =  plugin.getConfig().getString("SqlConfig.password","");
+        	  
+        	
+  	        sqlcom = new SqlCommands(plugin,this);
+  	        if ( sqlcom.DatabaseSetup() )
+  	        {
+  	        	plugin.getLogger().info("MumbleChat Database Setup Complete.");
+  	        	
+  	        }
+        }
 
         int len = (cs.getKeys(false)).size();
         cc = new ChatChannel[len];
 
         int x = 0;
+        //Colors for the Channels
         for (String key : cs.getKeys(false)) {
             //	plugin.getServer().getLogger().info(key + ":" + (String)cs.getString(key+".color"));
 

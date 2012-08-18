@@ -78,28 +78,85 @@ public class LoginListener implements Listener {
                 defaultColor = c.getColor();
             }
         }
-        reloadCustomConfig();
+        
+        //This is to load the YML config.
+        //We won't be doing this if we are using SQL.
+        if(!_cc.useSQL)
+        	reloadCustomConfig();
     }
 
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerKick(PlayerKickEvent plog) {
         if (cc.saveplayerdata) {
-            PlayerLeaving(plog.getPlayer());
+        	if(!cc.useSQL)
+        		PlayerLeaving_YML(plog.getPlayer());
         }
     }
 
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerQuit(PlayerQuitEvent plog) {
         if (cc.saveplayerdata) {
-            PlayerLeaving(plog.getPlayer());
+        	if(!cc.useSQL)
+        		PlayerLeaving_YML(plog.getPlayer());
         }
     }
 
-    void PlayerLeaving(Player pp) {
+    
+    void PlayerLeaving_SQL(Player pp)
+    {
+    	 Boolean listendefault = false;
+         int listencount = 0;
+         String listenchannels ="";
+         String mutechannels ="";
+                
+         //Check to see if we want to save them...
+         for (ChatChannel c : cc.getChannelsInfo()) 
+         {
+        	 if (getMetadata(pp, "listenchannel." + c.getName(), plugin)) {
+            	 listenchannels += c.getName() + ","; 
+            	 listencount++;
+                 //if they are only listening to the default and only talking on the default....
+                 if (c.isDefaultchannel() && getMetadataString(pp, "currentchannel", plugin).equalsIgnoreCase(c.getName())) 
+                 {                	
+                     listendefault = true;
+                 }
+             }
+
+             if (getMetadata(pp, "durpMute." + c.getName(), plugin)) {
+            	 mutechannels += c.getName() + ",";
+             }
+             
+         }
+       
+         //If they are only listening to the default channel no point in saving them.
+         if (listencount == 1 && listendefault == true ) {
+         	
+             return;
+         }
+         
+
+         String talkchannel;
+         String lastlogoff;
+         
+                 
+         talkchannel = getMetadataString(pp, "currentchannel", plugin);
+
+         Calendar currentDate = Calendar.getInstance();
+         SimpleDateFormat formatter =
+                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        lastlogoff = formatter.format(currentDate.getTime());
+         
+         cc.sqlcom.SavePlayerRecord(pp.getDisplayName(), talkchannel, listenchannels, mutechannels, lastlogoff);
+        
+         
+    }
+    
+    void PlayerLeaving_YML(Player pp) {
 
         //mama.getServer().getLogger().info("Logout.. ");
 
         //String curChannel;
+    	
         customConfig = getCustomConfig();
         Player pl = pp;
 
@@ -123,9 +180,10 @@ public class LoginListener implements Listener {
         	
             return;
         }
-
-        //if(getMetadataString(p,"listenchannel".+))
-
+        
+        //Do we have an existing Record for the player.. Insert vs Update ;)
+        
+        
         ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
         if (cs == null) {
             //	mama.getServer().getLogger().info("Logout.. No Player Found");

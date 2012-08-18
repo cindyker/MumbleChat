@@ -2,6 +2,7 @@ package net.muttsworld.mumblechat;
 
 import net.muttsworld.mumblechat.listeners.LoginListener;
 import net.muttsworld.mumblechat.listeners.ChatListener;
+import net.muttsworld.mumblechat.sql.SqlCommands;
 import net.muttsworld.mumblechat.commands.MuteCommandExecutor;
 import net.muttsworld.mumblechat.commands.TellCommandExecutor;
 import net.muttsworld.mumblechat.commands.ChatCommand;
@@ -16,7 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 //TODO: Add SQL so player data can be stored there
 //TODO: Implement /chwho [channel] to show online players in a channel
 @SuppressWarnings("unused")
-public class MumbleChat extends JavaPlugin {
+public class MumbleChat extends JavaPlugin 
+{
 
     public ChatListener cl;
     private ChatCommand myExecutor;
@@ -27,23 +29,29 @@ public class MumbleChat extends JavaPlugin {
     private ChatChannelInfo cci;
     FileConfiguration fc;
 
-    public void onEnable() {
+    public void onEnable() 
+    {
         getLogger().info("MumbleChat has been enabled.");
         fc = getConfig();
-        if (fc.getList("filters") == null) {
+        if (fc.getList("filters") == null) 
+        {
             saveDefaultConfig();
-
         }
         saveConfig();
-
+        
+ 
         //class with channel information
         cci = new ChatChannelInfo(this);
-
+        if(cci.useSQL)
+        {
+        	cci.sqlcom.LoadPlayerData(login.getCustomConfig());
+        }
+        
         cl = new ChatListener(this, cci);
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(cl, this);
 
-        login = new LoginListener(this, cci);
+        login = new LoginListener(this, cci );
         pm.registerEvents(login, this);
 
 
@@ -61,13 +69,24 @@ public class MumbleChat extends JavaPlugin {
 
         getCommand("durpmute").setExecutor(muteExecutor);
         getCommand("durpunmute").setExecutor(muteExecutor);
+        
+                
 
     }
 
-    public void onDisable() {
+    public void onDisable() 
+    {
         //getLogger().info("Your plugin has been disabled!");
-        login.SaveItToDisk();
-        System.out.println("Temp Chat Disabled");
+    	//YML Player Save.. don't need to do this if we are using SQL
+    	if(!cci.useSQL)
+    		login.SaveItToDisk();
+    	else
+    	{
+    		//CloseSQL Connection
+    		cci.sqlcom.CloseConnection();
+    		
+    	}
+    		
         getLogger().info("MumbleChat has been disabled.");
     }
 }
