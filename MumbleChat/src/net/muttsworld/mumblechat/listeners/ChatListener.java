@@ -89,12 +89,12 @@ public class ChatListener implements Listener {
         // Next thing to look at is to move this to Login with a metatag added with this info for
         // use here. 
         //PermissionUser user = PermissionsEx.getUser(p);
-        String pFormatted; //= cc.FormatPlayerName(user.getPrefix(),p.getPlayerListName(),user.getSuffix());
-        pFormatted = getMetadataString(p,"chatnameformat",plugin);
+        String pFormatted =""; //= cc.FormatPlayerName(user.getPrefix(),p.getPlayerListName(),user.getSuffix());
+        if (cc.usePexPrefix == true )
+        	pFormatted = getMetadataString(p,"chatnameformat",plugin);
        // p.setDisplayName(pFormatted);
          
-    
-     
+        
         evMessage = event.getMessage();
 
         //mama.getServer().getLogger().info("Filter ok?");
@@ -198,7 +198,7 @@ public class ChatListener implements Listener {
                 //String tempMessage = evMessage.toLowerCase()
                 //StringTokenizer fe = new StringTokenizer()
 
-                evMessage = evMessage.replaceAll("(?i)\\b" + pparse[0], pparse[1]);
+                evMessage = evMessage.replaceAll("(?i)" + pparse[0], pparse[1]);
 
             }
         }
@@ -246,8 +246,10 @@ public class ChatListener implements Listener {
             p.sendMessage(ChatColor.GOLD + "No one is listening to you");
         }
 
-        event.setFormat(pFormatted+" "+evMessage);
-       // event.setMessage(evMessage);
+        if(cc.usePexPrefix == true)
+        	event.setFormat(pFormatted+" "+evMessage);
+        else
+           event.setMessage(evMessage);
         // p.setMetadata("durpGlobal",new FixedMetadataValue(mama,false));
         return;
 
