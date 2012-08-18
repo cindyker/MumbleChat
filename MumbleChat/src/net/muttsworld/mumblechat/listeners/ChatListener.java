@@ -15,8 +15,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
-import ru.tehkode.permissions.PermissionUser;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
+//import ru.tehkode.permissions.PermissionUser;
+//import ru.tehkode.permissions.bukkit.PermissionsEx;
 //import org.bukkit.permissions.PermissionAttachmentInfo;
 
 //import java.lang.Math;
@@ -88,16 +88,14 @@ public class ChatListener implements Listener {
         // with the async chat, I am not sure if calling permissionsEx here is a good thing.
         // Next thing to look at is to move this to Login with a metatag added with this info for
         // use here. 
-        PermissionUser user = PermissionsEx.getUser(p);
-        String pFormatted = cc.FormatPlayerName(user.getPrefix(),p.getPlayerListName(),user.getSuffix());
-        p.setDisplayName(pFormatted);
+        //PermissionUser user = PermissionsEx.getUser(p);
+        String pFormatted; //= cc.FormatPlayerName(user.getPrefix(),p.getPlayerListName(),user.getSuffix());
+        pFormatted = getMetadataString(p,"chatnameformat",plugin);
+       // p.setDisplayName(pFormatted);
          
-        plugin.getServer().getLogger().info(pFormatted);
     
-        int t = 0;
+     
         evMessage = event.getMessage();
-
-
 
         //mama.getServer().getLogger().info("Filter ok?");
 
@@ -118,13 +116,14 @@ public class ChatListener implements Listener {
             insertchannel = "NONE";
         }
         if ((insertchannel.equalsIgnoreCase("NONE"))) {
-            //String curChannel = p.getMetadata("currentchannel").get(0).asString();
-            //		mama.getServer().getLogger().info("Talking Sticky");
+           //String curChannel = p.getMetadata("currentchannel").get(0).asString();
+           // 	plugin.getServer().getLogger().info("Talking Sticky");
             curChannel = getMetadataString(p, "currentchannel", plugin);
         } else {
             //		mama.getServer().getLogger().info("Temp Talk");
             curChannel = insertchannel;
             p.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
+            
         }
 
         if (curChannel.length() == 0) {
@@ -140,10 +139,16 @@ public class ChatListener implements Listener {
         String listenChannel = "listenchannel." + curChannel;
         //mama.getServer().getLogger().info("Who's listening on:" +listenChannel);
 
+        //if they are not muted and they want to talk on the channel...
+        //they need to listen on the channel.
         if (getMetadata(p, "durpMute." + curChannel, plugin) == true) {
             p.sendMessage(ChatColor.DARK_PURPLE + "You are muted in this channel: " + curChannel);
             event.setCancelled(true);
             return;
+        }
+        else
+        {
+        	 p.setMetadata(listenChannel, new FixedMetadataValue(plugin, true));
         }
 
         Double chDistance = (double) 0;
@@ -175,6 +180,7 @@ public class ChatListener implements Listener {
 
         /////////////////////////////////////////////////////
         //Apply the Filter is required
+        int t = 0;
         if (filterthis) {
             for (String s : filters) {
                 t = 0;
@@ -192,7 +198,7 @@ public class ChatListener implements Listener {
                 //String tempMessage = evMessage.toLowerCase()
                 //StringTokenizer fe = new StringTokenizer()
 
-                evMessage = evMessage.replaceAll("(?i)" + pparse[0], pparse[1]);
+                evMessage = evMessage.replaceAll("(?i)\\b" + pparse[0], pparse[1]);
 
             }
         }

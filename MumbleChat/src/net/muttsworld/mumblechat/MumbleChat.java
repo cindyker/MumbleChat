@@ -62,7 +62,6 @@ public class MumbleChat extends JavaPlugin {
         getCommand("durpmute").setExecutor(muteExecutor);
         getCommand("durpunmute").setExecutor(muteExecutor);
 
-
     }
 
     public void onDisable() {

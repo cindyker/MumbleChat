@@ -108,14 +108,19 @@ public class LoginListener implements Listener {
         for (ChatChannel c : cc.getChannelsInfo()) {
             if (getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
                 listencount++;
-                if (c.isDefaultchannel()) {
+                //if they are only listening to the default and only talking on the default....
+                if (c.isDefaultchannel() && getMetadataString(pl, "currentchannel", plugin).equalsIgnoreCase(c.getName())) 
+                {                	
                     listendefault = true;
                 }
             }
+            
         }
 
+        
         //If they are only listening to the default channel no point in saving them.
-        if (listencount == 1 && listendefault == true) {
+        if (listencount == 1 && listendefault == true ) {
+        	
             return;
         }
 
@@ -179,19 +184,12 @@ public class LoginListener implements Listener {
         //	   mama.getServer().getLogger().info("Before Save:" + dateNow);
         cs.set("date", dateNow);
 
-        saveCustomConfig();
-        reloadCustomConfig();
+        //Do we want this Disk IO on every logout..or do we
+        //just want to wait for server stop.
+        //lets wait until server stops...
+     //   saveCustomConfig();
+       // reloadCustomConfig();
     }
-
-    /*	String fixChatColor(String prefix)
-    {
-    for(ChatColor c: ChatColor.values())
-    {
-    prefix.replaceAll(c.hashCode(), ChatColor.)
-    }
-    }*/
-    
-   //Move this to the top... 
 
     
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
@@ -200,10 +198,14 @@ public class LoginListener implements Listener {
         Player pl = plog.getPlayer();
 
         PermissionUser user = PermissionsEx.getUser(pl);
+        //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
         String pFormatted = cc.FormatPlayerName(user.getPrefix(),pl.getPlayerListName(),user.getSuffix());
-         //pPrefix = "[" + pPrefix + pl.getPlayerListName() + "] ::";
-         pl.setDisplayName(pFormatted);
-       
+       //So it shows when you login.
+        pl.setDisplayName(pFormatted);
+
+         //put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
+         pl.setMetadata("chatnameformat",new FixedMetadataValue(plugin,pFormatted));
+
        
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
@@ -216,6 +218,8 @@ public class LoginListener implements Listener {
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, curChannel));
 
                 //mama.getServer().getLogger().info("before Listen");
+                
+                //check for channels to listen too...
                 String listenChannels = cs.getString("listen", "");
                 if (listenChannels.length() > 0) {
                     //String[] pparse = new String[2];
@@ -224,6 +228,12 @@ public class LoginListener implements Listener {
                         //mama.getServer().getLogger().info("chatting: " + st.toString() + " i:"+i);
                         pl.setMetadata("listenchannel." + st.nextToken(), new FixedMetadataValue(plugin, true));
                     }
+                }
+                else //if no channel is available to listen on... set it to default... they should listen on something.
+                {
+                	pl.sendMessage("You have no channels to listen to... setting listen to "+ defaultChannel);
+                	pl.sendMessage("Check /chlist for a list of available channels.");
+                	pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
                 }
                 //	mama.getServer().getLogger().info("before Mutes");
                 String muteChannels = cs.getString("mutes", "");

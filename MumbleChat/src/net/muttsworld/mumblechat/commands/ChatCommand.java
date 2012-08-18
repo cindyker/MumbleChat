@@ -181,19 +181,36 @@ public class ChatCommand implements CommandExecutor, Listener {
             break;
 
             case "leave": {
+            	
+            	int listenchannelcount = 0;
+            	
                 if (args[0].length() > 0) {
                     for (ChatChannel chname : cc.getChannelsInfo()) {
+                    	                   	
                         if (chname.getName().equalsIgnoreCase(args[0]) || chname.getAlias().equalsIgnoreCase(args[0])) {
+                        	
                             player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
 
                             String format = ChatColor.valueOf(chname.getColor().toUpperCase()) + "[" + chname.getName() + "]";
                             player.sendMessage("Leaving channel: " + format);
 
                             //	plugin.getServer().getLogger().info("Leaving Channel:" +chname.getName());
-
-                            return true;
+                            
                         }
+                        
+                        //Figure out how many channels the player is listening too..
+                        	//they need at least one.
+                    	if(getMetadata(player,"listenchannel."+chname.getName(),plugin) == true)
+                        		listenchannelcount++;
                     }
+                    
+                    if(listenchannelcount == 0)
+                    {
+                    	player.setMetadata("listenchannel."+cc.defaultChannel,new FixedMetadataValue(plugin, true));
+                    	player.sendMessage("You need to be listening on at least one channel.");
+                    	player.sendMessage("Setting to listening to: " + cc.defaultChannel);
+                    }
+                    return true;
 
                 } else {
                     player.sendMessage("Please include channel name");

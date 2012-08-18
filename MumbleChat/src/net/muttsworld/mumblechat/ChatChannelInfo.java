@@ -18,6 +18,7 @@ public class ChatChannelInfo {
     public Boolean saveplayerdata;
     public Boolean usePexPrefix;
     public Boolean usePexSuffix;
+    public String defaultChannel; //There can be only one :)
 
     @SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
@@ -80,6 +81,8 @@ public class ChatChannelInfo {
             _filter = (Boolean) cs.getBoolean(key + ".filter", true);
 
             _defaultchannel = (Boolean) cs.getBoolean(key + ".default", false);
+            if (_defaultchannel == true)
+            	defaultChannel = _name;
             //plugin.getServer().getLogger().info("Got defaultchannel:" + _defaultchannel);
 
             _alias = (String) cs.getString(key + ".alias", "None");
