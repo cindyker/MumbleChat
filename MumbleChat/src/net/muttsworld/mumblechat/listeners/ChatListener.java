@@ -141,7 +141,7 @@ public class ChatListener implements Listener {
 
         //if they are not muted and they want to talk on the channel...
         //they need to listen on the channel.
-        if (getMetadata(p, "durpMute." + curChannel, plugin) == true) {
+        if (getMetadata(p, "MumbleMute." + curChannel, plugin) == true) {
             p.sendMessage(ChatColor.DARK_PURPLE + "You are muted in this channel: " + curChannel);
             event.setCancelled(true);
             return;
@@ -176,32 +176,30 @@ public class ChatListener implements Listener {
             }
         }
 
-        //mama.getServer().getLogger().info("chatting on:" + curChannel);
-
-        /////////////////////////////////////////////////////
-        //Apply the Filter is required
-        int t = 0;
-        if (filterthis) {
-            for (String s : filters) {
-                t = 0;
-                String[] pparse = new String[2];
-                pparse[0] = " ";
-                pparse[1] = " ";
-                StringTokenizer st = new StringTokenizer(s, ",");
-                while (st.hasMoreTokens()) {
-                    //mama.getServer().getLogger().info("chatting: " + st.toString() + " i:"+i);
-                    if (t < 2) {
-                        pparse[t++] = st.nextToken();
+      /////////////////////////////////////////////////////
+     //Apply the Filter is required
+       int t = 0;
+       if (filterthis) 
+       {
+            for (String s : filters) 
+            {
+                    t = 0;
+                    String[] pparse = new String[2];
+                    pparse[0] = " ";
+                    pparse[1] = " ";
+                    StringTokenizer st = new StringTokenizer(s, ",");
+                    while (st.hasMoreTokens()) 
+                    {                      
+                        if (t < 2) 
+                        {
+                            pparse[t++] = st.nextToken();
+                        }
                     }
-                }
-                //	mama.getServer().getLogger().info(p[0]+":"+p[1] + " i:"+i);
-                //String tempMessage = evMessage.toLowerCase()
-                //StringTokenizer fe = new StringTokenizer()
+          
+                    evMessage = evMessage.replaceAll("(?i)" + pparse[0], pparse[1]);
 
-                evMessage = evMessage.replaceAll("(?i)" + pparse[0], pparse[1]);
-
-            }
-        }
+              }
+         }
 
         //Add channel info
         evMessage = tempformat + evMessage;
@@ -250,7 +248,6 @@ public class ChatListener implements Listener {
         	event.setFormat(pFormatted+" "+evMessage);
         else
            event.setMessage(evMessage);
-        // p.setMetadata("durpGlobal",new FixedMetadataValue(mama,false));
         return;
 
     }

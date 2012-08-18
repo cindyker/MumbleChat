@@ -139,7 +139,7 @@ filterexceptions:
 - villager
 - villagers
 mute:
-  permissions: durpchat.canmute
+  permissions: mumblechat.canmute
 saveplayerdata: true
 usePexPrefix: false
 channels:
@@ -148,13 +148,13 @@ channels:
     muteable: true
     alias: g
   staff:
-    permissions: durpchat.adminchannel
+    permissions: mumblechat.adminchannel
     color: green
     muteable: false
     filter: false
     alias: st
   diplo:
-    permissions: durpchat.diplochannel
+    permissions: mumblechat.diplochannel
     color: light_purple
     muteable: true
     alias: d

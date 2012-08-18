@@ -1,18 +1,20 @@
 name: MumbleChat
-version: 1.2.0
+version: 1.3.0
 main: net.muttsworld.mumblechat.MumbleChat
 depend: [PermissionsEx]
 author: cindy_k
+authors: [net_creator,mumblerit]
 description: Chat with Channels (1.3.1 level)
+website: www.muttsworldmine.com
 commands:
-    durpmute:
-        usage: /durpmute [player] [channel]
-        aliases: [dpm]
+    mute:
+        usage: /mute [player] [channel]
+        aliases: [mp]
         description: Mute player in a channel so they cannot talk.
         permission-message: You don't have <permission>
-    durpunmute:
-        usage: /durpunmute [player] [channel]
-        aliases: [dpu]
+    unmute:
+        usage: /unmute [player] [channel]
+        aliases: [ump]
         description: Unmute player in a channel so they can talk again.
         permission-message: You don't have <permission>
     tell:

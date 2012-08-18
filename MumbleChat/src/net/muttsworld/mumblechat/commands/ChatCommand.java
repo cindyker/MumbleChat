@@ -16,9 +16,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
-/*import DurpChat.chatChannel;
-import DurpChat.chatChannelInfo;
-import DurpChat.durpChat;*/
 public class ChatCommand implements CommandExecutor, Listener {
 
     private MumbleChat plugin;
@@ -99,8 +96,7 @@ public class ChatCommand implements CommandExecutor, Listener {
         Player player = (Player) sender;
 
         String comm = cmd.getName().toLowerCase();
-        //DurpCommands enumval = DurpCommands.valueOf(comm);
-
+       
         //player.sendMessage(comm + " we sent ");
         if (args == null) {
             return false;
@@ -244,28 +240,6 @@ public class ChatCommand implements CommandExecutor, Listener {
 
 
 
-        /*if(cmd.getName().equalsIgnoreCase("global"))
-        {
-        //plugin.getServer().getLogger().info("Got Commands!");	
-        
-        player.setMetadata("durpGlobal",new FixedMetadataValue(plugin,true));
-        if(args.length >= 1)
-        {
-        String msg = "";
-        if (args[0].length() > 0)
-        {
-        
-        for(String s:args)
-        msg +=" " + s;
-        player.chat(msg);
-        //	 plugin.getServer().getLogger().info("Called Chat... Commands!");
-        }
-        }
-        
-        
-        
-        return true;
-        }*/
 
         return false;
     }

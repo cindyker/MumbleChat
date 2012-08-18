@@ -53,9 +53,9 @@ public class MuteCommandExecutor implements CommandExecutor {
 		
 		//TODO: Fix this section... needs command changed, now has both mute and unmute
 		//Need to check for permission before checking for command
-		if(cmd.getName().equalsIgnoreCase("durpmute"))
+		if(cmd.getName().equalsIgnoreCase("mute"))
 		{
-			if(getMetadata(admin, "durpchat.canmute", plugin)==true)
+			if(getMetadata(admin, "mumblechat.canmute", plugin)==true)
 			{
 				//	plugin.getServer().getLogger().info("Got Mute!");	
 				
@@ -88,7 +88,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 					 {
 						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
 						 {
-							 player.setMetadata("durpMute."+c.getName(),new FixedMetadataValue(plugin,true));
+							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
 							 admin.sendMessage(ChatColor.RED+"Muted Player "+ args[0] + " in " + c.getName());
 							 return true;
 						 }
@@ -112,9 +112,9 @@ public class MuteCommandExecutor implements CommandExecutor {
 			}
 		}
 		
-		if(cmd.getName().equalsIgnoreCase("durpunmute"))
+		if(cmd.getName().equalsIgnoreCase("unmute"))
 		{
-			if(getMetadata(admin, "durpchat.canmute", plugin)==true)
+			if(getMetadata(admin, "mumblechat.canmute", plugin)==true)
 			{
 				//	plugin.getServer().getLogger().info("Got Mute!");	
 				
@@ -147,7 +147,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 					 {
 						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
 						 {
-							 player.setMetadata("durpMute."+c.getName(),new FixedMetadataValue(plugin,false));
+							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,false));
 							 admin.sendMessage(ChatColor.RED+"unMuted Player "+ args[0] + " in " + c.getName());
 							 return true;
 						 }

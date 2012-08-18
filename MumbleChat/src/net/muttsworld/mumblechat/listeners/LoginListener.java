@@ -150,7 +150,7 @@ public class LoginListener implements Listener {
                 strListening += c.getName() + ",";
             }
 
-            if (getMetadata(pl, "durpMute." + c.getName(), plugin)) {
+            if (getMetadata(pl, "MumbleMute." + c.getName(), plugin)) {
                 strMutes += c.getName() + ",";
             }
 
@@ -245,7 +245,7 @@ public class LoginListener implements Listener {
                 if (muteChannels.length() > 0) {
                     StringTokenizer st = new StringTokenizer(muteChannels, ",");
                     while (st.hasMoreTokens()) {
-                        pl.setMetadata("durpMute." + st.nextToken(), new FixedMetadataValue(plugin, true));
+                        pl.setMetadata("MumbleMute." + st.nextToken(), new FixedMetadataValue(plugin, true));
 
                     }
                 }
@@ -279,7 +279,7 @@ public class LoginListener implements Listener {
         if (pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] Can Mute Permissions given...");
-            pl.setMetadata("durpchat.canmute", new FixedMetadataValue(plugin, true));
+            pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
         }
 
         for (ChatChannel c : cc.getChannelsInfo()) {
