@@ -1,6 +1,7 @@
 package net.muttsworld.mumblechat;
 
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
@@ -126,6 +127,35 @@ public class ChatChannelInfo {
         }
 
         return null;
+    }
+    
+    
+    public String FilterChat(String msg)
+    {
+		/////////////////////////////////////////////////////
+		//Apply the Filter is required
+		int t = 0;
+		
+			for (String s : filters) 
+			{
+				t = 0;
+				String[] pparse = new String[2];
+				pparse[0] = " ";
+				pparse[1] = " ";
+				StringTokenizer st = new StringTokenizer(s, ",");
+				while (st.hasMoreTokens()) 
+				{                      
+					if (t < 2) 
+					{
+						pparse[t++] = st.nextToken();
+					}
+				}
+				
+				msg = msg.replaceAll("(?i)" + pparse[0], pparse[1]);
+				
+			}
+		
+    	return msg;
     }
     
     //This will fix the color on a player's name with PEX format.

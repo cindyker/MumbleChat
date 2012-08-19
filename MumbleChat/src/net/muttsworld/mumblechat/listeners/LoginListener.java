@@ -201,9 +201,12 @@ public class LoginListener implements Listener {
         {
         	PermissionUser user = PermissionsEx.getUser(pl);
         	//http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
-        	String pFormatted = cc.FormatPlayerName(user.getPrefix(),pl.getPlayerListName(),user.getSuffix());
+        	String pFormatted = cc.FormatPlayerName(user.getPrefix(),"%s",user.getSuffix());
+        	//pl.getPlayerListName()
         	//So it shows when you login.
-        	pl.setDisplayName(pFormatted); 
+        	//However this is bad.. as it makes who impossible....
+        	//pl.setDisplayName(pFormatted); 
+        	
         	//put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
         	pl.setMetadata("chatnameformat",new FixedMetadataValue(plugin,pFormatted));
         }

@@ -19,9 +19,10 @@ import org.bukkit.metadata.MetadataValue;
 //import ru.tehkode.permissions.bukkit.PermissionsEx;
 //import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import java.util.IllegalFormatException;
 //import java.lang.Math;
 import java.util.List;
-import java.util.StringTokenizer;
+//import java.util.StringTokenizer;
 import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
@@ -78,12 +79,37 @@ public class ChatListener implements Listener {
 
 
         String evMessage;
+        
         if (event.isCancelled()) {
             return;
         }
 
         Player p = event.getPlayer();
-
+        
+        // if sticky tell this becomes quick...
+        String tellPlayer = getMetadataString(p,"MumbleChat.tell",plugin);
+        if(tellPlayer.length()>0)
+        {
+        	//plugin.getServer().getLogger().info("tell to player" + tellPlayer);
+        	Player tp = plugin.getServer().getPlayer(tellPlayer);
+        	if(tp == null)
+        	{
+        		p.sendMessage(tellPlayer + " is not available");
+        		p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+        		return;        		
+        	}
+        	else
+        	{
+        		String filtered = cc.FilterChat(event.getMessage());
+        		String msg = p.getDisplayName()  +" tells you: "+ ChatColor.GRAY + filtered;
+        		tp.sendMessage(msg);        		
+        		p.sendMessage("You tell "+ tellPlayer +": "+ ChatColor.GRAY+ filtered);
+        		event.setCancelled(true);
+        	}
+        	
+        	return;
+        	
+        }
         // this gets the player's prefix and suffix from PEx.. but with every chat
         // with the async chat, I am not sure if calling permissionsEx here is a good thing.
         // Next thing to look at is to move this to Login with a metatag added with this info for
@@ -178,10 +204,11 @@ public class ChatListener implements Listener {
 
       /////////////////////////////////////////////////////
      //Apply the Filter is required
-       int t = 0;
+    //   int t = 0;
        if (filterthis) 
        {
-            for (String s : filters) 
+    	   evMessage = cc.FilterChat(evMessage);
+           /* for (String s : filters) 
             {
                     t = 0;
                     String[] pparse = new String[2];
@@ -198,11 +225,11 @@ public class ChatListener implements Listener {
           
                     evMessage = evMessage.replaceAll("(?i)" + pparse[0], pparse[1]);
 
-              }
+              }*/
          }
 
         //Add channel info
-        evMessage = tempformat + evMessage;
+       // evMessage = tempformat + evMessage;
 
 
         Player[] pl = event.getRecipients().toArray(new Player[0]);
@@ -245,12 +272,22 @@ public class ChatListener implements Listener {
         }
 
         if(cc.usePexPrefix == true)
-        	event.setFormat(pFormatted+" "+evMessage);
+        	try
+        	{
+        		event.setMessage(evMessage);
+        		event.setFormat(pFormatted+" "+tempformat+"%s"); //+" "+evMessage);
+        	}catch(IllegalFormatException ex)
+        	 { 
+        		plugin.getLogger().info("Message Format issue: " + ex.getMessage() + ":" + evMessage);
+        		event.setMessage(evMessage); 
+        	 }
+        			
         else
            event.setMessage(evMessage);
         return;
 
     }
+    
 
     public HandlerList getHandlers() {
         // TODO Auto-generated method stub

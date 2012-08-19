@@ -69,6 +69,14 @@ public class ChatCommand implements CommandExecutor, Listener {
 
                 player.setMetadata("insertchannel", new FixedMetadataValue(plugin, ci.getName()));
                 player.setMetadata("listenchannel." + ci.getName(), new FixedMetadataValue(plugin, true));
+                //If they were chatting with another player, its time to stop.
+                
+                String tellchat = getMetadataString(player,"MumbleChat.tell",plugin);
+                if(tellchat.length()>0)
+                {
+                	player.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+                	player.sendMessage("You are no longer in private conversation with "+tellchat);
+                }
 
                 //	 plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ "New Message to "+newMsg);	
                 e.setMessage(newMsg);
@@ -144,6 +152,14 @@ public class ChatCommand implements CommandExecutor, Listener {
                                 player.setMetadata("currentchannel", new FixedMetadataValue(plugin, chname.getName()));
                             }
 
+                            //Stop chatting with another player..
+                            String tellchat = getMetadataString(player,"MumbleChat.tell",plugin);
+                            if(tellchat.length()>0)
+                            {
+                            	player.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+                            	player.sendMessage("You are no longer in private conversation with "+tellchat);
+                            }
+                        	
                             player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, true));
                             String msg = "";
 

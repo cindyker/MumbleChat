@@ -2,24 +2,27 @@ package net.muttsworld.mumblechat.commands;
 
 import java.util.List;
 
+import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 public class TellCommandExecutor implements CommandExecutor {
 
-	@SuppressWarnings("unused")
 	private MumbleChat plugin;
 	@SuppressWarnings("unused")
 	private String name;
+	ChatChannelInfo cc;
 	
-	public TellCommandExecutor(MumbleChat plugin) {
+	public TellCommandExecutor(MumbleChat plugin, ChatChannelInfo _cc) {
 		this.plugin = plugin;
 		name= plugin.getName();
+		cc = _cc;
 	}
  
 	public boolean getMetadata(Player player, String key, MumbleChat plugin){
@@ -34,7 +37,8 @@ public class TellCommandExecutor implements CommandExecutor {
 	
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
+	{
 		
 		//if not a player... we are done.
 		if (!(sender instanceof Player)) return false; 
@@ -50,14 +54,9 @@ public class TellCommandExecutor implements CommandExecutor {
 	
 			//	plugin.getServer().getLogger().info("Got Tell!");	
 				
-				if (args.length < 2)
+				if (args.length == 0)
 				{
-	//				 plugin.getServer().getLogger().info("Command is /derpmute [player] [channel]");
-	//				 if (!(admin==null))
-	//				 {
-	//					 admin.sendMessage("Command is /derpmute [player] [channel]");
-	//				 
-	//				 }
+	
 					 return false;
 				}
 				
@@ -76,7 +75,7 @@ public class TellCommandExecutor implements CommandExecutor {
 				 
 				 }
 				 
-				 if(args.length >= 1)
+				 if(args.length >= 2)
 					{
 						String msg = "";
 						if (args[1].length() > 0)
@@ -87,13 +86,27 @@ public class TellCommandExecutor implements CommandExecutor {
 								msg +=" " + args[r];
 							
 							String echo = "you tell " + player.getDisplayName() + ChatColor.GRAY + " " + msg;							
-							msg = admin.getName()  +" tells you "+ ChatColor.GRAY + msg;
+							msg = admin.getDisplayName()  +" tells you "+ ChatColor.GRAY + msg;
 							
+							msg = cc.FilterChat(msg);
 							player.sendMessage(msg);
 							admin.sendMessage(echo);
 							//plugin.getServer().getLogger().info("Called Staff Chat... Commands!");
 					 	}
+						
 					}
+				 
+				 //Start a Sticky Tell
+				 if(args.length == 1)
+				 {
+					 if(args[0].length() > 0 )
+					 {
+						 plugin.getServer().getLogger().info("tell::" + args[0]);
+						 admin.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin,args[0]));
+						 admin.sendMessage("You are now chatting with " + args[0]);
+					 }
+				 
+				 }
 				
 		 return true;
 		 }
