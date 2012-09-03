@@ -19,7 +19,15 @@ public class ChatChannelInfo {
     public Boolean saveplayerdata;
     public Boolean usePexPrefix;
     public Boolean usePexSuffix;
+    public String tellColor;
     public String defaultChannel; //There can be only one :)
+    
+    //Broadcast Variables
+    public String broadcastCommand; //also only one
+    public String broadcastColor; //white
+    public String broadcastDisplayTag;
+    public Boolean broadcastPlayer;
+    public String broadcastPermissions;
 
     @SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
@@ -36,6 +44,7 @@ public class ChatChannelInfo {
         Boolean _defaultchannel = false;
         String _alias = "";
         Double _distance = (double) 0;
+        tellColor = "gray";
         ConfigurationSection cs = plugin.getConfig().getConfigurationSection("channels");
 
 
@@ -45,6 +54,11 @@ public class ChatChannelInfo {
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         usePexPrefix = plugin.getConfig().getBoolean("usePexPrefix", false);
         usePexSuffix = plugin.getConfig().getBoolean("usePexPrefix", false);
+      
+        tellColor = plugin.getConfig().getString("tellcolor","gray");
+        
+        //Fill in Broadcase information
+        getBroadcastInfo();
 
         int len = (cs.getKeys(false)).size();
         cc = new ChatChannel[len];
@@ -56,18 +70,10 @@ public class ChatChannelInfo {
             _color = (String) cs.getString(key + ".color", "white");
             //plugin.getServer().getLogger().info("Got Color:" + _color);
 
-            //Check for valid color... Default it to white if wrong.
-            Boolean bFound = false;
-            for (ChatColor bkColors : ChatColor.values()) {
-                //plugin.getServer().getLogger().info(_color+" : "+bkColors.name());
-                if (_color.equalsIgnoreCase(bkColors.name())) {
-                    bFound = true;
-                }
-            }
-            if (bFound == false) {
-                plugin.getServer().getLogger().info("[" + plugin.getName() + "] " + _color + "is not valid. Changing to white.");
+            if(!(isValidColor(_color)))
+            {
+                plugin.getServer().getLogger().info("[" + plugin.getName() + "] " + _color + " is not valid. Changing to white.");
                 _color = "white";
-
             }
 
             _name = key;
@@ -105,6 +111,39 @@ public class ChatChannelInfo {
         //logChannelList();
     }
 
+    
+    //***************************************
+    // Fill in the config for Alert Broadcasts...
+    void getBroadcastInfo()
+    {
+    	if( plugin.getConfig().isConfigurationSection("broadcast"))
+        {
+        	broadcastCommand = plugin.getConfig().getString("broadcast.command","");
+        	if(broadcastCommand.equalsIgnoreCase(""))
+        	{
+        		//If they didn't set a command, then no broadcast for you! 
+        		broadcastCommand=null;
+        		return;
+        	}
+        		
+        	
+        	broadcastPlayer =(plugin.getConfig().getBoolean("displayplayername",false));        		
+        	        	
+        	broadcastColor = plugin.getConfig().getString("broadcast.color","white");
+        	if(!(isValidColor(broadcastColor)))
+        	{
+        		broadcastColor = "white";
+        		plugin.getServer().getLogger().info("[" + plugin.getName() + "] Broadcast Color: " + broadcastColor + " is not valid. Changing to white.");
+        	}
+        	
+        	broadcastDisplayTag = plugin.getConfig().getString("broadcast.displaytag","");
+        	broadcastPermissions = plugin.getConfig().getString("broadcast.permissions","none");
+        }
+        else
+        	broadcastCommand=null;
+    	
+    }
+    
     int getChannelCount() {
         return cc.length;
     }
@@ -113,6 +152,33 @@ public class ChatChannelInfo {
         for (ChatChannel p : cc) {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "]" + p.getName() + ":" + p.getColor() + ":" + p.getPermission() + ":" + p.isMuteable() + ":" + p.isFiltered() + ":" + p.isDefaultchannel());
         }
+    }
+    
+    public Boolean isValidColor(String _color)
+    {
+    	//Check for valid color... Default it to white if wrong.
+        Boolean bFound = false;
+        for (ChatColor bkColors : ChatColor.values()) {
+            //plugin.getServer().getLogger().info(_color+" : "+bkColors.name());
+            if (_color.equalsIgnoreCase(bkColors.name())) {
+                bFound = true;
+            }
+        }
+    	
+    	return bFound;
+    }
+    
+    public String getBroadcastCommand()
+    {
+    	return broadcastCommand;
+    }
+    
+    public boolean isBroadcastAvailable()
+    {
+    	if(broadcastCommand == null)
+    		return false;
+    	else
+    		return true;
     }
 
     public ChatChannel[] getChannelsInfo() {
@@ -161,16 +227,53 @@ public class ChatChannelInfo {
     //This will fix the color on a player's name with PEX format.
     // it has to be put into the SetFormat method on the chat event.
     protected static Pattern chatColorPattern = Pattern.compile("(?i)&([0-9A-F])");
+	protected static Pattern chatMagicPattern = Pattern.compile("(?i)&([K])");
+	protected static Pattern chatBoldPattern = Pattern.compile("(?i)&([L])");
+	protected static Pattern chatStrikethroughPattern = Pattern.compile("(?i)&([M])");
+	protected static Pattern chatUnderlinePattern = Pattern.compile("(?i)&([N])");
+	protected static Pattern chatItalicPattern = Pattern.compile("(?i)&([O])");
+	protected static Pattern chatResetPattern = Pattern.compile("(?i)&([R])");
     
+	public String FormatString(String tobeformatted)
+	{
+		String allFormated;
+		
+			allFormated = chatColorPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatMagicPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatBoldPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatStrikethroughPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatUnderlinePattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatItalicPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatResetPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+	          			
+		return allFormated;
+		
+	}
+	
     public String FormatPlayerName(String playerPrefix,String playerDisplayName,String playerSuffix)
     {
-    	 if (usePexPrefix) {
+    	 if (usePexPrefix) 
+    	 {
 
             playerPrefix = chatColorPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            playerPrefix = chatMagicPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            playerPrefix = chatBoldPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            playerPrefix = chatStrikethroughPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            playerPrefix = chatUnderlinePattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            playerPrefix = chatItalicPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            playerPrefix = chatResetPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
+            
          }
-    	 if (usePexSuffix) {
+    	 if (usePexSuffix) 
+    	 {
 
              playerSuffix = chatColorPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+             playerSuffix = chatMagicPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+             playerSuffix = chatBoldPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+             playerSuffix = chatStrikethroughPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+             playerSuffix = chatUnderlinePattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+             playerSuffix = chatItalicPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
+             playerSuffix = chatResetPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
          }
     	 return playerPrefix+playerDisplayName.trim()+playerSuffix;
 

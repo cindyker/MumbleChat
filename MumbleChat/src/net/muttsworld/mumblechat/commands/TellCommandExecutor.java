@@ -49,7 +49,7 @@ public class TellCommandExecutor implements CommandExecutor {
 		   admin = (Player)sender;
 		 }
 		
-		if(cmd.getName().equalsIgnoreCase("tell"))
+		if(cmd.getName().equalsIgnoreCase("tell") || cmd.getName().equalsIgnoreCase("whisper"))
 		{
 	
 			//	plugin.getServer().getLogger().info("Got Tell!");	
@@ -71,7 +71,7 @@ public class TellCommandExecutor implements CommandExecutor {
 					 
 					 }
 					 
-					 return false;
+					 return true;
 				 
 				 }
 				 
@@ -85,8 +85,9 @@ public class TellCommandExecutor implements CommandExecutor {
 							for(int r = 1; r < args.length; r++)
 								msg +=" " + args[r];
 							
-							String echo = "you tell " + player.getDisplayName() + ChatColor.GRAY + " " + msg;							
-							msg = admin.getDisplayName()  +" tells you "+ ChatColor.GRAY + msg;
+							//ChatColor.GRAY
+							String echo = "you tell " + player.getDisplayName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;							
+							msg = admin.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
 							
 							msg = cc.FilterChat(msg);
 							player.sendMessage(msg);
@@ -113,7 +114,7 @@ public class TellCommandExecutor implements CommandExecutor {
 				 
 				
 			
-		
+		 admin.sendMessage("You got to the end");
 		return false;
 	}
 

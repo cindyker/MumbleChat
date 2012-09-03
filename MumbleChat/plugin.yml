@@ -19,6 +19,10 @@ commands:
         permission-message: You don't have <permission>
     tell:
         usage: /tell [player] [msg]
+        description: Send message to player
+        permission-message: You don't have <permission>
+    whisper:
+        usage: /whisper [player] [msg]
         aliases: [w]
         description: Send message to player
         permission-message: You don't have <permission>
@@ -32,10 +36,19 @@ commands:
         aliases: [lev]
         description: Allows players to leave listening to a channel
         permission-message: You don't have <permission>
+    join:
+        usage: /join [channelname]
+        description: Allows players to join a channel
+        permission-message: You don't have <permission>
     chlist:
         usage: /chlist
         aliases: [chl]
         description: Allows players to see a listing of available channels
+        permission-message: You don't have <permission>
+    chwho:
+        usage: /chwho [channelname]
+        aliases: [chw]
+        description: Allows players to see a listing of who is listening on a channel
         permission-message: You don't have <permission>
     
         

@@ -142,6 +142,13 @@ mute:
   permissions: mumblechat.canmute
 saveplayerdata: true
 usePexPrefix: false
+tellcolor: white
+broadcast:
+  color: red
+  displayplayername: false
+  permissions: mumblechat.adminchannel
+  command: alert
+  displaytag: '<Alert>'
 channels:
   global:
     color: dark_green

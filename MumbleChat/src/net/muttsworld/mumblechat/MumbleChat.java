@@ -55,9 +55,12 @@ public class MumbleChat extends JavaPlugin {
         tellExecutor = new TellCommandExecutor(this, cci);
 
         getCommand("tell").setExecutor(tellExecutor);
+        getCommand("whisper").setExecutor(tellExecutor);
         getCommand("channel").setExecutor(myExecutor);
         getCommand("leave").setExecutor(myExecutor);
+        getCommand("join").setExecutor(myExecutor);
         getCommand("chlist").setExecutor(myExecutor);
+        getCommand("chwho").setExecutor(myExecutor);
 
         getCommand("mute").setExecutor(muteExecutor);
         getCommand("unmute").setExecutor(muteExecutor);

@@ -211,9 +211,6 @@ public class LoginListener implements Listener {
         	pl.setMetadata("chatnameformat",new FixedMetadataValue(plugin,pFormatted));
         }
         
-
-       
-
        
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
@@ -265,6 +262,8 @@ public class LoginListener implements Listener {
             pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, defaultChannel));
             pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
         }
+        
+        //reset quick talk
         pl.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
 
         String curColor = defaultColor;

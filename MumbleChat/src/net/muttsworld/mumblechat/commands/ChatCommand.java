@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
+
 public class ChatCommand implements CommandExecutor, Listener {
 
     private MumbleChat plugin;
@@ -59,6 +60,46 @@ public class ChatCommand implements CommandExecutor, Listener {
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent e) {
 
         Player player = e.getPlayer();
+        String brformat ="";
+       
+        //Alert Alert Alert
+        	if (e.getMessage().toLowerCase().startsWith("/" + cc.getBroadcastCommand() + " "))
+        	{
+        		if( cc.isBroadcastAvailable())
+        		{
+	        		//Implement Alerts here... ?
+        			
+	        		if(cc.broadcastPermissions.equalsIgnoreCase("none")
+	        				||
+	        			player.hasPermission(cc.broadcastPermissions))
+	        		{
+	        		
+		        		 String newMsg = e.getMessage();
+		        		 
+		        		 //remove command
+		        		 newMsg = newMsg.replaceFirst("/" + cc.getBroadcastCommand() + " ", "");
+		    	        
+		        		 if (cc.broadcastPlayer){
+		        			 brformat =   ChatColor.valueOf(cc.broadcastColor.toUpperCase())+ " <" +player.getDisplayName()+ ">"+ cc.broadcastDisplayTag +" " + newMsg;
+		        			 
+		        		 }
+		        		 else
+		        		      brformat =   ChatColor.valueOf(cc.broadcastColor.toUpperCase())+  cc.broadcastDisplayTag +" " + newMsg;
+		        		 
+		        		 plugin.getServer().broadcastMessage(brformat);
+		        		 //put in Chat listener
+		        		 //player.chat(newMsg);
+		        		        		 
+		        		 //cancel command
+		        		 e.setCancelled(true);
+		        		 return;
+	        		}
+	        		        		
+        		
+        		}
+        	}
+        
+        
         for (ChatChannel ci : cc.getChannelsInfo()) {
 
             if (e.getMessage().toLowerCase().startsWith("/" + ci.getAlias() + " ")) {
@@ -113,8 +154,9 @@ public class ChatCommand implements CommandExecutor, Listener {
 
         //plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ "Argument: " +args.length + " command: "+ comm);
 
-        if (comm.equalsIgnoreCase("channel") && args.length == 0) {
-            player.sendMessage("Error in command: /channel [name] [msg]");
+        if ((comm.equalsIgnoreCase("join") || comm.equalsIgnoreCase("channel")) && args.length == 0) {
+            
+        	player.sendMessage("Error in command: /"+comm+" [name] [msg]");
             //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ "Returning to player");
 
             return false;
@@ -124,8 +166,14 @@ public class ChatCommand implements CommandExecutor, Listener {
             player.sendMessage("Error in command: /leave [name]");
             return false;
         }
+        
+        if (comm.equalsIgnoreCase("chwho") && args.length == 0) {
+            player.sendMessage("Error in command: /chwho [channelname]");
+            return false;
+        }
 
         switch (comm) {
+        	case "join":
             case "channel": {
                 if (args[0].length() > 0) {
                     //	player.sendMessage("channel: " + args[0]);
@@ -249,7 +297,88 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "chwho": {
-            }
+            	
+            	String lstchan = "listenchannel.";
+              	String playerlist = "";
+            	
+              	//did they provide a channel
+                if (args[0].length() > 0) {
+                	
+                	//is it a valid channel
+                	ChatChannel cinfo = cc.getChannelInfo(args[0]);
+                	
+                	if (cinfo != null)
+                	{
+                		if(cinfo.isDistance())
+                		{
+                			player.sendMessage("Sorry no who information for " + args[0] +" chat right now...");
+                			return true;
+                		}
+	                	lstchan += cinfo.getName();
+		               	Player pl[] = plugin.getServer().getOnlinePlayers();
+		               	
+		               	plugin.getServer().getLogger().info("Count of player:" +pl.length);
+		            	
+		            
+		               	long linecount = 30;
+		               	for(Player p:pl)
+		            	{
+		               	   	plugin.getServer().getLogger().info("player:"+p.getDisplayName() +" " +p.isOnline());
+		            		if( getMetadata(p,lstchan,  plugin))
+		            		{
+		            		//Wrapping the text on the screen...	
+		            		  if((playerlist.length()+p.getName().length() > linecount ))
+		            		  {
+		            			 plugin.getServer().getLogger().info("linecount:"+ linecount + "listlength:" + playerlist.length());
+		            			  playerlist += "\n";
+		            			  linecount= linecount*2;
+		            		  }
+		            		  
+		            		  		            		  
+		            		  if( ! getMetadata(p,"MumbleMute."+cinfo.getName(),plugin))
+		            		  {
+		            			   playerlist += ChatColor.WHITE+p.getName() ;
+		            		  }
+		            		  else
+		            		  {
+		            			    playerlist += ChatColor.RED+p.getName() ;
+		            		  }
+		            			
+		            		  //Add commas between names
+		            		  playerlist += ChatColor.WHITE+", ";
+		            		  
+		            		}
+		            		
+		            		
+		            		
+		            	}
+		               	               
+		            	//Remove the last trailing comma...
+		            	playerlist = playerlist.substring(0, playerlist.length()-2);
+		            	//show list to player who asked...
+		            	player.sendMessage(ChatColor.AQUA+ "Players in Channel : " +ChatColor.valueOf(cinfo.getColor().toUpperCase())+ cinfo.getName());
+		            	player.sendMessage(playerlist);
+
+		            	
+	            	    return true;
+	                } 
+                	else
+                	{
+                		player.sendMessage("Please enter a valid channel name");
+                		return true;
+                	}
+	                  
+                
+                }
+                else
+                {
+                	player.sendMessage("/chwho [Channel]");
+                	return true;
+                }
+                
+            	
+            } //end of chwho
+            
 
 
         }

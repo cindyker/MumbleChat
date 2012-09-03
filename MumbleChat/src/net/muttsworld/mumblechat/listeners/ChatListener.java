@@ -38,7 +38,8 @@ public class ChatListener implements Listener {
     public ChatListener(MumbleChat _plugin) {
         plugin = _plugin;
         //  int Count = 10;
-
+        
+    
 
         filters = (List<String>) plugin.getConfig().getList("filters");
 
@@ -85,7 +86,8 @@ public class ChatListener implements Listener {
         }
 
         Player p = event.getPlayer();
-        
+     
+        ////////////////////////////////////////////////////////////////////////
         // if sticky tell this becomes quick...
         String tellPlayer = getMetadataString(p,"MumbleChat.tell",plugin);
         if(tellPlayer.length()>0)
@@ -96,20 +98,21 @@ public class ChatListener implements Listener {
         	{
         		p.sendMessage(tellPlayer + " is not available");
         		p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
-        		return;        		
+        		   		
         	}
         	else
         	{
         		String filtered = cc.FilterChat(event.getMessage());
-        		String msg = p.getDisplayName()  +" tells you: "+ ChatColor.GRAY + filtered;
+        		String msg = p.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
         		tp.sendMessage(msg);        		
-        		p.sendMessage("You tell "+ tellPlayer +": "+ ChatColor.GRAY+ filtered);
-        		event.setCancelled(true);
+        		p.sendMessage("You tell "+ tellPlayer +": "+ ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
+        		  		
         	}
-        	
+        	event.setCancelled(true);   //Fixed bug.. this needs to be cancelled.
         	return;
         	
         }
+        
         // this gets the player's prefix and suffix from PEx.. but with every chat
         // with the async chat, I am not sure if calling permissionsEx here is a good thing.
         // Next thing to look at is to move this to Login with a metatag added with this info for
@@ -123,17 +126,14 @@ public class ChatListener implements Listener {
         
         evMessage = event.getMessage();
 
-        //mama.getServer().getLogger().info("Filter ok?");
+       // plugin.getServer().getLogger().info("Filter ok?");
 
 
         Location locreceip;
         Location locsender = p.getLocation();
         Location diff;
-        String tempformat;
+        
         Boolean filterthis = true;
-
-        tempformat = getMetadataString(p, "format", plugin);
-
         String curChannel = "";
 
         //Check for Quick chat vs Sticky Chat
@@ -141,12 +141,14 @@ public class ChatListener implements Listener {
         if (!p.hasMetadata("insertchannel")) {
             insertchannel = "NONE";
         }
+        
         if ((insertchannel.equalsIgnoreCase("NONE"))) {
            //String curChannel = p.getMetadata("currentchannel").get(0).asString();
-           // 	plugin.getServer().getLogger().info("Talking Sticky");
+           //	plugin.getServer().getLogger().info("Talking Sticky");
             curChannel = getMetadataString(p, "currentchannel", plugin);
-        } else {
-            //		mama.getServer().getLogger().info("Temp Talk");
+        } 
+        else  {
+            plugin.getServer().getLogger().info("Temp Talk");
             curChannel = insertchannel;
             p.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
             
@@ -154,7 +156,8 @@ public class ChatListener implements Listener {
 
         if (curChannel.length() == 0) {
             // Talking local?
-            p.sendMessage("please choose a channel! /ch [channelname]");
+            p.sendMessage("please choose a channel! /ch [channelname] - /chlist for channel list");
+            event.setCancelled(true);
             return;
 
         }
@@ -163,7 +166,7 @@ public class ChatListener implements Listener {
 
 
         String listenChannel = "listenchannel." + curChannel;
-        //mama.getServer().getLogger().info("Who's listening on:" +listenChannel);
+       // plugin.getServer().getLogger().info("Who's listening on:" +listenChannel);
 
         //if they are not muted and they want to talk on the channel...
         //they need to listen on the channel.
@@ -179,6 +182,9 @@ public class ChatListener implements Listener {
 
         Double chDistance = (double) 0;
 
+        String Channelformat;
+        Channelformat = getMetadataString(p, "format", plugin);
+        
         //Get Distance from Channel...
         for (ChatChannel ci : cc.getChannelsInfo()) {
             if (curChannel.equalsIgnoreCase(ci.getName())) {
@@ -196,7 +202,7 @@ public class ChatListener implements Listener {
 
                 if ((insertchannel.equalsIgnoreCase("NONE")) || insertchannel.length() == 0) {
 
-                    tempformat = ChatColor.valueOf(ci.getColor().toUpperCase()) + "[" + curChannel + "] ";
+                	Channelformat = ChatColor.valueOf(ci.getColor().toUpperCase()) + "[" + curChannel + "] ";
                 }
                 filterthis = ci.isFiltered();
             }
@@ -208,28 +214,10 @@ public class ChatListener implements Listener {
        if (filterthis) 
        {
     	   evMessage = cc.FilterChat(evMessage);
-           /* for (String s : filters) 
-            {
-                    t = 0;
-                    String[] pparse = new String[2];
-                    pparse[0] = " ";
-                    pparse[1] = " ";
-                    StringTokenizer st = new StringTokenizer(s, ",");
-                    while (st.hasMoreTokens()) 
-                    {                      
-                        if (t < 2) 
-                        {
-                            pparse[t++] = st.nextToken();
-                        }
-                    }
-          
-                    evMessage = evMessage.replaceAll("(?i)" + pparse[0], pparse[1]);
-
-              }*/
-         }
+       }
 
         //Add channel info
-       // evMessage = tempformat + evMessage;
+        //evMessage = tempformat + evMessage;
 
 
         Player[] pl = event.getRecipients().toArray(new Player[0]);
@@ -258,8 +246,8 @@ public class ChatListener implements Listener {
                         event.getRecipients().remove(rp);
 
                     }
-                } else //Not on the same planet
-                {
+                } else{ //Not on the same planet
+                
                     event.getRecipients().remove(rp);
                 }
 
@@ -271,19 +259,21 @@ public class ChatListener implements Listener {
             p.sendMessage(ChatColor.GOLD + "No one is listening to you");
         }
 
-        if(cc.usePexPrefix == true)
+        
+        if(cc.usePexPrefix == true) {
         	try
         	{
         		event.setMessage(evMessage);
-        		event.setFormat(pFormatted+" "+tempformat+"%s"); //+" "+evMessage);
+        		event.setFormat(pFormatted+" "+Channelformat+"%s"); //+" "+evMessage);
+        		plugin.getServer().getLogger().info("Format?:" + pFormatted + "::" + Channelformat);
         	}catch(IllegalFormatException ex)
         	 { 
         		plugin.getLogger().info("Message Format issue: " + ex.getMessage() + ":" + evMessage);
-        		event.setMessage(evMessage); 
+        		event.setMessage(Channelformat + evMessage); 
         	 }
-        			
+        }
         else
-           event.setMessage(evMessage);
+           event.setMessage( Channelformat +evMessage);
         return;
 
     }
