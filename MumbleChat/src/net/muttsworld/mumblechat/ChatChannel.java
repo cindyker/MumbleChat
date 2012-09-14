@@ -7,13 +7,14 @@ public class ChatChannel {
     private Boolean muteable;
     private String color;
     private Boolean defaultChannel;
+    private Boolean autojoin;
     private String alias;
     private Double distance;
     private Boolean filter;
 
     ChatChannel(String _Name, String _color, String _Permission,
             Boolean _muteable, Boolean _filter, Boolean _defaultchannel,
-            String _alias, Double _distance) {
+            String _alias, Double _distance,Boolean _autojoin) {
         name = _Name;
         permission = _Permission;
         muteable = _muteable;
@@ -22,6 +23,7 @@ public class ChatChannel {
         setAlias(_alias);
         setDistance(_distance);
         setFilter(_filter);
+        setAutojoin(_autojoin);
     }
 
     public String getName() {
@@ -30,6 +32,15 @@ public class ChatChannel {
 
     public String getPermission() {
         return permission;
+    }
+    
+    public Boolean getAutojoin() {
+        return autojoin;
+    }
+
+
+    public void setAutojoin(Boolean _autojoin) {
+        autojoin = _autojoin;
     }
 
     public Boolean isMuteable() {

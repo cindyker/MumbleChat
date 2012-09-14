@@ -1,9 +1,5 @@
 package net.muttsworld.mumblechat.listeners;
 
-//import org.bukkit.ChatColor;
-//import org.bukkit.Location;
-//import org.bukkit.configuration.file.FileConfiguration;
-//import org.bukkit.World;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -13,16 +9,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
-
-//import ru.tehkode.permissions.PermissionUser;
-//import ru.tehkode.permissions.bukkit.PermissionsEx;
-//import org.bukkit.permissions.PermissionAttachmentInfo;
-
 import java.util.IllegalFormatException;
-//import java.lang.Math;
 import java.util.List;
-//import java.util.StringTokenizer;
+import java.util.StringTokenizer;
+
 import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
@@ -53,27 +43,7 @@ public class ChatListener implements Listener {
 
 
     }
-
-    public boolean getMetadata(Player player, String key, MumbleChat plugin) {
-        List<MetadataValue> values = player.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
-                return value.asBoolean(); //value();
-            }
-        }
-        return false;
-    }
-
-    public String getMetadataString(Player player, String key, MumbleChat plugin) {
-        List<MetadataValue> values = player.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
-                return value.asString(); //value();
-            }
-        }
-        return "";
-    }
-
+  
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         // boolean globalmsg = false;
@@ -89,7 +59,7 @@ public class ChatListener implements Listener {
      
         ////////////////////////////////////////////////////////////////////////
         // if sticky tell this becomes quick...
-        String tellPlayer = getMetadataString(p,"MumbleChat.tell",plugin);
+        String tellPlayer = plugin.getMetadataString(p,"MumbleChat.tell",plugin);
         if(tellPlayer.length()>0)
         {
         	//plugin.getServer().getLogger().info("tell to player" + tellPlayer);
@@ -102,6 +72,25 @@ public class ChatListener implements Listener {
         	}
         	else
         	{
+        		//Check for Ignores....
+        		 String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);				 
+				 if(playerignorelist.length() > 0)
+				 {		        
+					String curplayer = "";
+                    StringTokenizer st = new StringTokenizer(playerignorelist, ",");
+                    while (st.hasMoreTokens()) {
+                       		                        
+                    	curplayer=st.nextToken();
+                        if(curplayer.equalsIgnoreCase(p.getName()))
+                        {
+                        	p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
+                        	event.setCancelled(true); 
+                            return;                       	
+                        }
+                    }
+		                   
+		         }              
+        		
         		String filtered = cc.FilterChat(event.getMessage());
         		String msg = p.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
         		tp.sendMessage(msg);        		
@@ -113,15 +102,10 @@ public class ChatListener implements Listener {
         	
         }
         
-        // this gets the player's prefix and suffix from PEx.. but with every chat
-        // with the async chat, I am not sure if calling permissionsEx here is a good thing.
-        // Next thing to look at is to move this to Login with a metatag added with this info for
-        // use here. 
-        //PermissionUser user = PermissionsEx.getUser(p);
-        String pFormatted =""; //= cc.FormatPlayerName(user.getPrefix(),p.getPlayerListName(),user.getSuffix());
+
+        String pFormatted ="";
         if (cc.usePexPrefix == true )
-        	pFormatted = getMetadataString(p,"chatnameformat",plugin);
-       // p.setDisplayName(pFormatted);
+        	pFormatted = plugin.getMetadataString(p,"chatnameformat",plugin);
          
         
         evMessage = event.getMessage();
@@ -137,7 +121,7 @@ public class ChatListener implements Listener {
         String curChannel = "";
 
         //Check for Quick chat vs Sticky Chat
-        String insertchannel = getMetadataString(p, "insertchannel", plugin);
+        String insertchannel = plugin.getMetadataString(p, "insertchannel", plugin);
         if (!p.hasMetadata("insertchannel")) {
             insertchannel = "NONE";
         }
@@ -145,7 +129,7 @@ public class ChatListener implements Listener {
         if ((insertchannel.equalsIgnoreCase("NONE"))) {
            //String curChannel = p.getMetadata("currentchannel").get(0).asString();
            //	plugin.getServer().getLogger().info("Talking Sticky");
-            curChannel = getMetadataString(p, "currentchannel", plugin);
+            curChannel = plugin.getMetadataString(p, "currentchannel", plugin);
         } 
         else  {
             plugin.getServer().getLogger().info("Temp Talk");
@@ -170,7 +154,7 @@ public class ChatListener implements Listener {
 
         //if they are not muted and they want to talk on the channel...
         //they need to listen on the channel.
-        if (getMetadata(p, "MumbleMute." + curChannel, plugin) == true) {
+        if (plugin.getMetadata(p, "MumbleMute." + curChannel, plugin) == true) {
             p.sendMessage(ChatColor.DARK_PURPLE + "You are muted in this channel: " + curChannel);
             event.setCancelled(true);
             return;
@@ -183,13 +167,13 @@ public class ChatListener implements Listener {
         Double chDistance = (double) 0;
 
         String Channelformat;
-        Channelformat = getMetadataString(p, "format", plugin);
+        Channelformat = plugin.getMetadataString(p, "format", plugin);
         
         //Get Distance from Channel...
         for (ChatChannel ci : cc.getChannelsInfo()) {
             if (curChannel.equalsIgnoreCase(ci.getName())) {
                 if (ci.hasPermission()) {
-                    if (getMetadata(p, ci.getPermission(), plugin) == false) {
+                    if (plugin.getMetadata(p, ci.getPermission(), plugin) == false) {
                         //	 mama.getServer().getLogger().info(ci.getPermission()+" <== you don't have this");
                         p.sendMessage(ChatColor.DARK_PURPLE + "You don't have permissions for this channel.");
                         event.setCancelled(true);
@@ -214,6 +198,7 @@ public class ChatListener implements Listener {
        if (filterthis) 
        {
     	   evMessage = cc.FilterChat(evMessage);
+    	   
        }
 
         //Add channel info
@@ -229,7 +214,7 @@ public class ChatListener implements Listener {
                 event.getRecipients().remove(rp);
 
             } else {
-                if ((getMetadata(rp, listenChannel, plugin) == false)) {
+                if ((plugin.getMetadata(rp, listenChannel, plugin) == false)) {
                     event.getRecipients().remove(rp);
                 }
             }
@@ -263,8 +248,16 @@ public class ChatListener implements Listener {
         if(cc.usePexPrefix == true) {
         	try
         	{
+        		if(plugin.getMetadata(p, "mumblechat.canmute", plugin)==true)
+    			{
+        			//Rainbow Colored Skittles here... :)
+        			evMessage = cc.FormatString(evMessage);
+    			}
         		event.setMessage(evMessage);
-        		event.setFormat(pFormatted+" "+Channelformat+"%s"); //+" "+evMessage);
+        		        		
+        		//event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
+        		event.setFormat(pFormatted+" "+Channelformat+"%s"); //+" ");
+        		//event.setMessage("");
         		plugin.getServer().getLogger().info("Format?:" + pFormatted + "::" + Channelformat);
         	}catch(IllegalFormatException ex)
         	 { 

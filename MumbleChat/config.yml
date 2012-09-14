@@ -140,6 +140,9 @@ filterexceptions:
 - villagers
 mute:
   permissions: mumblechat.canmute
+force:
+  permissions: mumblechat.canforce
+loglevel: info
 saveplayerdata: true
 usePexPrefix: false
 tellcolor: white
@@ -182,6 +185,7 @@ channels:
     muteable: true
     alias: l
     distance: 230
+    autojoin: true
   noob:
     color: white
     mutable: true

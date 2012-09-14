@@ -21,6 +21,10 @@ commands:
         usage: /tell [player] [msg]
         description: Send message to player
         permission-message: You don't have <permission>
+    ignore:
+        usage: /ignore [player]
+        description: This disallows player from sending you a tell
+        permission-message: You don't have <permission>
     whisper:
         usage: /whisper [player] [msg]
         aliases: [w]

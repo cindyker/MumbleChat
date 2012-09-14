@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
+import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,10 +25,10 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 
 
 public class LoginListener implements Listener {
@@ -38,25 +40,6 @@ public class LoginListener implements Listener {
     FileConfiguration customConfig = null;
     File customConfigFile = null;
 
-    public String getMetadataString(Player player, String key, MumbleChat plugin) {
-        List<MetadataValue> values = player.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
-                return value.asString(); //value();
-            }
-        }
-        return "";
-    }
-
-    public boolean getMetadata(Player player, String key, MumbleChat plugin) {
-        List<MetadataValue> values = player.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
-                return value.asBoolean(); //value();
-            }
-        }
-        return false;
-    }
 
     public void SaveItToDisk() {
         //saveCustomConfig();
@@ -102,25 +85,28 @@ public class LoginListener implements Listener {
         //String curChannel;
         customConfig = getCustomConfig();
         Player pl = pp;
-
-        Boolean listendefault = false;
-        int listencount = 0;
+      
+        Boolean nothingspecial = true;
         for (ChatChannel c : cc.getChannelsInfo()) {
-            if (getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
-                listencount++;
+            if (plugin.getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
+               
                 //if they are only listening to the default and only talking on the default....
-                if (c.isDefaultchannel() && getMetadataString(pl, "currentchannel", plugin).equalsIgnoreCase(c.getName())) 
+                if (!plugin.getMetadata(pl, "MumbleMute." + c.getName(), plugin) && !c.isDefaultchannel() && !c.getAutojoin() && plugin.getMetadataString(pl, "currentchannel", plugin).equalsIgnoreCase(c.getName())) 
                 {                	
-                    listendefault = true;
+                	nothingspecial = false;
                 }
+                
             }
             
         }
-
+        if( ! plugin.getMetadataString(pl, "MumbleChat.ignore", plugin).isEmpty())
+        	nothingspecial = false;
         
-        //If they are only listening to the default channel no point in saving them.
-        if (listencount == 1 && listendefault == true ) {
+        
+        //If they are only listening to the default and autojoin channels no point in saving them.
+        if (nothingspecial ) {
         	
+        	plugin.logme(LOG_LEVELS.DEBUG, "Player Logoff", "No special chat stuff.. not savings them");
             return;
         }
 
@@ -139,18 +125,21 @@ public class LoginListener implements Listener {
 
         }
 
-        cs.set("default", getMetadataString(pl, "currentchannel", plugin));
+        cs.set("default", plugin.getMetadataString(pl, "currentchannel", plugin));
+        //Save the Ignores list...
+        cs.set("ignores", plugin.getMetadataString(pl, "MumbleChat.ignore", plugin));
+
 
         //	mama.getServer().getLogger().info("After Section.... ");
 
         String strListening = "";
         String strMutes = "";
         for (ChatChannel c : cc.getChannelsInfo()) {
-            if (getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
+            if (plugin.getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
                 strListening += c.getName() + ",";
             }
 
-            if (getMetadata(pl, "MumbleMute." + c.getName(), plugin)) {
+            if (plugin.getMetadata(pl, "MumbleMute." + c.getName(), plugin)) {
                 strMutes += c.getName() + ",";
             }
 
@@ -176,6 +165,7 @@ public class LoginListener implements Listener {
         //	mama.getServer().getLogger().info("After Section....3 ");
 
 
+   
         Calendar currentDate = Calendar.getInstance();
         SimpleDateFormat formatter =
                 new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
@@ -187,11 +177,17 @@ public class LoginListener implements Listener {
         //Do we want this Disk IO on every logout..or do we
         //just want to wait for server stop.
         //lets wait until server stops...
-     //   saveCustomConfig();
+       // saveCustomConfig();
        // reloadCustomConfig();
     }
 
     
+    ///////////////////////////////////////////
+    //Function:
+    //   onPlayerLogin
+    //
+    //  Responds to Player Login event.
+    ///////////////////////////////////////////
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerLogin(PlayerLoginEvent plog) {
         String curChannel;
@@ -214,24 +210,45 @@ public class LoginListener implements Listener {
        
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
-
+            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We are saving player data");
+            
+            	//mama.getServer().getLogger().info("before Listen");
             ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
             if (cs != null) {
-                //mama.getServer().getLogger().info("Player Found");
-
+            	 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Player's data has been found");
+                
                 curChannel = cs.getString("default", defaultChannel);
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, curChannel));
-
-                //mama.getServer().getLogger().info("before Listen");
                 
+                //Get the Ignore list.. if they have one.
+                String ignores = cs.getString("ignores", "");
+                pl.setMetadata("MumbleChat.ignore", new FixedMetadataValue(plugin, ignores ));
+                
+               
+                plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for listen channels");
                 //check for channels to listen too...
                 String listenChannels = cs.getString("listen", "");
+                
+                plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Listenchannels:" + listenChannels);
                 if (listenChannels.length() > 0) {
                     //String[] pparse = new String[2];
+                	
                     StringTokenizer st = new StringTokenizer(listenChannels, ",");
                     while (st.hasMoreTokens()) {
-                        //mama.getServer().getLogger().info("chatting: " + st.toString() + " i:"+i);
-                        pl.setMetadata("listenchannel." + st.nextToken(), new FixedMetadataValue(plugin, true));
+                        
+                    	String chname = st.nextToken();
+                    	ChatChannel c = cc.getChannelInfo(chname);
+                    	plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for each channel:" + c.getName());
+                    	//Check for Channel Permission before allowing player to use channel.
+                    	//Incase their permissions change.
+                    	if(c.hasPermission())
+                    	{
+                    		plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
+                    		if(pl.isPermissionSet(c.getPermission()))
+                    			pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));                    		
+                    	}
+                    	else
+                    		pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
                     }
                 }
                 else //if no channel is available to listen on... set it to default... they should listen on something.
@@ -249,6 +266,9 @@ public class LoginListener implements Listener {
 
                     }
                 }
+                
+               
+                
 
             } else {
                 //mama.getServer().getLogger().info("No Player Found");
@@ -265,7 +285,15 @@ public class LoginListener implements Listener {
         
         //reset quick talk
         pl.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
-
+        
+        //Set AutoJoins up.. just make sure they are listening
+        List<String> autolist =  cc.getAutojoinList();
+        if(autolist.size()>0)
+        {
+        	for(String s:autolist)
+        		pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, true));
+        }
+        
         String curColor = defaultColor;
         for (ChatChannel c : cc.getChannelsInfo()) {
             if (c.getName().equalsIgnoreCase(curChannel)) {
@@ -277,11 +305,22 @@ public class LoginListener implements Listener {
         pl.setMetadata("format", new FixedMetadataValue(plugin, format));
 
 
-
+        //====================================================================================
+        // ---  Get Permissions for Special Commands here -----------------------------------
+        //====================================================================================
         if (pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
         {
-            plugin.getServer().getLogger().info("[" + plugin.getName() + "] Can Mute Permissions given...");
+            plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Mute permissions given...");
             pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////
+        //FUTURE FORCE CHANNEL CODE
+        ///////////////////////////////////////////////////////////////////////////////////////
+        if (pl.isPermissionSet(cc.forcepermissions)) 
+        {
+            plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Force permissions given...");
+            pl.setMetadata("mumblechat.canforce", new FixedMetadataValue(plugin, true));
         }
 
         for (ChatChannel c : cc.getChannelsInfo()) {
@@ -297,6 +336,9 @@ public class LoginListener implements Listener {
                 }
             }
         }
+        
+     
+       
 
         //mama.getServer().getLogger().info("End the Login Event");
     }

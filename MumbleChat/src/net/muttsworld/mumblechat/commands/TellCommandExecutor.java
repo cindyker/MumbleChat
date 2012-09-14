@@ -1,16 +1,18 @@
 package net.muttsworld.mumblechat.commands;
 
-import java.util.List;
+import java.util.StringTokenizer;
 
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
+import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
+
 
 public class TellCommandExecutor implements CommandExecutor {
 
@@ -24,22 +26,14 @@ public class TellCommandExecutor implements CommandExecutor {
 		name= plugin.getName();
 		cc = _cc;
 	}
- 
-	public boolean getMetadata(Player player, String key, MumbleChat plugin){
-		  List<MetadataValue> values = player.getMetadata(key);  
-		  for(MetadataValue value : values){
-		     if(value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())){
-		        return value.asBoolean(); //value();
-		     }
-		  }
-		  return false;
-		}
-	
+
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
 	{
 		
+		long ignorecount = 0;
+		String ignorelist;
 		//if not a player... we are done.
 		if (!(sender instanceof Player)) return false; 
 		
@@ -49,10 +43,162 @@ public class TellCommandExecutor implements CommandExecutor {
 		   admin = (Player)sender;
 		 }
 		
+		
+		if(cmd.getName().equalsIgnoreCase("ignore"))
+		{
+			
+			plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Entered");
+			
+			if(args.length == 0)
+			{
+				plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "No Arguements");
+				plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Returned False");
+				return false;
+			}
+			 
+			 if(args.length == 1)
+			 {
+				 String newignorelist = "";
+				 	
+				 	//Ignore help and listing..
+				 	if(args[0].equalsIgnoreCase("?"))
+				 	{
+				 		 admin.sendMessage("\n"+ChatColor.AQUA+"-->Ignore Information<--");
+				 		 admin.sendMessage(ChatColor.AQUA+"    /ignore [playername]");
+						 admin.sendMessage(ChatColor.AQUA+"This will prevent players from sending you tells. ");
+						 admin.sendMessage(ChatColor.AQUA+"You may only have 20 players ignored at a time");
+						 admin.sendMessage(ChatColor.AQUA+"To remove an ignore; use the ignore command again.");
+						 admin.sendMessage(ChatColor.AQUA+"------------------------------------------------");
+						 
+						 ignorelist = plugin.getMetadataString(admin, "MumbleChat.ignore", plugin);
+						 
+						 if(ignorelist.length() > 0)
+						 {
+							 //lets display a list of currently ignored players to the user
+							 long linecount = plugin.getLineLength();
+							 String curignores = "";
+							 String nextpl ="";
+			                 StringTokenizer st = new StringTokenizer(ignorelist, ",");
+			                 if (st.countTokens() > 0)
+			                 {
+			                	 admin.sendMessage(ChatColor.GOLD+"You are currently ignoring these players:"+ChatColor.WHITE);
+			                 }
+							 while (st.hasMoreTokens()) {
+			                        
+								nextpl = st.nextToken();
+			                    	
+			                    if(curignores.length() + nextpl.length()> linecount)
+			                    {
+			                    	curignores += "\n" + nextpl;
+			                    	linecount = linecount + plugin.getLineLength();	
+			                    	//plugin.getServer().getLogger().info("Linecount = " + linecount + "nextpl:"+nextpl);
+			                    }
+			                    else
+			                    	curignores += nextpl;
+							  
+			                  
+			                    curignores += ChatColor.WHITE+", ";
+			                 } //while tokens
+							 
+							//Remove the last trailing comma...
+							 curignores = curignores.substring(0, curignores.length()-2);
+							 //show player list.
+							 admin.sendMessage(curignores);
+						 }
+						 
+						 plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Returned True");
+						 return true;
+				 	}
+				 
+					if (args[0].length() > 0)
+				 	{
+					 
+						ignorelist = plugin.getMetadataString(admin, "MumbleChat.ignore", plugin);
+						Boolean bFoundRemove = false;
+						//Check to see if we are removing player from ignore list first...
+						// they don't need to be online for that...
+						if(ignorelist.length() > 0)
+						{		        
+								String curplayer = "";
+			                    StringTokenizer st = new StringTokenizer(ignorelist, ",");
+			                    ignorecount = st.countTokens();
+			                    while (st.hasMoreTokens()) {
+			                    	 
+			                    	curplayer=st.nextToken();
+			                        if(curplayer.equalsIgnoreCase(args[0]))
+			                        {
+			                        	admin.sendMessage("You are no longer ignoring player: " + args[0]);
+			                        	bFoundRemove = true;			                        	
+			                        }
+			                        else
+			                        {
+			                        	newignorelist += curplayer + "," ;
+			                        				                        	
+			                        }
+			                    } //while tokens
+			                    
+			                    //strip off trailing comma
+			                    if(newignorelist.length() > 0)			                   
+			                    	newignorelist = newignorelist.substring(0, newignorelist.length()-1);
+			                  
+			                   //Save modified list
+			                   admin.setMetadata("MumbleChat.ignore", new FixedMetadataValue(plugin,newignorelist));
+			             }
+						
+						//Didn't find the name to remove from ignore.
+						//lets check to see if the player is offline or online.
+						if(bFoundRemove == false)
+						{
+							Player player = null;
+							 player = sender.getServer().getPlayer(args[0]);
+							 if(player == null)
+							 {
+								 if (!(admin==null))
+								 {
+									 admin.sendMessage(ChatColor.RED+"Wrong player name or player offline: "+ args[0] + ".");
+								 
+								 }
+								 
+								 return true;
+							 }
+							 
+							 if (ignorecount >= 20)
+							 {
+								 admin.sendMessage(ChatColor.RED+"You cannot ignore more than 20 players at once");
+								 admin.sendMessage(ChatColor.RED+"/ignore ignoredplayername  ");
+								 admin.sendMessage(ChatColor.RED+"to remove one from existing list.");
+								 admin.sendMessage(ChatColor.RED+" Use /ignore ? to see a list of ignored players.");
+								 return true;
+							 }
+							 //looks like they are online... lets add em to the list then.
+							 if(newignorelist.length() == 0)
+								 newignorelist += args[0];
+							 else
+								 newignorelist += "," + args[0];
+							 
+							 admin.sendMessage("You are now ignoring player: " + args[0]);
+							 
+							 admin.setMetadata("MumbleChat.ignore", new FixedMetadataValue(plugin,newignorelist));
+							 
+						}
+					
+						plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Returned True");
+						return true;  //removed them from ignore...
+							
+					}// name field has length
+							
+			 }// received a name argument
+			 
+			 plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Returned False");
+			 return false;
+			 
+		}
+		
 		if(cmd.getName().equalsIgnoreCase("tell") || cmd.getName().equalsIgnoreCase("whisper"))
 		{
 	
 			//	plugin.getServer().getLogger().info("Got Tell!");	
+			plugin.logme(LOG_LEVELS.DEBUG, "tell", "Tell or Whisper command called: "+ cmd.getName() );
 				
 				if (args.length == 0)
 				{
@@ -64,17 +210,39 @@ public class TellCommandExecutor implements CommandExecutor {
 				 player = sender.getServer().getPlayer(args[0]);
 				 if(player == null)
 				 {
-					 //plugin.getServer().getLogger().info("Can't find Player "+ args[0] + ".");
+					plugin.logme(LOG_LEVELS.DEBUG, "tell", "Can't find Player "+ args[0] + ".");
+					
 					 if (!(admin==null))
 					 {
 						 admin.sendMessage(ChatColor.RED+"Can't find Player "+ args[0] + ".");
 					 
 					 }
 					 
+					 plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:tell", "Returned True");
 					 return true;
 				 
 				 }
 				 
+				 //Ok.. we have a player.. lets see if they are ignoring us...
+				 String playerignorelist = plugin.getMetadataString(player, "MumbleChat.ignore", plugin);				 
+				 if(playerignorelist.length() > 0)
+				 {		        
+					String curplayer = "";
+                    StringTokenizer st = new StringTokenizer(playerignorelist, ",");
+                    ignorecount = st.countTokens();
+                    while (st.hasMoreTokens()) {
+                       		                        
+                    	curplayer=st.nextToken();
+                        if(curplayer.equalsIgnoreCase(admin.getName()))
+                        {
+                        	admin.sendMessage(ChatColor.YELLOW + args[0] + " is currently ignoring your tells.");
+                            return true;                       	
+                        }
+                    }
+		                   
+		         }              
+				
+				 //Ok, they are not ignoring you....
 				 if(args.length >= 2)
 					{
 						String msg = "";
@@ -108,13 +276,12 @@ public class TellCommandExecutor implements CommandExecutor {
 					 }
 				 
 				 }
-				
+		        
+		  plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:tell", "Returned True");
 		 return true;
 		 }
-				 
-				
-			
-		 admin.sendMessage("You got to the end");
+		 
+		 plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:tell", "Returned False");
 		return false;
 	}
 

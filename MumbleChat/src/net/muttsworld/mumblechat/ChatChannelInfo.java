@@ -1,5 +1,6 @@
 package net.muttsworld.mumblechat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -16,18 +17,20 @@ public class ChatChannelInfo {
     //List<chatChannel> cc;
     ChatChannel[] cc;
     public String mutepermissions;
+    public String forcepermissions;
     public Boolean saveplayerdata;
     public Boolean usePexPrefix;
     public Boolean usePexSuffix;
     public String tellColor;
     public String defaultChannel; //There can be only one :)
-    
+       
     //Broadcast Variables
     public String broadcastCommand; //also only one
     public String broadcastColor; //white
     public String broadcastDisplayTag;
     public Boolean broadcastPlayer;
     public String broadcastPermissions;
+       
 
     @SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
@@ -44,16 +47,20 @@ public class ChatChannelInfo {
         Boolean _defaultchannel = false;
         String _alias = "";
         Double _distance = (double) 0;
+        Boolean _autojoin = false;
         tellColor = "gray";
         ConfigurationSection cs = plugin.getConfig().getConfigurationSection("channels");
 
 
-        mutepermissions = plugin.getConfig().getString("mute.permissions");
+        mutepermissions = plugin.getConfig().getString("mute.permissions","");
+        forcepermissions = plugin.getConfig().getString("force.permissions","");
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         usePexPrefix = plugin.getConfig().getBoolean("usePexPrefix", false);
         usePexSuffix = plugin.getConfig().getBoolean("usePexPrefix", false);
+        
+        plugin.setLogLevel(plugin.getConfig().getString("loglevel","INFO").toUpperCase());
       
         tellColor = plugin.getConfig().getString("tellcolor","gray");
         
@@ -95,9 +102,11 @@ public class ChatChannelInfo {
             _alias = (String) cs.getString(key + ".alias", "None");
 
             _distance = (Double) cs.getDouble(key + ".distance", (double) 0);
+            
+            _autojoin = (Boolean) cs.getBoolean(key +".autojoin", false);
 
             ChatChannel c =
-                    new ChatChannel(_name, _color, _permission, _muteable, _filter, _defaultchannel, _alias, _distance);
+                    new ChatChannel(_name, _color, _permission, _muteable, _filter, _defaultchannel, _alias, _distance, _autojoin);
 
             //	plugin.getServer().getLogger().info("new channel:" + c.getName());
 
@@ -142,6 +151,19 @@ public class ChatChannelInfo {
         else
         	broadcastCommand=null;
     	
+    }
+    
+    public List<String> getAutojoinList()
+    {
+    	List<String> joinlist =new ArrayList<String>();;
+    	    	
+    	for (ChatChannel c : cc) {
+            if (c.getAutojoin()) {
+                joinlist.add(c.getName());                
+            }
+    	}   	
+    	
+    	return joinlist;
     }
     
     int getChannelCount() {
@@ -236,15 +258,16 @@ public class ChatChannelInfo {
     
 	public String FormatString(String tobeformatted)
 	{
-		String allFormated;
+		String allFormated = tobeformatted;
 		
-			allFormated = chatColorPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
-			allFormated = chatMagicPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
-			allFormated = chatBoldPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
-			allFormated = chatStrikethroughPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
-			allFormated = chatUnderlinePattern.matcher(tobeformatted).replaceAll("\u00A7$1");
-			allFormated = chatItalicPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
-			allFormated = chatResetPattern.matcher(tobeformatted).replaceAll("\u00A7$1");
+			allFormated = chatColorPattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = chatMagicPattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = chatBoldPattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = chatStrikethroughPattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = chatUnderlinePattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = chatItalicPattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = chatResetPattern.matcher(allFormated).replaceAll("\u00A7$1");
+			allFormated = allFormated.replaceAll("%","/%");
 	          			
 		return allFormated;
 		

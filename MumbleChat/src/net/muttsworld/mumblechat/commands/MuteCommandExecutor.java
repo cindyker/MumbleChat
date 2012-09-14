@@ -1,18 +1,16 @@
 package net.muttsworld.mumblechat.commands;
 
-import java.util.List;
-
 import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
+import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
-
 
 public class MuteCommandExecutor implements CommandExecutor {
 
@@ -27,16 +25,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 		cc = _cc;
 	}
  
-	public boolean getMetadata(Player player, String key, MumbleChat plugin){
-		  List<MetadataValue> values = player.getMetadata(key);  
-		  for(MetadataValue value : values){
-		     if(value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())){
-		        return value.asBoolean(); //value();
-		     }
-		  }
-		  return false;
-		}
-	
+		
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
@@ -50,12 +39,47 @@ public class MuteCommandExecutor implements CommandExecutor {
 		 {
 		   admin = (Player)sender;
 		 }
+	
+// Future Development!
+// Want to be able force in and force out
+//		if(cmd.getName().equalsIgnoreCase("force"))
+//		{
+//		
+//		
+//			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
+//			{
+//				
+//				
+//					if (args.length < 2)
+//					{
+//	
+//						 return false;
+//					}
+//					
+//					if(args.length == 2)
+//					{
+//						Player player = plugin.getServer().getPlayer(args [0]);
+//						if(player != null){
+//							for(ChatChannel chname:cc.getChannelsInfo())
+//							{
+//								
+//								
+//								player.setMetadata("listenchannel."+chname.getName(),new FixedMetadataValue(plugin,true));
+//								
+//								player.setMetadata("currentchannel",new FixedMetadataValue(plugin,chname.getName()));
+//								return true;
+//							}
+//						}
+//					}
+//			}
+//				
+//		}
 		
-		//TODO: Fix this section... needs command changed, now has both mute and unmute
+		
 		//Need to check for permission before checking for command
 		if(cmd.getName().equalsIgnoreCase("mute"))
 		{
-			if(getMetadata(admin, "mumblechat.canmute", plugin)==true)
+			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
 			{
 				//	plugin.getServer().getLogger().info("Got Mute!");	
 				
@@ -89,7 +113,8 @@ public class MuteCommandExecutor implements CommandExecutor {
 						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
 						 {
 							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
-							 admin.sendMessage(ChatColor.RED+"Muted Player "+ args[0] + " in " + c.getName());
+							 admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ args[0] + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+							 player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
 							 return true;
 						 }
 					 }
@@ -114,18 +139,12 @@ public class MuteCommandExecutor implements CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("unmute"))
 		{
-			if(getMetadata(admin, "mumblechat.canmute", plugin)==true)
+			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
 			{
-				//	plugin.getServer().getLogger().info("Got Mute!");	
-				
+				   plugin.logme(LOG_LEVELS.DEBUG ,"Unmute command", "Got Command..." );
+									
 					if (args.length < 2)
 					{
-		//				 plugin.getServer().getLogger().info("Command is /derpmute [player] [channel]");
-		//				 if (!(admin==null))
-		//				 {
-		//					 admin.sendMessage("Command is /derpmute [player] [channel]");
-		//				 
-		//				 }
 						 return false;
 					}
 				
@@ -148,7 +167,8 @@ public class MuteCommandExecutor implements CommandExecutor {
 						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
 						 {
 							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,false));
-							 admin.sendMessage(ChatColor.RED+"unMuted Player "+ args[0] + " in " + c.getName());
+							 admin.sendMessage(ChatColor.RED+"unMuted Player "+ args[0] + " in "+  ChatColor.valueOf(c.getColor().toUpperCase())  +c.getName());
+							 player.sendMessage(ChatColor.RED+"You have just been unmuted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
 							 return true;
 						 }
 					 }

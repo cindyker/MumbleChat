@@ -1,11 +1,11 @@
 package net.muttsworld.mumblechat.commands;
 
-import java.util.List;
 
 import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,8 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
-
 
 public class ChatCommand implements CommandExecutor, Listener {
 
@@ -36,26 +34,7 @@ public class ChatCommand implements CommandExecutor, Listener {
         cc = chatchannel;
     }
 
-    public boolean getMetadata(Player player, String key, MumbleChat plugin) {
-        List<MetadataValue> values = player.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
-                return value.asBoolean(); //value();
-            }
-        }
-        return false;
-    }
-
-    public String getMetadataString(Player player, String key, MumbleChat plugin) {
-        List<MetadataValue> values = player.getMetadata(key);
-        for (MetadataValue value : values) {
-            if (value.getOwningPlugin().getDescription().getName().equals(plugin.getDescription().getName())) {
-                return value.asString(); //value();
-            }
-        }
-        return "";
-    }
-
+  
     @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent e) {
 
@@ -112,7 +91,7 @@ public class ChatCommand implements CommandExecutor, Listener {
                 player.setMetadata("listenchannel." + ci.getName(), new FixedMetadataValue(plugin, true));
                 //If they were chatting with another player, its time to stop.
                 
-                String tellchat = getMetadataString(player,"MumbleChat.tell",plugin);
+                String tellchat = plugin.getMetadataString(player,"MumbleChat.tell",plugin);
                 if(tellchat.length()>0)
                 {
                 	player.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
@@ -194,14 +173,14 @@ public class ChatCommand implements CommandExecutor, Listener {
 
                             //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ "set Current Channel to "+chname.getName());	
 
-                            if ((getMetadataString(player, "insertchannel", plugin).equalsIgnoreCase("NONE"))) {
+                            if ((plugin.getMetadataString(player, "insertchannel", plugin).equalsIgnoreCase("NONE"))) {
 
                                 //	plugin.getServer().getLogger().info("Change Sticky Channel to "+chname.getName());	
                                 player.setMetadata("currentchannel", new FixedMetadataValue(plugin, chname.getName()));
                             }
 
                             //Stop chatting with another player..
-                            String tellchat = getMetadataString(player,"MumbleChat.tell",plugin);
+                            String tellchat = plugin.getMetadataString(player,"MumbleChat.tell",plugin);
                             if(tellchat.length()>0)
                             {
                             	player.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
@@ -260,7 +239,7 @@ public class ChatCommand implements CommandExecutor, Listener {
                         
                         //Figure out how many channels the player is listening too..
                         	//they need at least one.
-                    	if(getMetadata(player,"listenchannel."+chname.getName(),plugin) == true)
+                    	if(plugin.getMetadata(player,"listenchannel."+chname.getName(),plugin) == true)
                         		listenchannelcount++;
                     }
                     
@@ -306,36 +285,53 @@ public class ChatCommand implements CommandExecutor, Listener {
                 	
                 	//is it a valid channel
                 	ChatChannel cinfo = cc.getChannelInfo(args[0]);
-                	
+               
                 	if (cinfo != null)
-                	{
-                		if(cinfo.isDistance())
-                		{
-                			player.sendMessage("Sorry no who information for " + args[0] +" chat right now...");
-                			return true;
-                		}
+	                	{
+                		
+                		//Does this channel have permissions?
+	                	if(cinfo.hasPermission()){ 
+                		
+	                		if (!player.isPermissionSet(cinfo.getPermission())){
+		                        //Command pre processor may have added listener, need to turn it off.
+		                        player.setMetadata("listenchannel." + cinfo.getName(), new FixedMetadataValue(plugin, false));
+		                        player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission to look at this channel");
+		                        return true;
+	                		}	                		
+	                	}
+                		
 	                	lstchan += cinfo.getName();
 		               	Player pl[] = plugin.getServer().getOnlinePlayers();
 		               	
 		               	plugin.getServer().getLogger().info("Count of player:" +pl.length);
 		            	
 		            
-		               	long linecount = 30;
+		               	long linecount = plugin.getLineLength();
 		               	for(Player p:pl)
 		            	{
 		               	   	plugin.getServer().getLogger().info("player:"+p.getDisplayName() +" " +p.isOnline());
-		            		if( getMetadata(p,lstchan,  plugin))
+		            		if( plugin.getMetadata(p,lstchan,  plugin))
 		            		{
-		            		//Wrapping the text on the screen...	
+		            			
+		            			
+		            		   if(cinfo.isDistance())
+		                		{
+		            			  if (!isPlayerWithinDistance(player, p, cinfo.getDistance()))
+		            			  {
+		            			    continue;
+		            			  }
+		                		}
+		            		   
+		            		  //Wrapping the text on the screen...
 		            		  if((playerlist.length()+p.getName().length() > linecount ))
 		            		  {
 		            			 plugin.getServer().getLogger().info("linecount:"+ linecount + "listlength:" + playerlist.length());
 		            			  playerlist += "\n";
-		            			  linecount= linecount*2;
+		            			  linecount= linecount+plugin.getLineLength();
 		            		  }
 		            		  
 		            		  		            		  
-		            		  if( ! getMetadata(p,"MumbleMute."+cinfo.getName(),plugin))
+		            		  if( ! plugin.getMetadata(p,"MumbleMute."+cinfo.getName(),plugin))
 		            		  {
 		            			   playerlist += ChatColor.WHITE+p.getName() ;
 		            		  }
@@ -354,7 +350,8 @@ public class ChatCommand implements CommandExecutor, Listener {
 		            	}
 		               	               
 		            	//Remove the last trailing comma...
-		            	playerlist = playerlist.substring(0, playerlist.length()-2);
+		               	if(playerlist.length() > 2 )
+		               		playerlist = playerlist.substring(0, playerlist.length()-2);
 		            	//show list to player who asked...
 		            	player.sendMessage(ChatColor.AQUA+ "Players in Channel : " +ChatColor.valueOf(cinfo.getColor().toUpperCase())+ cinfo.getName());
 		            	player.sendMessage(playerlist);
@@ -387,5 +384,36 @@ public class ChatCommand implements CommandExecutor, Listener {
 
 
         return false;
+    }
+    
+    Boolean isPlayerWithinDistance(Player p1, Player p2, double Distance )
+    {
+	
+        Double chDistance = Distance;
+        Location locreceip;
+        Location locsender = p1.getLocation();
+        Location diff;
+        
+
+		 //Player has listenChannel and its true...
+        if (chDistance > (double) 0) {
+            locreceip = p2.getLocation();
+            if ((locreceip.getWorld() == p1.getWorld())) {
+                diff = locreceip.subtract(locsender);
+                //  mama.getServer().getLogger().info("Looking for distance!:" + " X:" + diff.getX()+" Y:" + diff.getY() + " Z:" + diff.getZ());
+
+                if (Math.abs(diff.getX()) > chDistance || Math.abs(diff.getZ()) > chDistance) //diff.getY() > 100 && 
+                {
+                	 return false;
+
+                }
+            } else{ //Not on the same planet
+            
+               return false;
+            }
+
+        }
+        
+        return true;
     }
 }
