@@ -1,5 +1,6 @@
 package net.muttsworld.mumblechat.listeners;
 
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,7 +19,6 @@ import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
 
 public class ChatListener implements Listener {
-
     MumbleChat plugin;
     // String[] Filters;
     List<String> filters;
@@ -28,8 +28,6 @@ public class ChatListener implements Listener {
     public ChatListener(MumbleChat _plugin) {
         plugin = _plugin;
         //  int Count = 10;
-        
-    
 
         filters = (List<String>) plugin.getConfig().getList("filters");
 
@@ -43,80 +41,75 @@ public class ChatListener implements Listener {
 
 
     }
-  
+
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         // boolean globalmsg = false;
 
 
         String evMessage;
-        
+
         if (event.isCancelled()) {
             return;
         }
 
         Player p = event.getPlayer();
-     
+
         ////////////////////////////////////////////////////////////////////////
         // if sticky tell this becomes quick...
-        String tellPlayer = plugin.getMetadataString(p,"MumbleChat.tell",plugin);
-        if(tellPlayer.length()>0)
-        {
-        	//plugin.getServer().getLogger().info("tell to player" + tellPlayer);
-        	Player tp = plugin.getServer().getPlayer(tellPlayer);
-        	if(tp == null)
-        	{
-        		p.sendMessage(tellPlayer + " is not available");
-        		p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
-        		   		
-        	}
-        	else
-        	{
-        		//Check for Ignores....
-        		 String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);				 
-				 if(playerignorelist.length() > 0)
-				 {		        
-					String curplayer = "";
+        String tellPlayer = plugin.getMetadataString(p, "MumbleChat.tell", plugin);
+        if (tellPlayer.length() > 0) {
+            //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
+            Player tp = plugin.getServer().getPlayer(tellPlayer);
+            if (tp == null) {
+                p.sendMessage(tellPlayer + " is not available");
+                p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+
+            } else {
+                //Check for Ignores....
+                String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
+                if (playerignorelist.length() > 0) {
+                    String curplayer = "";
                     StringTokenizer st = new StringTokenizer(playerignorelist, ",");
                     while (st.hasMoreTokens()) {
-                       		                        
-                    	curplayer=st.nextToken();
-                        if(curplayer.equalsIgnoreCase(p.getName()))
-                        {
-                        	p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
-                        	event.setCancelled(true); 
-                            return;                       	
+
+                        curplayer = st.nextToken();
+                        if (curplayer.equalsIgnoreCase(p.getName())) {
+                            p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
+                            event.setCancelled(true);
+                            return;
                         }
                     }
-		                   
-		         }              
-        		
-        		String filtered = cc.FilterChat(event.getMessage());
-        		String msg = p.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
-        		tp.sendMessage(msg);        		
-        		p.sendMessage("You tell "+ tellPlayer +": "+ ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
-        		  		
-        	}
-        	event.setCancelled(true);   //Fixed bug.. this needs to be cancelled.
-        	return;
-        	
-        }
-        
 
-        String pFormatted ="";
-        if (cc.usePexPrefix == true )
-        	pFormatted = plugin.getMetadataString(p,"chatnameformat",plugin);
-         
-        
+                }
+
+                String filtered = cc.FilterChat(event.getMessage());
+                String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
+                tp.sendMessage(msg);
+                p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
+
+            }
+            event.setCancelled(true);   //Fixed bug.. this needs to be cancelled.
+            return;
+
+        }
+
+
+        String pFormatted = "";
+        if (cc.usePrefix == true) {
+            pFormatted = plugin.getMetadataString(p, "chatnameformat", plugin);
+        }
+
+
         evMessage = event.getMessage();
 
-       // plugin.getServer().getLogger().info("Filter ok?");
+        // plugin.getServer().getLogger().info("Filter ok?");
 
 
         Location locreceip;
         Location locsender = p.getLocation();
         Location diff;
-        
+
         Boolean filterthis = true;
         String curChannel = "";
 
@@ -125,17 +118,16 @@ public class ChatListener implements Listener {
         if (!p.hasMetadata("insertchannel")) {
             insertchannel = "NONE";
         }
-        
+
         if ((insertchannel.equalsIgnoreCase("NONE"))) {
-           //String curChannel = p.getMetadata("currentchannel").get(0).asString();
-           //	plugin.getServer().getLogger().info("Talking Sticky");
+            //String curChannel = p.getMetadata("currentchannel").get(0).asString();
+            //	plugin.getServer().getLogger().info("Talking Sticky");
             curChannel = plugin.getMetadataString(p, "currentchannel", plugin);
-        } 
-        else  {
+        } else {
             plugin.getServer().getLogger().info("Temp Talk");
             curChannel = insertchannel;
             p.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
-            
+
         }
 
         if (curChannel.length() == 0) {
@@ -150,7 +142,7 @@ public class ChatListener implements Listener {
 
 
         String listenChannel = "listenchannel." + curChannel;
-       // plugin.getServer().getLogger().info("Who's listening on:" +listenChannel);
+        // plugin.getServer().getLogger().info("Who's listening on:" +listenChannel);
 
         //if they are not muted and they want to talk on the channel...
         //they need to listen on the channel.
@@ -158,17 +150,15 @@ public class ChatListener implements Listener {
             p.sendMessage(ChatColor.DARK_PURPLE + "You are muted in this channel: " + curChannel);
             event.setCancelled(true);
             return;
-        }
-        else
-        {
-        	 p.setMetadata(listenChannel, new FixedMetadataValue(plugin, true));
+        } else {
+            p.setMetadata(listenChannel, new FixedMetadataValue(plugin, true));
         }
 
         Double chDistance = (double) 0;
 
         String Channelformat;
         Channelformat = plugin.getMetadataString(p, "format", plugin);
-        
+
         //Get Distance from Channel...
         for (ChatChannel ci : cc.getChannelsInfo()) {
             if (curChannel.equalsIgnoreCase(ci.getName())) {
@@ -186,20 +176,19 @@ public class ChatListener implements Listener {
 
                 if ((insertchannel.equalsIgnoreCase("NONE")) || insertchannel.length() == 0) {
 
-                	Channelformat = ChatColor.valueOf(ci.getColor().toUpperCase()) + "[" + curChannel + "] ";
+                    Channelformat = ChatColor.valueOf(ci.getColor().toUpperCase()) + "[" + curChannel + "] ";
                 }
                 filterthis = ci.isFiltered();
             }
         }
 
-      /////////////////////////////////////////////////////
-     //Apply the Filter is required
-    //   int t = 0;
-       if (filterthis) 
-       {
-    	   evMessage = cc.FilterChat(evMessage);
-    	   
-       }
+        /////////////////////////////////////////////////////
+        //Apply the Filter is required
+        //   int t = 0;
+        if (filterthis) {
+            evMessage = cc.FilterChat(evMessage);
+
+        }
 
         //Add channel info
         //evMessage = tempformat + evMessage;
@@ -231,8 +220,8 @@ public class ChatListener implements Listener {
                         event.getRecipients().remove(rp);
 
                     }
-                } else{ //Not on the same planet
-                
+                } else { //Not on the same planet
+
                     event.getRecipients().remove(rp);
                 }
 
@@ -244,33 +233,29 @@ public class ChatListener implements Listener {
             p.sendMessage(ChatColor.GOLD + "No one is listening to you");
         }
 
-        
-        if(cc.usePexPrefix == true) {
-        	try
-        	{
-        		if(plugin.getMetadata(p, "mumblechat.canmute", plugin)==true)
-    			{
-        			//Rainbow Colored Skittles here... :)
-        			evMessage = cc.FormatString(evMessage);
-    			}
-        		event.setMessage(evMessage);
-        		        		
-        		//event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
-        		event.setFormat(pFormatted+" "+Channelformat+"%s"); //+" ");
-        		//event.setMessage("");
-        		plugin.getServer().getLogger().info("Format?:" + pFormatted + "::" + Channelformat);
-        	}catch(IllegalFormatException ex)
-        	 { 
-        		plugin.getLogger().info("Message Format issue: " + ex.getMessage() + ":" + evMessage);
-        		event.setMessage(Channelformat + evMessage); 
-        	 }
+
+        if (cc.usePrefix == true) {
+            try {
+                if (plugin.getMetadata(p, "mumblechat.canmute", plugin) == true) {
+                    //Rainbow Colored Skittles here... :)
+                    evMessage = cc.FormatString(evMessage);
+                }
+                event.setMessage(evMessage);
+
+                //event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
+                event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
+                //event.setMessage("");
+                plugin.getServer().getLogger().log(Level.INFO, "Format?:{0}::{1}", new Object[]{pFormatted, Channelformat});
+            } catch (IllegalFormatException ex) {
+                plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
+                event.setMessage(Channelformat + evMessage);
+            }
+        } else {
+            event.setMessage(Channelformat + evMessage);
         }
-        else
-           event.setMessage( Channelformat +evMessage);
         return;
 
     }
-    
 
     public HandlerList getHandlers() {
         // TODO Auto-generated method stub

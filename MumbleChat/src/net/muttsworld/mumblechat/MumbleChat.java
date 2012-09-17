@@ -23,17 +23,24 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MumbleChat extends JavaPlugin {
 
     //  public static final String LOG_LEVEL = null;
-    public ChatListener cl;
-    private ChatCommand myExecutor;
+    // Listeners --------------------------------
+    public ChatListener chatListener;
+    public LoginListener loginListener;
+
+    // Executors --------------------------------
+    private ChatCommand chatExecutor;
     private MuteCommandExecutor muteExecutor;
     //private unmuteCommandExecutor muteExecutor;
     private TellCommandExecutor tellExecutor;
-    public LoginListener login;
+
+    // Misc --------------------------------
     private ChatChannelInfo cci;
     FileConfiguration fc;
+    MumblePermissions mp;
+
+    // Vault --------------------------------
     public static Permission permission = null;
     public static Chat chat = null;
-    MumblePermissions mp;
 
     public enum LOG_LEVELS {
         DEBUG, INFO, WARNING, ERROR
@@ -47,7 +54,9 @@ public class MumbleChat extends JavaPlugin {
 
         getLogger().info("Checking for Vault...");
 
-        
+        if(!setupPermissions()) {
+            getLogger().info(null);
+        }
 
         getLogger().info("MumbleChat has been enabled.");
         fc = getConfig();
@@ -59,19 +68,19 @@ public class MumbleChat extends JavaPlugin {
         //class with channel information
         cci = new ChatChannelInfo(this);
 
-        cl = new ChatListener(this, cci);
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(cl, this);
+        chatListener = new ChatListener(this, cci);
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(chatListener, this);
 
-        login = new LoginListener(this, cci);
-        pm.registerEvents(login, this);
+        loginListener = new LoginListener(this, cci);
+        pluginManager.registerEvents(loginListener, this);
 
         //Future enhancement testing...
         //mp = new MumblePermissions(this,cci);
         //mp.PermissionsExAvailable();
 
-        myExecutor = new ChatCommand(this, cci);
-        pm.registerEvents(myExecutor, this);
+        chatExecutor = new ChatCommand(this, cci);
+        pluginManager.registerEvents(chatExecutor, this);
 
         muteExecutor = new MuteCommandExecutor(this, cci);
         tellExecutor = new TellCommandExecutor(this, cci);
@@ -80,11 +89,11 @@ public class MumbleChat extends JavaPlugin {
         getCommand("ignore").setExecutor(tellExecutor);
         getCommand("whisper").setExecutor(tellExecutor);
 
-        getCommand("channel").setExecutor(myExecutor);
-        getCommand("leave").setExecutor(myExecutor);
-        getCommand("join").setExecutor(myExecutor);
-        getCommand("chlist").setExecutor(myExecutor);
-        getCommand("chwho").setExecutor(myExecutor);
+        getCommand("channel").setExecutor(chatExecutor);
+        getCommand("leave").setExecutor(chatExecutor);
+        getCommand("join").setExecutor(chatExecutor);
+        getCommand("chlist").setExecutor(chatExecutor);
+        getCommand("chwho").setExecutor(chatExecutor);
 
         getCommand("mute").setExecutor(muteExecutor);
         getCommand("unmute").setExecutor(muteExecutor);
@@ -116,7 +125,7 @@ public class MumbleChat extends JavaPlugin {
     @Override
     public void onDisable() {
         //getLogger().info("Your plugin has been disabled!");
-        login.SaveItToDisk();
+        loginListener.SaveItToDisk();
         //System.out.println("Temp Chat Disabled");
         getLogger().info("MumbleChat has been disabled.");
     }

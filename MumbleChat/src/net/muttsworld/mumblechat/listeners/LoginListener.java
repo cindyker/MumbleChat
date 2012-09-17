@@ -186,7 +186,7 @@ public class LoginListener implements Listener {
         String curChannel;
         Player pl = plog.getPlayer();
 
-        if (cc.usePexPrefix == true) {
+        if (cc.usePrefix == true) {
             PermissionUser user = PermissionsEx.getUser(pl);
             //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
             String pFormatted = cc.FormatPlayerName(user.getPrefix(), "%s", user.getSuffix());
