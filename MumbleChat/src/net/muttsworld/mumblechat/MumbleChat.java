@@ -2,6 +2,7 @@ package net.muttsworld.mumblechat;
 
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
@@ -14,6 +15,7 @@ import net.muttsworld.mumblechat.commands.ChatCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,9 +36,10 @@ public class MumbleChat extends JavaPlugin {
     private TellCommandExecutor tellExecutor;
 
     // Misc --------------------------------
-    private ChatChannelInfo cci;
+    private ChatChannelInfo ccInfo;
     FileConfiguration fc;
     MumblePermissions mp;
+    private static final Logger log = Logger.getLogger("Minecraft");
 
     // Vault --------------------------------
     public static Permission permission = null;
@@ -50,40 +53,45 @@ public class MumbleChat extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("Initializing MumbleChat.");
+        log.info(String.format("[%s] - Initializing...", getDescription().getName()));
 
-        getLogger().info("Checking for Vault...");
+        log.info(String.format("[%s] - Checking for Vault...", getDescription().getName()));
 
+        // Set up Vault
         if(!setupPermissions()) {
-            getLogger().info(null);
+            log.info(String.format("[%s] - Could not find Vault dependency, disabling.", getDescription().getName()));
         }
+        setupChat();
 
-        getLogger().info("MumbleChat has been enabled.");
+        // Log completion of initialization
+        getLogger().info(String.format("[%s] - Enabled with version %s", getDescription().getName(), getDescription().getVersion()));
+        
+        // Get config and handle
         fc = getConfig();
         if (fc.getList("filters") == null) {
             saveDefaultConfig();
         }
         saveConfig();
 
-        //class with channel information
-        cci = new ChatChannelInfo(this);
+        // Channel information reference
+        ccInfo = new ChatChannelInfo(this);
 
-        chatListener = new ChatListener(this, cci);
+        chatListener = new ChatListener(this, ccInfo);
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(chatListener, this);
 
-        loginListener = new LoginListener(this, cci);
+        loginListener = new LoginListener(this, ccInfo);
         pluginManager.registerEvents(loginListener, this);
 
         //Future enhancement testing...
         //mp = new MumblePermissions(this,cci);
         //mp.PermissionsExAvailable();
 
-        chatExecutor = new ChatCommand(this, cci);
+        chatExecutor = new ChatCommand(this, ccInfo);
         pluginManager.registerEvents(chatExecutor, this);
 
-        muteExecutor = new MuteCommandExecutor(this, cci);
-        tellExecutor = new TellCommandExecutor(this, cci);
+        muteExecutor = new MuteCommandExecutor(this, ccInfo);
+        tellExecutor = new TellCommandExecutor(this, ccInfo);
 
         getCommand("tell").setExecutor(tellExecutor);
         getCommand("ignore").setExecutor(tellExecutor);
@@ -127,7 +135,7 @@ public class MumbleChat extends JavaPlugin {
         //getLogger().info("Your plugin has been disabled!");
         loginListener.SaveItToDisk();
         //System.out.println("Temp Chat Disabled");
-        getLogger().info("MumbleChat has been disabled.");
+        log.info("MumbleChat has been disabled.");
     }
 
     //Utiliy metadata functions... 
@@ -163,7 +171,7 @@ public class MumbleChat extends JavaPlugin {
         //Get LogLevel from Config...
         //if no loglevel exist assume Warning... less spam that way
         if (level.ordinal() >= curLogLevel.ordinal()) {
-            getLogger().log(Level.INFO, ":{0}:{1} : {2}", new Object[]{level.toString(), location, logline});
+            log.log(Level.INFO, ":{0}:{1} : {2}", new Object[]{level.toString(), location, logline});
         }
 
     }

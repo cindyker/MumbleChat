@@ -187,9 +187,9 @@ public class LoginListener implements Listener {
         Player pl = plog.getPlayer();
 
         if (cc.usePrefix == true) {
-            PermissionUser user = PermissionsEx.getUser(pl);
             //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
-            String pFormatted = cc.FormatPlayerName(user.getPrefix(), "%s", user.getSuffix());
+            String pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
+                    "%s", MumbleChat.chat.getPlayerSuffix(pl));
             //pl.getPlayerListName()
             //So it shows when you login.
             //However this is bad.. as it makes who impossible....

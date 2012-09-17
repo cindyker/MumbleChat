@@ -144,7 +144,7 @@ force:
   permissions: mumblechat.canforce
 loglevel: info
 saveplayerdata: true
-usePexPrefix: false
+usePrefix: false
 tellcolor: white
 broadcast:
   color: red
