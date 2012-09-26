@@ -20,7 +20,7 @@ public class ChatChannelInfo {
     public String forcepermissions;
     public Boolean saveplayerdata;
     public Boolean usePrefix;
-    public Boolean usePexSuffix;
+    public Boolean useSuffix;
     public String tellColor;
     public String defaultChannel; //There can be only one :)
     //Broadcast Variables
@@ -54,9 +54,20 @@ public class ChatChannelInfo {
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
-        usePrefix = plugin.getConfig().getBoolean("usePexPrefix", false);
-        usePexSuffix = plugin.getConfig().getBoolean("usePexPrefix", false);
+        
+        //Temporary support for backwards config compatability
+        if(plugin.getConfig().getBoolean("usePexPrefix", false))
+        {
+        	usePrefix = plugin.getConfig().getBoolean("usePexPrefix", false);
+        	useSuffix = plugin.getConfig().getBoolean("usePexPrefix", false);
+        }
 
+        if(plugin.getConfig().getBoolean("usePrefix", false))
+        {
+        	usePrefix = plugin.getConfig().getBoolean("usePrefix", false);
+        	useSuffix = plugin.getConfig().getBoolean("usePrefix", false);
+        }
+        
         plugin.setLogLevel(plugin.getConfig().getString("loglevel", "INFO").toUpperCase());
 
         tellColor = plugin.getConfig().getString("tellcolor", "gray");
@@ -268,7 +279,7 @@ public class ChatChannelInfo {
             playerPrefix = chatResetPattern.matcher(playerPrefix).replaceAll("\u00A7$1");
 
         }
-        if (usePexSuffix) {
+        if (useSuffix) {
 
             playerSuffix = chatColorPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
             playerSuffix = chatMagicPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
