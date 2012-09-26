@@ -190,6 +190,9 @@ public class LoginListener implements Listener {
             //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
             String pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
                     "%s", MumbleChat.chat.getPlayerSuffix(pl));
+            
+           // plugin.logme(LOG_LEVELS.ERROR, "Player Format:", pFormatted);
+            //pl.sendMessage(pFormatted);
             //pl.getPlayerListName()
             //So it shows when you login.
             //However this is bad.. as it makes who impossible....

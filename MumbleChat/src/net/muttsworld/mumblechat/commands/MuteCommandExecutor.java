@@ -91,6 +91,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 		//					 admin.sendMessage("Command is /derpmute [player] [channel]");
 		//				 
 		//				 }
+						admin.sendMessage(ChatColor.WHITE+"Invalid command: /mute [player] [channel]");
 						 return false;
 					}
 				
