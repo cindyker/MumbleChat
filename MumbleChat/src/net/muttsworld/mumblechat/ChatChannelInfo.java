@@ -140,7 +140,7 @@ public class ChatChannelInfo {
             }
 
 
-            broadcastPlayer = (plugin.getConfig().getBoolean("displayplayername", false));
+            broadcastPlayer = (plugin.getConfig().getBoolean("broadcast.displayplayername", false));
 
             broadcastColor = plugin.getConfig().getString("broadcast.color", "white");
             if (!(isValidColor(broadcastColor))) {

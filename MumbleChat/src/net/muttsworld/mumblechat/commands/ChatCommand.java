@@ -48,15 +48,25 @@ public class ChatCommand implements CommandExecutor, Listener {
                         || player.hasPermission(cc.broadcastPermissions)) {
 
                     String newMsg = e.getMessage();
-
+                  
                     //remove command
                     newMsg = newMsg.replaceFirst("/" + cc.getBroadcastCommand() + " ", "");
-
+                    
+                    //Format it for Rainbow Skittle colors - Your Welcome Double.
+                    newMsg = cc.broadcastDisplayTag + cc.FormatString(newMsg);
+                    
                     if (cc.broadcastPlayer) {
-                        brformat = ChatColor.valueOf(cc.broadcastColor.toUpperCase()) + " <" + player.getDisplayName() + ">" + cc.broadcastDisplayTag + " " + newMsg;
+                    	String pName= "";
+                    	 if (cc.usePrefix == true) {
+                             pName = String.format(plugin.getMetadataString(player, "chatnameformat", plugin),player.getDisplayName());
+                         }
+                    	 else
+                    		 pName = player.getDisplayName();
+
+                        brformat =  pName  + ChatColor.valueOf(cc.broadcastColor.toUpperCase()) +  " " + newMsg;
 
                     } else {
-                        brformat = ChatColor.valueOf(cc.broadcastColor.toUpperCase()) + cc.broadcastDisplayTag + " " + newMsg;
+                        brformat = ChatColor.valueOf(cc.broadcastColor.toUpperCase()) +  " " + newMsg;
                     }
 
                     plugin.getServer().broadcastMessage(brformat);
