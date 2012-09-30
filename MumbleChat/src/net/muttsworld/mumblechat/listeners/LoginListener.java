@@ -184,11 +184,17 @@ public class LoginListener implements Listener {
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerLogin(PlayerLoginEvent plog) {
         String curChannel;
+        String pFormatted = "";
         Player pl = plog.getPlayer();
 
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Player");
+        
         if (cc.usePrefix == true) {
+        	
+        	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
+        	 
             //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
-            String pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
+            pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
                     "%s", MumbleChat.chat.getPlayerSuffix(pl));
             
            // plugin.logme(LOG_LEVELS.ERROR, "Player Format:", pFormatted);
@@ -201,7 +207,13 @@ public class LoginListener implements Listener {
             //put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
             pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
         }
-
+        else
+        {
+        	  pFormatted = "%s"; 
+        	  pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
+        }
+        
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After Format");
 
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
@@ -277,6 +289,8 @@ public class LoginListener implements Listener {
             pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
         }
 
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After Channels");
+        
         //reset quick talk
         pl.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
 
@@ -298,6 +312,9 @@ public class LoginListener implements Listener {
         String format = ChatColor.valueOf(curColor.toUpperCase()) + "[" + curChannel + "]";
         pl.setMetadata("format", new FixedMetadataValue(plugin, format));
 
+        
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After format");
+        
 
         //====================================================================================
         // ---  Get Permissions for Special Commands here -----------------------------------
@@ -307,6 +324,8 @@ public class LoginListener implements Listener {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Mute permissions given...");
             pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
         }
+        
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");
 
         ////////////////////////////////////////////////////////////////////////////////////////
         //FUTURE FORCE CHANNEL CODE
@@ -331,7 +350,8 @@ public class LoginListener implements Listener {
         }
 
 
-
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After forcechannel");
+        
 
         //mama.getServer().getLogger().info("End the Login Event");
     }

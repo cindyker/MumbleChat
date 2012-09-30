@@ -55,6 +55,8 @@ public class ChatChannelInfo {
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         
+        usePrefix = false;
+        useSuffix = false;
         //Temporary support for backwards config compatability
         if(plugin.getConfig().getBoolean("usePexPrefix", false))
         {

@@ -130,14 +130,6 @@ filters:
 - rain,sunshine
 - planet minecraft,another dimension
 - planetminecraft,another dimension
-filterexceptions:
-- ambassador
-- glass
-- assume
-- passing
-- pass
-- villager
-- villagers
 mute:
   permissions: mumblechat.canmute
 force:

@@ -67,21 +67,37 @@ public class MumbleChat extends JavaPlugin {
         getLogger().info(String.format("[%s] - Enabled with version %s", getDescription().getName(), getDescription().getVersion()));
         
         // Get config and handle
+        getConfig().options().copyDefaults(true);
         fc = getConfig();
         if (fc.getList("filters") == null) {
             saveDefaultConfig();
+            fc = getConfig();
+            if(fc.getList("filters")==null)
+            {
+            	//We don't have a config.. We are need to disable the chat 
+                log.info("MumbleChat has no config file.");
+            	onDisable();
+            }
         }
         saveConfig();
+
+        log.info(String.format("[%s] - Registering Listeners", getDescription().getName()));
 
         // Channel information reference
         ccInfo = new ChatChannelInfo(this);
 
+        if(ccInfo == null)
+        	 log.info(String.format("[%s] - Configuration is BAD!", getDescription().getName()));
+
+        
         chatListener = new ChatListener(this, ccInfo);
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(chatListener, this);
 
         loginListener = new LoginListener(this, ccInfo);
         pluginManager.registerEvents(loginListener, this);
+        
+       
 
         //Future enhancement testing...
         //mp = new MumblePermissions(this,cci);
@@ -89,7 +105,9 @@ public class MumbleChat extends JavaPlugin {
 
         chatExecutor = new ChatCommand(this, ccInfo);
         pluginManager.registerEvents(chatExecutor, this);
-
+        
+        log.info(String.format("[%s] - Attaching to Executors", getDescription().getName()));
+        
         muteExecutor = new MuteCommandExecutor(this, ccInfo);
         tellExecutor = new TellCommandExecutor(this, ccInfo);
 

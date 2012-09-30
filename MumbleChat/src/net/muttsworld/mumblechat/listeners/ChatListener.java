@@ -96,9 +96,9 @@ public class ChatListener implements Listener {
 
 
         String pFormatted = "";
-        if (cc.usePrefix == true) {
+        //if (cc.usePrefix == true) {
             pFormatted = plugin.getMetadataString(p, "chatnameformat", plugin);
-        }
+        //}
 
 
         evMessage = event.getMessage();
@@ -251,7 +251,8 @@ public class ChatListener implements Listener {
                 event.setMessage(Channelformat + evMessage);
             }
         } else {
-            event.setMessage(Channelformat + evMessage);
+            event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
+            event.setMessage( evMessage);
         }
         return;
 
