@@ -132,8 +132,6 @@ filters:
 - planetminecraft,another dimension
 mute:
   permissions: mumblechat.canmute
-force:
-  permissions: mumblechat.canforce
 loglevel: info
 saveplayerdata: true
 usePrefix: false

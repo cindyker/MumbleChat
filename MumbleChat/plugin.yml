@@ -4,7 +4,7 @@ main: net.muttsworld.mumblechat.MumbleChat
 depend: [PermissionsEx]
 author: cindy_k
 authors: [net_creator,mumblerit]
-description: Chat with Channels (1.3.1 level)
+description: Chat with Channels (1.3.2 level)
 website: www.muttsworldmine.com
 commands:
     mute:
@@ -23,7 +23,7 @@ commands:
         permission-message: You don't have <permission>
     ignore:
         usage: /ignore [player]
-        description: This disallows player from sending you a tell
+        description: This allows you to prevent a player from sending you a tell /ignore ? for more info
         permission-message: You don't have <permission>
     whisper:
         usage: /whisper [player] [msg]

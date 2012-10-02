@@ -57,6 +57,7 @@ public class MumbleChat extends JavaPlugin {
 
         log.info(String.format("[%s] - Checking for Vault...", getDescription().getName()));
 
+        
         // Set up Vault
         if(!setupPermissions()) {
             log.info(String.format("[%s] - Could not find Vault dependency, disabling.", getDescription().getName()));
@@ -67,19 +68,23 @@ public class MumbleChat extends JavaPlugin {
         getLogger().info(String.format("[%s] - Enabled with version %s", getDescription().getName(), getDescription().getVersion()));
         
         // Get config and handle
-        getConfig().options().copyDefaults(true);
-        fc = getConfig();
-        if (fc.getList("filters") == null) {
-            saveDefaultConfig();
-            fc = getConfig();
-            if(fc.getList("filters")==null)
-            {
-            	//We don't have a config.. We are need to disable the chat 
-                log.info("MumbleChat has no config file.");
-            	onDisable();
-            }
-        }
-        saveConfig();
+        
+     // Configuration
+     		try {
+     			getConfig().options().copyDefaults(true);
+     			fc= getConfig(); 					
+     			saveConfig();
+     			if(fc.getList("channels") == null)
+     			{
+     				saveDefaultConfig();
+     				reloadConfig();
+     			}
+     		
+     		} catch (Exception ex) {
+     			getLogger().log(Level.SEVERE,
+     					"[MumbleChat] Could not load configuration!", ex);
+     		}
+     	   
 
         log.info(String.format("[%s] - Registering Listeners", getDescription().getName()));
 

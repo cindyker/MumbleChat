@@ -74,22 +74,42 @@ public class LoginListener implements Listener {
 
     void PlayerLeaving(Player pp) {
 
-        //mama.getServer().getLogger().info("Logout.. ");
+    	plugin.logme(LOG_LEVELS.DEBUG, "Player Logout", "Function Start");
 
+    
         //String curChannel;
         customConfig = getCustomConfig();
         Player pl = pp;
-
+        
+        //look up player in config
+        ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
+    
+        //If the player doesn't have a section already, then we want to do this...
+        if (cs == null) {
         Boolean nothingspecial = true;
         for (ChatChannel c : cc.getChannelsInfo()) {
-            if (plugin.getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
+            
+        	if (plugin.getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
 
-                //if they are only listening to the default and only talking on the default....
-                if (!plugin.getMetadata(pl, "MumbleMute." + c.getName(), plugin) && !c.isDefaultchannel() && !c.getAutojoin() && plugin.getMetadataString(pl, "currentchannel", plugin).equalsIgnoreCase(c.getName())) {
+                //if they have more than the default
+                if (    !c.isDefaultchannel() 
+                		&& !c.getAutojoin())
+                {
                     nothingspecial = false;
-                }
-
+                }  
+              
+            } 
+            
+            //or if they are muted...
+            if (plugin.getMetadata(pl, "MumbleMute." + c.getName(), plugin))
+            {                
+            	nothingspecial = false;
             }
+            
+            //once we set nothingspecial to false, no point continuing.
+            if(!nothingspecial)
+            	break;
+            
 
         }
         if (!plugin.getMetadataString(pl, "MumbleChat.ignore", plugin).isEmpty()) {
@@ -104,14 +124,8 @@ public class LoginListener implements Listener {
             return;
         }
 
-        //if(getMetadataString(p,"listenchannel".+))
-
-        ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
-        if (cs == null) {
-            //	mama.getServer().getLogger().info("Logout.. No Player Found");
-            //cs = new ConfigurationSection();
-            //cs = customConfig.createSection("players");
-            ConfigurationSection ps = customConfig.getConfigurationSection("players");
+     
+         ConfigurationSection ps = customConfig.getConfigurationSection("players");
             if (ps == null) {
                 cs = customConfig.createSection("players");
             }
@@ -119,12 +133,11 @@ public class LoginListener implements Listener {
 
         }
 
+        //Otherwise lets always save these people, they are in there already. 
         cs.set("default", plugin.getMetadataString(pl, "currentchannel", plugin));
         //Save the Ignores list...
         cs.set("ignores", plugin.getMetadataString(pl, "MumbleChat.ignore", plugin));
-
-
-        //	mama.getServer().getLogger().info("After Section.... ");
+        
 
         String strListening = "";
         String strMutes = "";
@@ -134,6 +147,7 @@ public class LoginListener implements Listener {
             }
 
             if (plugin.getMetadata(pl, "MumbleMute." + c.getName(), plugin)) {
+            	plugin.logme(LOG_LEVELS.DEBUG, "Player leaving", "Mutes");
                 strMutes += c.getName() + ",";
             }
 
@@ -165,14 +179,14 @@ public class LoginListener implements Listener {
                 new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
         String dateNow = formatter.format(currentDate.getTime());
 
-        //	   mama.getServer().getLogger().info("Before Save:" + dateNow);
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Logout", "before save: "+ dateNow);
         cs.set("date", dateNow);
 
         //Do we want this Disk IO on every logout..or do we
         //just want to wait for server stop.
-        //lets wait until server stops...
-        // saveCustomConfig();
-        // reloadCustomConfig();
+        // Lets just do it on server stop.
+       //  saveCustomConfig();
+       //  reloadCustomConfig();
     }
 
     ///////////////////////////////////////////
@@ -277,7 +291,7 @@ public class LoginListener implements Listener {
 
 
             } else {
-                //mama.getServer().getLogger().info("No Player Found");
+                plugin.logme(LOG_LEVELS.DEBUG, "Player Login","No Player Data Found");
                 curChannel = defaultChannel;
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, defaultChannel));
                 pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
@@ -294,7 +308,10 @@ public class LoginListener implements Listener {
         //reset quick talk
         pl.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
 
+        //=========================================================
+        // AUTO JOIN 
         //Set AutoJoins up.. just make sure they are listening
+        //=========================================================
         List<String> autolist = cc.getAutojoinList();
         if (autolist.size() > 0) {
             for (String s : autolist) {
@@ -302,13 +319,12 @@ public class LoginListener implements Listener {
             }
         }
 
+        //=========================================================
+        // Set up Current Channel Format 
+        //=========================================================
         String curColor = defaultColor;
-        for (ChatChannel c : cc.getChannelsInfo()) {
-            if (c.getName().equalsIgnoreCase(curChannel)) {
-                curColor = c.getColor();
-            }
-        }
-
+        ChatChannel cf = cc.getChannelInfo(curChannel);
+        curColor = cf.getColor();
         String format = ChatColor.valueOf(curColor.toUpperCase()) + "[" + curChannel + "]";
         pl.setMetadata("format", new FixedMetadataValue(plugin, format));
 

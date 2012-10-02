@@ -263,7 +263,7 @@ public class ChatChannelInfo {
         allFormated = chatUnderlinePattern.matcher(allFormated).replaceAll("\u00A7$1");
         allFormated = chatItalicPattern.matcher(allFormated).replaceAll("\u00A7$1");
         allFormated = chatResetPattern.matcher(allFormated).replaceAll("\u00A7$1");
-        allFormated = allFormated.replaceAll("%", "/%");
+        allFormated = allFormated.replaceAll("%", "\\%");
 
         return allFormated;
 
