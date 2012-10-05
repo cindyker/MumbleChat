@@ -212,7 +212,7 @@ public class ChatChannelInfo {
 
     public ChatChannel getChannelInfo(String ChannelName) {
         for (ChatChannel c : cc) {
-            if (c.getName().equalsIgnoreCase(ChannelName)) {
+            if (c.getName().equalsIgnoreCase(ChannelName) || c.getAlias().equalsIgnoreCase(ChannelName)) {
                 return c;
             }
         }

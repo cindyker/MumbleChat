@@ -157,64 +157,75 @@ public class ChatCommand implements CommandExecutor, Listener {
         switch (comm) {
             case "join":
             case "channel": {
-                if (args[0].length() > 0) {
-                    //	player.sendMessage("channel: " + args[0]);
+                if (args[0].length() > 0)
+                {
+            	       //	player.sendMessage("channel: " + args[0]);
 
-                    for (ChatChannel chname : cc.getChannelsInfo()) {
+                	ChatChannel chname;
+                	
+                	chname = cc.getChannelInfo(args[0]);
+                	if(chname == null)
+                	{
+                		 player.sendMessage("Invalid channel name");
+                		 return false;
+                	}
+                	
+                    //for (ChatChannel chname : cc.getChannelsInfo()) {
                         //player.sendMessage("channels: " + chname.getName()+ "=" + args[0]);
-
-                        if (chname.getName().equalsIgnoreCase(args[0]) || chname.getAlias().equalsIgnoreCase(args[0])) {
-                            if (chname.hasPermission()) {
-                                if (!player.isPermissionSet(chname.getPermission())) {
-                                    //Command pre processor may have added listener, need to turn it off.
-                                    player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
-                                    //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ " Permission missing: "+chname.getPermission());	
-                                    player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission for this channel");
-                                    return true;
-                                }
-                            }
-
-                            //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ "set Current Channel to "+chname.getName());	
-
-                            if ((plugin.getMetadataString(player, "insertchannel", plugin).equalsIgnoreCase("NONE"))) {
-
-                                //	plugin.getServer().getLogger().info("Change Sticky Channel to "+chname.getName());	
-                                player.setMetadata("currentchannel", new FixedMetadataValue(plugin, chname.getName()));
-                            }
-
-                            //Stop chatting with another player..
-                            String tellchat = plugin.getMetadataString(player, "MumbleChat.tell", plugin);
-                            if (tellchat.length() > 0) {
-                                player.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
-                                player.sendMessage("You are no longer in private conversation with " + tellchat);
-                            }
-
-                            player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, true));
-                            String msg = "";
-
-                            String format = ChatColor.valueOf(chname.getColor().toUpperCase()) + "[" + chname.getName() + "] ";
-                            player.setMetadata("format", new FixedMetadataValue(plugin, format));
-
-                            if (args.length > 1) {
-                                if (args[1].length() > 0) {
-                                    //msg = ChatColor.valueOf(chname.getColor().toUpperCase()) + "["+chname.getName()+"]";
-                                    for (int x = 1; x < args.length; x++) {
-                                        msg += " " + args[x];
-                                    }
-
-                                    player.chat(msg);
-                                    //	 plugin.getServer().getLogger().info("Called Chat... Commands!");
-                                    return true;
-                                }
-                            } else {
-                                player.sendMessage("Channel Set: " + format);
-                                return true;
-                            }
+                    if (chname.hasPermission()) {
+                        if (!player.isPermissionSet(chname.getPermission())) {
+                            //Command pre processor may have added listener, need to turn it off.
+                            player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
+                            //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ " Permission missing: "+chname.getPermission());	
+                            player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission for this channel");
+                            return true;
                         }
                     }
 
-                    player.sendMessage("Invalid channel name");
+                    //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ "set Current Channel to "+chname.getName());	
+
+                    if ((plugin.getMetadataString(player, "insertchannel", plugin).equalsIgnoreCase("NONE"))) {
+
+                        //	plugin.getServer().getLogger().info("Change Sticky Channel to "+chname.getName());	
+                        player.setMetadata("currentchannel", new FixedMetadataValue(plugin, chname.getName()));
+                    }
+
+                    //Stop chatting with another player..
+                    String tellchat = plugin.getMetadataString(player, "MumbleChat.tell", plugin);
+                    if (tellchat.length() > 0) {
+                        player.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+                        player.sendMessage("You are no longer in private conversation with " + tellchat);
+                    }
+
+                    player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, true));
+                    String msg = "";
+
+                    String format = ChatColor.valueOf(chname.getColor().toUpperCase()) + "[" + chname.getName() + "] ";
+                    player.setMetadata("format", new FixedMetadataValue(plugin, format));
+
+                    if (args.length > 1) 
+                    {
+                          //msg = ChatColor.valueOf(chname.getColor().toUpperCase()) + "["+chname.getName()+"]";
+                            for (int x = 1; x < args.length; x++) 
+                            {
+                            	 if (args[x].length() > 0) //
+                                       msg += " " + args[x];
+                            }
+
+                            player.chat(msg);
+                            //	 plugin.getServer().getLogger().info("Called Chat... Commands!");
+                            return true;
+                       
+                    }
+                    else
+                    {
+                        player.sendMessage("Channel Set: " + format);
+                        return true;
+                    }
                 }
+                  
+                   
+               
             }
             break;
 

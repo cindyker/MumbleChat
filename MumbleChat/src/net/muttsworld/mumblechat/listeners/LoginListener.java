@@ -228,23 +228,38 @@ public class LoginListener implements Listener {
         }
         
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After Format");
+   
+        //Set up Player Permissions FIRST
+        for (ChatChannel c : cc.getChannelsInfo()) {
+            //	mama.getServer().getLogger().info("Find Stuff  " + c.getName() + " " + c.getPermission());
+            if (c.hasPermission()) {
+                //	mama.getServer().getLogger().info("Perms Exist!" + c.getPermission());
 
+                if (pl.isPermissionSet(c.getPermission())) {
+                    //mama.getServer().getLogger().info("And I can use them!!!" + c.getPermission());
+                    pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, true));
+                } else {
+                    pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, false));
+                }
+            }
+        }
+        
+                
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
-            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We are saving player data");
+            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We have saved player data");
 
             //mama.getServer().getLogger().info("before Listen");
             ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
             if (cs != null) {
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Player's data has been found");
-
+             
                 curChannel = cs.getString("default", defaultChannel);
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, curChannel));
 
                 //Get the Ignore list.. if they have one.
                 String ignores = cs.getString("ignores", "");
                 pl.setMetadata("MumbleChat.ignore", new FixedMetadataValue(plugin, ignores));
-
 
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for listen channels");
                 //check for channels to listen too...
@@ -315,8 +330,19 @@ public class LoginListener implements Listener {
         List<String> autolist = cc.getAutojoinList();
         if (autolist.size() > 0) {
             for (String s : autolist) {
-                pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, true));
+            	
+            	ChatChannel c = cc.getChannelInfo(s);
+            	 //Incase their permissions change.
+                if (c.hasPermission()) {
+                    plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
+                    if (pl.isPermissionSet(c.getPermission())) {
+                        pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, true));
+                    }
+                } else {
+                    pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, true));
+                }
             }
+                          	
         }
 
         //=========================================================
@@ -351,19 +377,7 @@ public class LoginListener implements Listener {
             pl.setMetadata("mumblechat.canforce", new FixedMetadataValue(plugin, true));
         }
 
-        for (ChatChannel c : cc.getChannelsInfo()) {
-            //	mama.getServer().getLogger().info("Find Stuff  " + c.getName() + " " + c.getPermission());
-            if (c.hasPermission()) {
-                //	mama.getServer().getLogger().info("Perms Exist!" + c.getPermission());
-
-                if (pl.isPermissionSet(c.getPermission())) {
-                    //mama.getServer().getLogger().info("And I can use them!!!" + c.getPermission());
-                    pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, true));
-                } else {
-                    pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, false));
-                }
-            }
-        }
+     
 
 
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After forcechannel");
