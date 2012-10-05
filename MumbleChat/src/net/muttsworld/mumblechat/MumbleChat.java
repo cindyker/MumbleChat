@@ -71,11 +71,12 @@ public class MumbleChat extends JavaPlugin {
         
      // Configuration
      		try {
-     			getConfig().options().copyDefaults(true);
+     			
      			fc= getConfig(); 					
-     			saveConfig();
+     			//saveConfig();
      			if(fc.getList("channels") == null)
      			{
+     				getConfig().options().copyDefaults(true);
      				saveDefaultConfig();
      				reloadConfig();
      			}
@@ -194,7 +195,7 @@ public class MumbleChat extends JavaPlugin {
         //Get LogLevel from Config...
         //if no loglevel exist assume Warning... less spam that way
         if (level.ordinal() >= curLogLevel.ordinal()) {
-            log.log(Level.INFO, ":{0}:{1} : {2}", new Object[]{level.toString(), location, logline});
+            log.log(Level.INFO, "[MumbleChat]: {0}:{1} : {2}", new Object[]{level.toString(), location, logline});
         }
 
     }

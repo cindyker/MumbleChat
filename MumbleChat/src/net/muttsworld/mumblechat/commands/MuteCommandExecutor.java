@@ -111,13 +111,23 @@ public class MuteCommandExecutor implements CommandExecutor {
 					 
 					 for(ChatChannel c:cc.getChannelsInfo())
 					 {
-						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
+						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]) )
 						 {
-							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
-							 admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ args[0] + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
-							 player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+							 if(c.isMuteable())
+							 {
+								 plugin.logme(LOG_LEVELS.INFO ,"Muting Player", " In Channel : " + c.getName() + " Player Name: " + args[0] );
+								 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
+								 admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ args[0] + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+								 player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+								
+							 }
+							 else
+							   admin.sendMessage(ChatColor.RED + "You cannot mute players in this channel: "  + c.getName());
+														 
 							 return true;
 						 }
+						 
+							 
 					 }
 					 
 				
@@ -143,6 +153,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
 			{
 				   plugin.logme(LOG_LEVELS.DEBUG ,"Unmute command", "Got Command..." );
+				
 									
 					if (args.length < 2)
 					{
@@ -166,7 +177,8 @@ public class MuteCommandExecutor implements CommandExecutor {
 					 for(ChatChannel c:cc.getChannelsInfo())
 					 {
 						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
-						 {
+						 { 
+							 plugin.logme(LOG_LEVELS.INFO ,"Unmuting Player", " In Channel : " + c.getName() + " Player Name: " + args[0] );
 							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,false));
 							 admin.sendMessage(ChatColor.RED+"unMuted Player "+ args[0] + " in "+  ChatColor.valueOf(c.getColor().toUpperCase())  +c.getName());
 							 player.sendMessage(ChatColor.RED+"You have just been unmuted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
