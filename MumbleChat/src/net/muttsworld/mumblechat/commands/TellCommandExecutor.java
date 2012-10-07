@@ -270,7 +270,7 @@ public class TellCommandExecutor implements CommandExecutor {
 				 {
 					 if(args[0].length() > 0 )
 					 {
-						 plugin.getServer().getLogger().info("tell::" + args[0]);
+						 plugin.logme(LOG_LEVELS.DEBUG,"Sticky Tell", "tell::" + args[0]);
 						 admin.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin,args[0]));
 						 admin.sendMessage("You are now chatting with " + args[0]);
 					 }

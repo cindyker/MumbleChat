@@ -17,6 +17,7 @@ import java.util.StringTokenizer;
 import net.muttsworld.mumblechat.ChatChannel;
 import net.muttsworld.mumblechat.ChatChannelInfo;
 import net.muttsworld.mumblechat.MumbleChat;
+import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
 
 public class ChatListener implements Listener {
     MumbleChat plugin;
@@ -124,7 +125,7 @@ public class ChatListener implements Listener {
             //	plugin.getServer().getLogger().info("Talking Sticky");
             curChannel = plugin.getMetadataString(p, "currentchannel", plugin);
         } else {
-            plugin.getServer().getLogger().info("Temp Talk");
+        	 plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent","Temp Talk");
             curChannel = insertchannel;
             p.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
 
@@ -245,7 +246,7 @@ public class ChatListener implements Listener {
                 //event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
                 event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
                 //event.setMessage("");
-                plugin.getServer().getLogger().log(Level.INFO, "Format?:{0}::{1}", new Object[]{pFormatted, Channelformat});
+                plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
             } catch (IllegalFormatException ex) {
                 plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
                 event.setMessage(Channelformat + evMessage);
