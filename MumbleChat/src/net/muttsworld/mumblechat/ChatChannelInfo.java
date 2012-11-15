@@ -30,11 +30,11 @@ public class ChatChannelInfo {
     public Boolean broadcastPlayer;
     public String broadcastPermissions;
 
-    @SuppressWarnings("unchecked")
+   //@SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
         plugin = _plugin;
-        filters = (List<String>) plugin.getConfig().getList("filters");
-        filterexceptions = (List<String>) plugin.getConfig().getList("filterexceptions");
+        filters = (List<String>) plugin.getConfig().getStringList("filters");
+        filterexceptions = (List<String>) plugin.getConfig().getStringList("filterexceptions");
 
         String _color = "";
         String _name = "";

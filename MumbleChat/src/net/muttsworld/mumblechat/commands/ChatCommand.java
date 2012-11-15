@@ -55,7 +55,7 @@ public class ChatCommand implements CommandExecutor, Listener {
                     newMsg = newMsg.replaceFirst("/" + cc.getBroadcastCommand() + " ", "");
                     
                     //Format it for Rainbow Skittle colors - Your Welcome Double.
-                    newMsg = cc.broadcastDisplayTag + cc.FormatString(newMsg);
+                    newMsg = cc.broadcastDisplayTag +" " + cc.FormatString(newMsg);
                     
                     if (cc.broadcastPlayer) {
                     	String pName= "";
@@ -68,7 +68,7 @@ public class ChatCommand implements CommandExecutor, Listener {
                         brformat =  pName  + ChatColor.valueOf(cc.broadcastColor.toUpperCase()) +  " " + newMsg;
 
                     } else {
-                        brformat = ChatColor.valueOf(cc.broadcastColor.toUpperCase()) +  " " + newMsg;
+                        brformat = ChatColor.valueOf(cc.broadcastColor.toUpperCase()) +" " + newMsg;
                     }
 
                     plugin.getServer().broadcastMessage(brformat);
