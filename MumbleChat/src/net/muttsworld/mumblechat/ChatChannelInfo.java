@@ -5,8 +5,15 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import com.p000ison.dev.simpleclans2.api.clan.Clan;
+import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 
 public class ChatChannelInfo {
 
@@ -18,6 +25,7 @@ public class ChatChannelInfo {
     ChatChannel[] cc;
     public String mutepermissions;
     public String forcepermissions;
+    public String colorpermissions;
     public Boolean saveplayerdata;
     public Boolean usePrefix;
     public Boolean useSuffix;
@@ -29,6 +37,9 @@ public class ChatChannelInfo {
     public String broadcastDisplayTag;
     public Boolean broadcastPlayer;
     public String broadcastPermissions;
+    
+    public Boolean bChannelInfront;
+    public Boolean bDisplayAlias;
 
    //@SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
@@ -51,12 +62,15 @@ public class ChatChannelInfo {
 
         mutepermissions = plugin.getConfig().getString("mute.permissions", "");
         forcepermissions = plugin.getConfig().getString("force.permissions", "");
+        colorpermissions = plugin.getConfig().getString("inchat_color_permissions","");
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         
         usePrefix = false;
         useSuffix = false;
+        bChannelInfront = false;
+        bDisplayAlias=false;
         //Temporary support for backwards config compatability
         if(plugin.getConfig().getBoolean("usePexPrefix", false))
         {
@@ -72,6 +86,7 @@ public class ChatChannelInfo {
         
         plugin.setLogLevel(plugin.getConfig().getString("loglevel", "INFO").toUpperCase());
 
+        bChannelInfront = plugin.getConfig().getBoolean("channelInFront",false);
         tellColor = plugin.getConfig().getString("tellcolor", "gray");
 
         //Fill in Broadcase information
@@ -206,6 +221,21 @@ public class ChatChannelInfo {
         }
     }
 
+    public String getChannelDisplayFormat(String ChannelName)
+    {
+    	 for (ChatChannel c : cc) {
+             if (c.getName().equalsIgnoreCase(ChannelName) || c.getAlias().equalsIgnoreCase(ChannelName)) {
+                
+            	 if (bDisplayAlias)
+			    	return c.getAlias();			    				    	
+            	 else
+            		 return c.getName();
+             }
+         }
+    	
+    	 return null;
+    }
+    
     public ChatChannel[] getChannelsInfo() {
         return cc;
     }
@@ -294,6 +324,67 @@ public class ChatChannelInfo {
         return playerPrefix + playerDisplayName.trim() + playerSuffix;
 
     }
+    
+          
+    
+    public String GetClanTag(Player pl)
+    {
+    	String strclantag = ""; 
+	    if(plugin.simplelclans)
+	    {
+	    	 
+	    	 plugin.logme(LOG_LEVELS.INFO, "Player Login", "Simple Clans");
+	    	 ClanPlayer cp = plugin.sc.getClanPlayerManager().getClanPlayer(pl.getName());
+	    	//Incase they don't have a clan, we have to put it back.
+	    	  pl.setDisplayName(pl.getPlayerListName());
+	         if (cp != null)
+	         {
+	        	
+	             Clan clan = cp.getClan();
+	            // pl.setPlayerListName(clan.getTag()+pl.getPlayerListName());               
+	             //plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set ListName to:" + pl.getPlayerListName());
+	             strclantag = clan.getTag()+ChatColor.WHITE+".";
+	             pl.setDisplayName(strclantag+pl.getPlayerListName());
+	             plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set DisplayName to:"+strclantag + pl.getDisplayName());
+	         }
+	        
+	        
+	     }
+	    return strclantag;
+    }
+    
+    public void SetPlayerDisplayName(Player pl)
+    {
+    	 String pFormatted = "";
+    	 
+    	   GetClanTag(pl);
+		    if (usePrefix == true) {
+		    	
+		 	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
+		 	 
+		     //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
+		     pFormatted = FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
+		             "%s", MumbleChat.chat.getPlayerSuffix(pl));
+		     
+		    // plugin.logme(LOG_LEVELS.ERROR, "Player Format:", pFormatted);
+		     //pl.sendMessage(pFormatted);
+		     //pl.getPlayerListName()
+		     //So it shows when you login.
+		     //However this is bad.. as it makes who impossible....
+		     //pl.setDisplayName(pFormatted);
+		
+		     //put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
+		     pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
+		 }
+		 else
+		 {
+		 	  pFormatted = "%s"; 
+		 	  pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
+		 }
+    
+    }
+    
+    
 
     List<String> getFilters() {
         return filters;

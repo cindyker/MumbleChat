@@ -1,0 +1,11 @@
+players:
+  testplayer:
+    default: global
+    listen: global
+    mute:
+    date: 10/10/2012
+  noplayer:
+    default: diplo
+    listen: global
+    mute:
+    date: 10/10/2012

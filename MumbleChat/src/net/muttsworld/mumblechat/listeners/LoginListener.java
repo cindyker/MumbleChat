@@ -1,5 +1,6 @@
 package net.muttsworld.mumblechat.listeners;
 
+//import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -25,6 +26,9 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+
+//import com.p000ison.dev.simpleclans2.api.clan.Clan;
+//import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 
 public class LoginListener implements Listener {
 
@@ -83,7 +87,7 @@ public class LoginListener implements Listener {
         
         //look up player in config
         ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
-    
+        
         //If the player doesn't have a section already, then we want to do this...
         if (cs == null) {
         Boolean nothingspecial = true;
@@ -198,34 +202,36 @@ public class LoginListener implements Listener {
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerLogin(PlayerLoginEvent plog) {
         String curChannel;
-        String pFormatted = "";
+       // String pFormatted = "";
         Player pl = plog.getPlayer();
-
-        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Player");
         
-        if (cc.usePrefix == true) {
-        	
-        	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
-        	 
-            //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
-            pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
-                    "%s", MumbleChat.chat.getPlayerSuffix(pl));
-            
-           // plugin.logme(LOG_LEVELS.ERROR, "Player Format:", pFormatted);
-            //pl.sendMessage(pFormatted);
-            //pl.getPlayerListName()
-            //So it shows when you login.
-            //However this is bad.. as it makes who impossible....
-            //pl.setDisplayName(pFormatted);
-
-            //put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
-            pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
-        }
-        else
-        {
-        	  pFormatted = "%s"; 
-        	  pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
-        }
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Player");
+             
+        cc.SetPlayerDisplayName(pl);
+      
+//        if (cc.usePrefix == true) {
+//        	
+//        	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
+//        	 
+//            //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
+//            pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
+//                    "%s", MumbleChat.chat.getPlayerSuffix(pl)+cc.GetClanTag(pl));
+//            
+//           // plugin.logme(LOG_LEVELS.ERROR, "Player Format:", pFormatted);
+//            //pl.sendMessage(pFormatted);
+//            //pl.getPlayerListName()
+//            //So it shows when you login.
+//            //However this is bad.. as it makes who impossible....
+//            //pl.setDisplayName(pFormatted);
+//
+//            //put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
+//            pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
+//        }
+//        else
+//        {
+//        	  pFormatted = "%s"; 
+//        	  pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
+//        }
         
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After Format");
    
@@ -345,6 +351,7 @@ public class LoginListener implements Listener {
                           	
         }
 
+        
         //=========================================================
         // Set up Current Channel Format 
         //=========================================================
@@ -368,6 +375,15 @@ public class LoginListener implements Listener {
         }
         
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");
+        
+        //------------------------------------------------------------------------------
+        // --  Get Color Text Permissions
+        //------------------------------------------------------------------------------
+        if (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
+        {
+            plugin.getServer().getLogger().info("[" + plugin.getName() + "] chat color permissions given...");
+            pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, true));
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////
         //FUTURE FORCE CHANNEL CODE
@@ -377,8 +393,7 @@ public class LoginListener implements Listener {
             pl.setMetadata("mumblechat.canforce", new FixedMetadataValue(plugin, true));
         }
 
-     
-
+       
 
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After forcechannel");
         

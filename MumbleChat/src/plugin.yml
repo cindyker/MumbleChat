@@ -1,0 +1,59 @@
+name: MumbleChat
+version: 1.4.7
+main: net.muttsworld.mumblechat.MumbleChat
+depend: [Vault]
+author: cindy_k
+authors: [net_creator,mumblerit]
+description: Chat with Channels (1.4.7 level)
+website: www.muttsworldmine.com
+commands:
+    mute:
+        usage: /mute [player] [channel]
+        aliases: [mp]
+        description: Mute player in a channel so they cannot talk.
+        permission-message: You don't have <permission>
+    unmute:
+        usage: /unmute [player] [channel]
+        aliases: [ump]
+        description: Unmute player in a channel so they can talk again.
+        permission-message: You don't have <permission>
+    tell:
+        usage: /tell [player] [msg]
+        description: Send message to player
+        permission-message: You don't have <permission>
+    ignore:
+        usage: /ignore [player] or /ignore ? for more information
+        description: This allows you to prevent a player from sending you a tell /ignore ? for more info
+        permission-message: You don't have <permission>
+    whisper:
+        usage: /whisper [player] [msg]
+        aliases: [w]
+        description: Send message to player
+        permission-message: You don't have <permission>
+    channel:
+        usage: /channel [channelname]
+        aliases: [ch]
+        description: Allows players to add the ability to listen to the channel
+        permission-message: You don't have <permission>
+    leave:
+        usage: /leave [channelname]
+        aliases: [lev]
+        description: Allows players to leave listening to a channel
+        permission-message: You don't have <permission>
+    join:
+        usage: /join [channelname]
+        description: Allows players to join a channel
+        permission-message: You don't have <permission>
+    chlist:
+        usage: /chlist
+        aliases: [chl]
+        description: Allows players to see a listing of available channels
+        permission-message: You don't have <permission>
+    chwho:
+        usage: /chwho [channelname]
+        aliases: [chw]
+        description: Allows players to see a listing of who is listening on a channel
+        permission-message: You don't have <permission>
+    
+        
+        

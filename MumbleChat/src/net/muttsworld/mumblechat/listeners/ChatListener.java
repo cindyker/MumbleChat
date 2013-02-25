@@ -1,6 +1,9 @@
 package net.muttsworld.mumblechat.listeners;
 
 import java.util.logging.Level;
+
+import com.p000ison.dev.simpleclans2.api.clan.Clan;
+import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -98,6 +101,9 @@ public class ChatListener implements Listener {
 
         String pFormatted = "";
         //if (cc.usePrefix == true) {
+        
+            cc.SetPlayerDisplayName(p);  //This Should ReGET the player's tag Each time they talk. 
+            
             pFormatted = plugin.getMetadataString(p, "chatnameformat", plugin);
         //}
 
@@ -145,6 +151,18 @@ public class ChatListener implements Listener {
         String listenChannel = "listenchannel." + curChannel;
         // plugin.getServer().getLogger().info("Who's listening on:" +listenChannel);
 
+        //---------------SIMPLE CLANS CHAT ------------------------------
+        if(plugin.simplelclans)
+        {
+	        if(curChannel.equalsIgnoreCase("ally")||curChannel.equals("clan"))
+	        {
+	        	ClanChat(curChannel,listenChannel,p,event.getRecipients().toArray(new Player[0]),cc.FilterChat(evMessage));
+	        	event.setCancelled(true);
+	        	return;
+	        }
+        }
+              
+        
         //if they are not muted and they want to talk on the channel...
         //they need to listen on the channel.
         if (plugin.getMetadata(p, "MumbleMute." + curChannel, plugin) == true) {
@@ -158,11 +176,15 @@ public class ChatListener implements Listener {
         Double chDistance = (double) 0;
 
         String Channelformat;
+        String ChannelColor = "WHITE";
         Channelformat = plugin.getMetadataString(p, "format", plugin);
 
         //Get Distance from Channel...
         for (ChatChannel ci : cc.getChannelsInfo()) {
             if (curChannel.equalsIgnoreCase(ci.getName())) {
+            	
+            	ChannelColor = ci.getColor().toUpperCase();
+            	
                 if (ci.hasPermission()) {
                     if (plugin.getMetadata(p, ci.getPermission(), plugin) == false) {
                         //	 mama.getServer().getLogger().info(ci.getPermission()+" <== you don't have this");
@@ -236,29 +258,96 @@ public class ChatListener implements Listener {
 
 
         if (cc.usePrefix == true) {
-            try {
-                if (plugin.getMetadata(p, "mumblechat.canmute", plugin) == true) {
-                    //Rainbow Colored Skittles here... :)
-                    evMessage = cc.FormatString(evMessage);
-                }
-                event.setMessage(evMessage);
+        	  try {
+                  if (p.hasPermission("mumblechat.cancolor") == true) {
+                      //Rainbow Colored Skittles here... :)
+                      evMessage = cc.FormatString(evMessage);
+                  }
+                  event.setMessage(evMessage);
 
-                //event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
-                event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
-                //event.setMessage("");
-                plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
-            } catch (IllegalFormatException ex) {
-                plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
-                event.setMessage(Channelformat + evMessage);
-            }
-        } else {
-            event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
-            event.setMessage( evMessage);
-        }
+                  //event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
+                  if(cc.bChannelInfront)
+                      event.setFormat(Channelformat + pFormatted  + ChatColor.valueOf(ChannelColor)+ ": " + "%s"  ); //+" ");
+                  else
+                      event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
+              
+                 // plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{"listenchannel:", listenChannel}));
+                 
+                  //event.setMessage("");
+                  plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
+              } catch (IllegalFormatException ex) {
+                  plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
+                  event.setMessage(Channelformat + evMessage);
+              }
+          } else {
+        	  if(cc.bChannelInfront)
+        	  	  event.setFormat(Channelformat +" " +pFormatted + ChatColor.valueOf(ChannelColor)+ ": " + "%s"); //+" ");
+        	  else
+        		  event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
+        	  
+              event.setMessage( evMessage);
+          }
         return;
 
     }
 
+    public void ClanChat(String currentChannel, String listenChannel,Player pl,Player[] receivers,String Message)
+    {
+    	// String format;
+     //    Player player = event.getPlayer();
+         ClanPlayer clanPlayer = plugin.sc.getClanPlayerManager().getClanPlayer(pl);
+         String tag = clanPlayer.getClan().getTag();
+         
+         for(Player pr: receivers)
+         {
+        	 
+
+             if (!(pr.hasMetadata(listenChannel))) {
+                 continue;
+
+             } else {
+                 if ((plugin.getMetadata(pr, listenChannel, plugin) == false)) {
+                     continue;
+                 }
+             }
+
+        	 if(pr.hasMetadata(listenChannel)) //If they aren't listening to clan chat, skip them.
+
+        	 {
+	        	 ClanPlayer clanreceiver = plugin.sc.getClanPlayerManager().getClanPlayer(pr);
+	        //	 if(currentChannel.equalsIgnoreCase("clan"))
+	        	// {
+	        		
+	        		 if(clanreceiver.getClan().getTag().equalsIgnoreCase(tag))
+	        		 {
+	        			pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
+	        		 }
+	        //	 }
+	        	 if(currentChannel.equalsIgnoreCase("ally"))
+	        	 {
+	        		 plugin.getLogger().log(Level.INFO, "Ally Chat");
+	        		 for(Clan A:clanreceiver.getClan().getAllies())
+	        		 {
+	        			if(tag.equalsIgnoreCase(A.getTag()))
+	        			{
+	        				 plugin.getLogger().log(Level.INFO, "Ally Found them");
+	        				 pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
+	        				 break;
+	        			}
+	        		 }
+	        		         		 
+	        	 }
+        	 }
+        	        	 
+         }
+        // format = plugin.removeRetrievers(receivers, clanPlayer, player);
+
+
+    	
+    }
+    
+    
+    
     public HandlerList getHandlers() {
         // TODO Auto-generated method stub
         return null;

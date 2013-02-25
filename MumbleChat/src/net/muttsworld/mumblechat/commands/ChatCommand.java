@@ -165,12 +165,31 @@ public class ChatCommand implements CommandExecutor, Listener {
 
                 	ChatChannel chname;
                 	
+                	if(plugin.simplelclans)
+                	{
+                		
+	                	if(args[0].equalsIgnoreCase("ally") || args[0].equalsIgnoreCase("clan"))
+	                	{
+	                		//CLAN CHAT  
+	                		//They can hear it
+	                		player.setMetadata("listenchannel." + args[0].toLowerCase(), new FixedMetadataValue(plugin, true));
+	                		//They will talk on it when no commands are added. 
+	                		player.setMetadata("currentchannel", new FixedMetadataValue(plugin, args[0].toLowerCase()));
+	                		 player.sendMessage("Channel Set: " + args[0]);
+	                		return true;
+	                	}	                	
+	                
+                	}
+                	
                 	chname = cc.getChannelInfo(args[0]);
                 	if(chname == null)
                 	{
                 		 player.sendMessage("Invalid channel name");
                 		 return false;
                 	}
+                	
+                	
+                	
                 	
                     //for (ChatChannel chname : cc.getChannelsInfo()) {
                         //player.sendMessage("channels: " + chname.getName()+ "=" + args[0]);
@@ -235,6 +254,36 @@ public class ChatCommand implements CommandExecutor, Listener {
                 int listenchannelcount = 0;
 
                 if (args[0].length() > 0) {
+                	
+
+                	if(plugin.simplelclans)
+                	{
+                		
+	                	if(args[0].equalsIgnoreCase("ally") || args[0].equalsIgnoreCase("clan"))
+	                	{
+	                		//CLAN CHAT  
+	                		player.setMetadata("listenchannel." + args[0].toLowerCase(), new FixedMetadataValue(plugin, false));
+	                		  
+	                	    
+	                	    if (!cc.getAutojoinList().isEmpty())
+	                	    {
+	                	    	player.setMetadata("listenchannel." + cc.getAutojoinList().get(0), new FixedMetadataValue(plugin, true));
+	                	    	player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.getAutojoinList().get(0)));
+	                	    	player.sendMessage("Leaving "+args[0]+" Channel - Changing to: " +  cc.getAutojoinList().get(0));
+	                	    }
+	                	    else
+	                	    {
+	                	    	player.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
+	                	    	player.sendMessage("Leaving "+args[0]+" Channel - Changing to: " + cc.defaultChannel);
+	                	    	player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.defaultChannel));
+	                	    }
+	                	   
+	                		return true;
+	                	}	                   	                	
+	                
+                	}
+                	
+                	
                     for (ChatChannel chname : cc.getChannelsInfo()) {
 
                         if (chname.getName().equalsIgnoreCase(args[0]) || chname.getAlias().equalsIgnoreCase(args[0])) {
@@ -284,83 +333,91 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "chwho": {
-                String lstchan = "listenchannel.";
-                String playerlist = "";
-
-                //did they provide a channel
-                if (args[0].length() > 0) {
-
-                    //is it a valid channel
-                    ChatChannel cinfo = cc.getChannelInfo(args[0]);
-
-                    if (cinfo != null) {
-
-                        //Does this channel have permissions?
-                        if (cinfo.hasPermission()) {
-
-                            if (!player.isPermissionSet(cinfo.getPermission())) {
-                                //Command pre processor may have added listener, need to turn it off.
-                                player.setMetadata("listenchannel." + cinfo.getName(), new FixedMetadataValue(plugin, false));
-                                player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission to look at this channel");
-                                return true;
-                            }
-                        }
-
-                        lstchan += cinfo.getName();
-                        Player pl[] = plugin.getServer().getOnlinePlayers();
-
-                        plugin.logme(LOG_LEVELS.DEBUG, "ChWho","Count of player:" + pl.length);
-
-
-                        long linecount = plugin.getLineLength();
-                        for (Player p : pl) {
-                            plugin.logme(LOG_LEVELS.DEBUG, "ChWho:", "player:" + p.getDisplayName() + " " + p.isOnline());
-                            if (plugin.getMetadata(p, lstchan, plugin)) {
-
-
-                                if (cinfo.isDistance()) {
-                                    if (!isPlayerWithinDistance(player, p, cinfo.getDistance())) {
-                                        continue;
-                                    }
-                                }
-
-                                //Wrapping the text on the screen...
-                                if ((playerlist.length() + p.getName().length() > linecount)) {
-                                	 plugin.logme(LOG_LEVELS.DEBUG, "ChWho","linecount:" + linecount + "listlength:" + playerlist.length());
-                                    playerlist += "\n";
-                                    linecount = linecount + plugin.getLineLength();
-                                }
-
-
-                                if (!plugin.getMetadata(p, "MumbleMute." + cinfo.getName(), plugin)) {
-                                    playerlist += ChatColor.WHITE + p.getName();
-                                } else {
-                                    playerlist += ChatColor.RED + p.getName();
-                                }
-
-                                //Add commas between names
-                                playerlist += ChatColor.WHITE + ", ";
-                            }
-                        }
-
-                        //Remove the last trailing comma...
-                        if (playerlist.length() > 2) {
-                            playerlist = playerlist.substring(0, playerlist.length() - 2);
-                        }
-                        //show list to player who asked...
-                        player.sendMessage(ChatColor.AQUA + "Players in Channel : " + ChatColor.valueOf(cinfo.getColor().toUpperCase()) + cinfo.getName());
-                        player.sendMessage(playerlist);
-
-                        return true;
-                    } else {
-                        player.sendMessage("Please enter a valid channel name");
-                        return true;
-                    }
-
-                } else {
-                    player.sendMessage("/chwho [Channel]");
-                    return true;
-                }
+            	if(player.hasPermission("mumblechat.who"))
+            	{
+	                String lstchan = "listenchannel.";
+	                String playerlist = "";
+	
+	                //did they provide a channel
+	                if (args[0].length() > 0) {
+	
+	                    //is it a valid channel
+	                    ChatChannel cinfo = cc.getChannelInfo(args[0]);
+	
+	                    if (cinfo != null) {
+	
+	                        //Does this channel have permissions?
+	                        if (cinfo.hasPermission()) {
+	
+	                            if (!player.isPermissionSet(cinfo.getPermission())) {
+	                                //Command pre processor may have added listener, need to turn it off.
+	                                player.setMetadata("listenchannel." + cinfo.getName(), new FixedMetadataValue(plugin, false));
+	                                player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission to look at this channel");
+	                                return true;
+	                            }
+	                        }
+	
+	                        lstchan += cinfo.getName();
+	                        Player pl[] = plugin.getServer().getOnlinePlayers();
+	
+	                        plugin.logme(LOG_LEVELS.DEBUG, "ChWho","Count of player:" + pl.length);
+	
+	
+	                        long linecount = plugin.getLineLength();
+	                        for (Player p : pl) {
+	                            plugin.logme(LOG_LEVELS.DEBUG, "ChWho:", "player:" + p.getDisplayName() + " " + p.isOnline());
+	                            if (plugin.getMetadata(p, lstchan, plugin)) {
+	
+	
+	                                if (cinfo.isDistance()) {
+	                                    if (!isPlayerWithinDistance(player, p, cinfo.getDistance())) {
+	                                        continue;
+	                                    }
+	                                }
+	
+	                                //Wrapping the text on the screen...
+	                                if ((playerlist.length() + p.getName().length() > linecount)) {
+	                                	 plugin.logme(LOG_LEVELS.DEBUG, "ChWho","linecount:" + linecount + "listlength:" + playerlist.length());
+	                                    playerlist += "\n";
+	                                    linecount = linecount + plugin.getLineLength();
+	                                }
+	
+	
+	                                if (!plugin.getMetadata(p, "MumbleMute." + cinfo.getName(), plugin)) {
+	                                    playerlist += ChatColor.WHITE + p.getName();
+	                                } else {
+	                                    playerlist += ChatColor.RED + p.getName();
+	                                }
+	
+	                                //Add commas between names
+	                                playerlist += ChatColor.WHITE + ", ";
+	                            }
+	                        }
+	
+	                        //Remove the last trailing comma...
+	                        if (playerlist.length() > 2) {
+	                            playerlist = playerlist.substring(0, playerlist.length() - 2);
+	                        }
+	                        //show list to player who asked...
+	                        player.sendMessage(ChatColor.AQUA + "Players in Channel : " + ChatColor.valueOf(cinfo.getColor().toUpperCase()) + cinfo.getName());
+	                        player.sendMessage(playerlist);
+	
+	                        return true;
+	                    } else {
+	                        player.sendMessage("Please enter a valid channel name");
+	                        return true;
+	                    }
+	
+	                } else {
+	                    player.sendMessage("/chwho [Channel]");
+	                    return true;
+	                }
+            	}//Permissions
+            	else
+            	{
+            		player.sendMessage("You do not have permissions to use this command.");
+            		return true;
+            	}
             } //end of chwho
         }
 

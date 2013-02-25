@@ -8,6 +8,7 @@ import net.milkbowl.vault.permission.Permission;
 
 import net.muttsworld.mumblechat.listeners.LoginListener;
 import net.muttsworld.mumblechat.listeners.ChatListener;
+import net.muttsworld.mumblechat.listeners.SimpleClansListener;
 import net.muttsworld.mumblechat.permissions.MumblePermissions;
 import net.muttsworld.mumblechat.commands.MuteCommandExecutor;
 import net.muttsworld.mumblechat.commands.TellCommandExecutor;
@@ -15,10 +16,13 @@ import net.muttsworld.mumblechat.commands.ChatCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.p000ison.dev.simpleclans2.SimpleClans;
 
 //TODO: Add SQL so player data can be stored there
 @SuppressWarnings("unused")
@@ -28,6 +32,7 @@ public class MumbleChat extends JavaPlugin {
     // Listeners --------------------------------
     public ChatListener chatListener;
     public LoginListener loginListener;
+    public SimpleClans sc;
 
     // Executors --------------------------------
     private ChatCommand chatExecutor;
@@ -39,6 +44,7 @@ public class MumbleChat extends JavaPlugin {
     private ChatChannelInfo ccInfo;
     FileConfiguration fc;
     MumblePermissions mp;
+    public boolean simplelclans=false;
     private static final Logger log = Logger.getLogger("Minecraft");
 
     // Vault --------------------------------
@@ -56,14 +62,31 @@ public class MumbleChat extends JavaPlugin {
         log.info(String.format("[%s] - Initializing...", getDescription().getName()));
 
         log.info(String.format("[%s] - Checking for Vault...", getDescription().getName()));
-
         
         // Set up Vault
         if(!setupPermissions()) {
             log.info(String.format("[%s] - Could not find Vault dependency, disabling.", getDescription().getName()));
         }
+        
+        log.info(String.format("[%s] - Checking for SimpleClans...", getDescription().getName()));
+        
+        Plugin plug = getServer().getPluginManager().getPlugin("SimpleClans2");
+       
+        // Set up simpleclans
+        if(plug==null) {
+            log.info(String.format("[%s] - Could not find Simpleclans dependency, disabling.", getDescription().getName()));
+        }
+        else
+        {
+        	simplelclans=true;
+        	sc = ((SimpleClans) plug);
+        	
+        
+        }
+        
         setupChat();
 
+        
         // Log completion of initialization
         getLogger().info(String.format("[%s] - Enabled with version %s", getDescription().getName(), getDescription().getVersion()));
         
@@ -91,14 +114,18 @@ public class MumbleChat extends JavaPlugin {
 
         // Channel information reference
         ccInfo = new ChatChannelInfo(this);
-
+        
         if(ccInfo == null)
         	 log.info(String.format("[%s] - Configuration is BAD!", getDescription().getName()));
 
         
+        if(simplelclans)
+        	super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
+        
         chatListener = new ChatListener(this, ccInfo);
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(chatListener, this);
+       
 
         loginListener = new LoginListener(this, ccInfo);
         pluginManager.registerEvents(loginListener, this);
