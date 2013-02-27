@@ -102,7 +102,7 @@ public class ChatListener implements Listener {
         String pFormatted = "";
         //if (cc.usePrefix == true) {
         
-            cc.SetPlayerDisplayName(p);  //This Should ReGET the player's tag Each time they talk. 
+
             
             pFormatted = plugin.getMetadataString(p, "chatnameformat", plugin);
         //}
@@ -295,51 +295,82 @@ public class ChatListener implements Listener {
     {
     	// String format;
      //    Player player = event.getPlayer();
+    	
          ClanPlayer clanPlayer = plugin.sc.getClanPlayerManager().getClanPlayer(pl);
-         String tag = clanPlayer.getClan().getTag();
-         
-         for(Player pr: receivers)
+         if(clanPlayer!=null)
          {
-        	 
-
-             if (!(pr.hasMetadata(listenChannel))) {
-                 continue;
-
-             } else {
-                 if ((plugin.getMetadata(pr, listenChannel, plugin) == false)) {
-                     continue;
-                 }
-             }
-
-        	 if(pr.hasMetadata(listenChannel)) //If they aren't listening to clan chat, skip them.
-
-        	 {
-	        	 ClanPlayer clanreceiver = plugin.sc.getClanPlayerManager().getClanPlayer(pr);
-	        //	 if(currentChannel.equalsIgnoreCase("clan"))
-	        	// {
-	        		
-	        		 if(clanreceiver.getClan().getTag().equalsIgnoreCase(tag))
-	        		 {
-	        			pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
-	        		 }
-	        //	 }
-	        	 if(currentChannel.equalsIgnoreCase("ally"))
+	         String tag = clanPlayer.getClan().getTag();
+	         
+	         for(Player pr: receivers)
+	         {
+	        	 	
+	             if (!(pr.hasMetadata(listenChannel))) {
+	                 continue;
+	
+	             } else {
+	                 if ((plugin.getMetadata(pr, listenChannel, plugin) == false)) {
+	                     continue;
+	                 }
+	             }
+	
+	        	 if(pr.hasMetadata(listenChannel)) //If they aren't listening to clan chat, skip them.
+	
 	        	 {
-	        		 plugin.getLogger().log(Level.INFO, "Ally Chat");
-	        		 for(Clan A:clanreceiver.getClan().getAllies())
-	        		 {
-	        			if(tag.equalsIgnoreCase(A.getTag()))
-	        			{
-	        				 plugin.getLogger().log(Level.INFO, "Ally Found them");
-	        				 pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
-	        				 break;
-	        			}
-	        		 }
-	        		         		 
+		        	 ClanPlayer clanreceiver = plugin.sc.getClanPlayerManager().getClanPlayer(pr);
+		        	 if(clanreceiver==null)
+		        	 {
+		        		 //player is no longer in a clan.
+		        		 continue;
+		        	 }
+		        //	 if(currentChannel.equalsIgnoreCase("clan"))
+		        	// {
+		        		
+		        		 if(clanreceiver.getClan().getTag().equalsIgnoreCase(tag))
+		        		 {
+		        			pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
+		        		 }
+		        //	 }
+		        	 if(currentChannel.equalsIgnoreCase("ally"))
+		        	 {
+		        		// plugin.getLogger().log(Level.INFO, "Ally Chat");
+		        		 for(Clan A:clanreceiver.getClan().getAllies())
+		        		 {
+		        			if(tag.equalsIgnoreCase(A.getTag()))
+		        			{
+		        				 //plugin.getLogger().log(Level..DEBUG, "Ally Found them");
+		        				 pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
+		        				 break;
+		        			}
+		        		 }
+		        		         		 
+		        	 }
 	        	 }
-        	 }
-        	        	 
+	        	        	 
+	         }
          }
+         else
+         {
+        	 pl.sendMessage("You are not in a clan");
+        		//CLAN CHAT  
+     	
+     	    
+     	    if (!cc.getAutojoinList().isEmpty())
+     	    {
+     	    	pl.setMetadata("listenchannel." + cc.getAutojoinList().get(0), new FixedMetadataValue(plugin, true));
+     	    	pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.getAutojoinList().get(0)));
+     	    	pl.sendMessage("Changing to: " +  cc.getAutojoinList().get(0));
+     	    }
+     	    else
+     	    {
+     	    	pl.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
+     	    	pl.sendMessage("Changing to: " + cc.defaultChannel);
+     	    	pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.defaultChannel));
+     	    }
+        	 
+         }
+        	 
+         
+         
         // format = plugin.removeRetrievers(receivers, clanPlayer, player);
 
 

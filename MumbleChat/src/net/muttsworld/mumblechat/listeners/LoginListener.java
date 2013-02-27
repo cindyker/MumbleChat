@@ -156,6 +156,21 @@ public class LoginListener implements Listener {
             }
 
         }
+        if(plugin.simplelclans)
+        {
+        	if(plugin.getMetadata(pl, "listenchannel.ally" , plugin))
+        	{
+        		strListening += "ally"+",";
+        				
+        	}
+        	
+        	if(plugin.getMetadata(pl, "listenchannel.clan" , plugin))
+        	{
+        		strListening += "clan"+",";
+        				
+        	}
+        	
+        }
 
         //	mama.getServer().getLogger().info("After Section....2 ");
 
@@ -262,6 +277,11 @@ public class LoginListener implements Listener {
              
                 curChannel = cs.getString("default", defaultChannel);
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, curChannel));
+                if(curChannel.length()<2) //If for some reason an empty string is here. 
+                {
+                	pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
+                }
+                
 
                 //Get the Ignore list.. if they have one.
                 String ignores = cs.getString("ignores", "");
@@ -280,16 +300,29 @@ public class LoginListener implements Listener {
 
                         String chname = st.nextToken();
                         ChatChannel c = cc.getChannelInfo(chname);
-                        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for each channel:" + c.getName());
-                        //Check for Channel Permission before allowing player to use channel.
-                        //Incase their permissions change.
-                        if (c.hasPermission()) {
-                            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
-                            if (pl.isPermissionSet(c.getPermission())) {
-                                pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
-                            }
-                        } else {
-                            pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+                        if(c != null)
+                        {
+	                        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for each channel:" + c.getName());
+	                        //Check for Channel Permission before allowing player to use channel.
+	                        //Incase their permissions change.
+	                        if (c.hasPermission()) {
+	                            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
+	                            if (pl.isPermissionSet(c.getPermission())) {
+	                                pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+	                            }
+	                        }
+	                        else {
+	                            pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+	                        }
+                        }
+                        else
+                        { //Check for Clan listen channels.
+                           if(plugin.simplelclans){
+                        	   		if(chname.equalsIgnoreCase("ally")||chname.equalsIgnoreCase("clan"))
+                        	   		{
+                        	   			pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+                        	   		}
+                               }
                         }
                     }
                 } else //if no channel is available to listen on... set it to default... they should listen on something.
@@ -356,11 +389,16 @@ public class LoginListener implements Listener {
         // Set up Current Channel Format 
         //=========================================================
         String curColor = defaultColor;
+    	String format = "[Unknown]";
         ChatChannel cf = cc.getChannelInfo(curChannel);
-        curColor = cf.getColor();
-        String format = ChatColor.valueOf(curColor.toUpperCase()) + "[" + curChannel + "]";
+        if(cf != null)
+        {
+        	curColor = cf.getColor();
+        	format = ChatColor.valueOf(curColor.toUpperCase()) + "[" + curChannel + "]";
+        	
+        }
+    
         pl.setMetadata("format", new FixedMetadataValue(plugin, format));
-
         
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After format");
         

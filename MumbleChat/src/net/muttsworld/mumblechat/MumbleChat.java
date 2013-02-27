@@ -120,7 +120,10 @@ public class MumbleChat extends JavaPlugin {
 
         
         if(simplelclans)
-        	super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
+        {
+        //	super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
+        	//super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
+        }
         
         chatListener = new ChatListener(this, ccInfo);
         PluginManager pluginManager = getServer().getPluginManager();

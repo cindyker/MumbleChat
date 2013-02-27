@@ -83,7 +83,24 @@ public class ChatCommand implements CommandExecutor, Listener {
 
             }
         }
+        
+        if(e.getMessage().toLowerCase().startsWith("/chname"))
+        {
+        	  cc.SetPlayerDisplayName(player);  //This Should Re GET the player's tag Each time they talk. 
+        	  player.sendMessage("Display name has been updated.");
+        	  e.setCancelled(true);
+        	  
+              return;
+        }
 
+        if(plugin.simplelclans)
+        {
+        	if(e.getMessage().toLowerCase().startsWith("/clan modtag"))
+        	{
+        		player.sendMessage("/chname to refresh your tag after you have changed it.");
+        		return;
+        	}
+        }
 
         for (ChatChannel ci : cc.getChannelsInfo()) {
 
@@ -165,6 +182,8 @@ public class ChatCommand implements CommandExecutor, Listener {
 
                 	ChatChannel chname;
                 	
+                  
+                    
                 	if(plugin.simplelclans)
                 	{
                 		

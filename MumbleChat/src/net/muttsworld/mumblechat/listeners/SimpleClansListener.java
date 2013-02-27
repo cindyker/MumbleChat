@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 
 import com.p000ison.dev.simpleclans2.api.events.ClanPlayerKillEvent;
 import com.p000ison.dev.simpleclans2.api.events.ClanPlayerCreateEvent;
+import com.p000ison.dev.simpleclans2.api.events.ClanCreateEvent;
 
 public class SimpleClansListener implements Listener{
 	ChatChannelInfo cc;
@@ -29,9 +30,15 @@ public class SimpleClansListener implements Listener{
 
 	    public void onClanPlayer(ClanPlayerCreateEvent event)
 	    {
-	    	plugin.logme(LOG_LEVELS.INFO, "SimpleClanListener", "Setting Display Name");
+	    	plugin.logme(LOG_LEVELS.INFO, "SimpleClanListener", "ClanPlayerCreateEvent Setting Display Name");
 	    	cc.GetClanTag(event.getClanPlayer().getOnlineVersion().toPlayer());
 	    }
-	
+	   
+	    public void onClanEvent(ClanCreateEvent event)
+	    {
+	    	plugin.logme(LOG_LEVELS.INFO, "SimpleClanListener", "ClanCreateEvent Setting Display Name: "+event.getClan().getTag());
+	    	
+	    	//cc.GetClanTag(event.getClanPlayer().getOnlineVersion().toPlayer());
+	    }
 
 }
