@@ -177,6 +177,6 @@ channels:
     autojoin: true
   noob:
     color: white
-    mutable: true
+    muteable: true
     alias: n
     default: true
