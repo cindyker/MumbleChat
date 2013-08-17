@@ -120,10 +120,7 @@ public class MumbleChat extends JavaPlugin {
 
         
         if(simplelclans)
-        {
-        //	super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
-        	//super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
-        }
+        	super.getServer().getPluginManager().registerEvents(new SimpleClansListener(this, ccInfo), this);
         
         chatListener = new ChatListener(this, ccInfo);
         PluginManager pluginManager = getServer().getPluginManager();
@@ -156,7 +153,10 @@ public class MumbleChat extends JavaPlugin {
         getCommand("join").setExecutor(chatExecutor);
         getCommand("chlist").setExecutor(chatExecutor);
         getCommand("chwho").setExecutor(chatExecutor);
-
+        getCommand("chversion").setExecutor(chatExecutor);
+        
+        getCommand("chmute").setExecutor(muteExecutor);        
+        getCommand("chunmute").setExecutor(muteExecutor);
         getCommand("mute").setExecutor(muteExecutor);
         getCommand("unmute").setExecutor(muteExecutor);
     }
@@ -219,6 +219,11 @@ public class MumbleChat extends JavaPlugin {
         } else {
             curLogLevel = LOG_LEVELS.INFO;
         }
+    }
+
+    public ChatChannelInfo getChatChannelInfo()
+    {
+        return ccInfo;
     }
 
     public void logme(LOG_LEVELS level, String location, String logline) {

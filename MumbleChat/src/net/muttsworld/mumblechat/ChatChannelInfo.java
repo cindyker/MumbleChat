@@ -24,6 +24,8 @@ public class ChatChannelInfo {
     //List<chatChannel> cc;
     ChatChannel[] cc;
     public String mutepermissions;
+    public String unmutepermissions;
+    public String tellpermissions;
     public String forcepermissions;
     public String colorpermissions;
     public Boolean saveplayerdata;
@@ -60,11 +62,15 @@ public class ChatChannelInfo {
         ConfigurationSection cs = plugin.getConfig().getConfigurationSection("channels");
 
 
-        mutepermissions = plugin.getConfig().getString("mute.permissions", "");
-        forcepermissions = plugin.getConfig().getString("force.permissions", "");
-        colorpermissions = plugin.getConfig().getString("inchat_color_permissions","");
+        mutepermissions = plugin.getConfig().getString("permissions.mute", "");
+        unmutepermissions = plugin.getConfig().getString("permissions.unmute",mutepermissions);
+        
+        forcepermissions = plugin.getConfig().getString("permissions.force", "");
+        colorpermissions = plugin.getConfig().getString("permissions.color","");
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
+        tellpermissions = plugin.getConfig().getString("permissions.tell","");
+        
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         
         usePrefix = false;
@@ -333,7 +339,7 @@ public class ChatChannelInfo {
 	    if(plugin.simplelclans)
 	    {
 	    	 
-	    	 plugin.logme(LOG_LEVELS.INFO, "Player Login", "Simple Clans");
+	    	 plugin.logme(LOG_LEVELS.DEBUG, "GetClanTag", "Simple Clans");
 	    	 ClanPlayer cp = plugin.sc.getClanPlayerManager().getClanPlayer(pl.getName());
 	    	//Incase they don't have a clan, we have to put it back.
 	    	  pl.setDisplayName(pl.getPlayerListName());
@@ -345,7 +351,7 @@ public class ChatChannelInfo {
 	             //plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set ListName to:" + pl.getPlayerListName());
 	             strclantag = clan.getTag()+ChatColor.WHITE+".";
 	             pl.setDisplayName(strclantag+pl.getPlayerListName());
-	             plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set DisplayName to:"+strclantag + pl.getDisplayName());
+	             plugin.logme(LOG_LEVELS.DEBUG, "GetClanTag", "Set DisplayName to:"+strclantag + pl.getDisplayName());
 	         }
 	        
 	        
@@ -358,10 +364,12 @@ public class ChatChannelInfo {
     	 String pFormatted = "";
     	 
     	   GetClanTag(pl);
-		    if (usePrefix == true) {
+		    if (usePrefix) {
 		    	
-		 	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
-		 	 
+		 	   plugin.logme(LOG_LEVELS.DEBUG, "SetPlayerDisplayName", "Got Prefix");
+
+               plugin.logme(LOG_LEVELS.INFO,"SetPlayerDisplayName","Vault Player Prefix: " + MumbleChat.chat.getPlayerPrefix(pl));
+
 		     //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
 		     pFormatted = FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
 		             "%s", MumbleChat.chat.getPlayerSuffix(pl));

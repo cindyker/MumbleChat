@@ -61,61 +61,55 @@ public class ChatListener implements Listener {
 
         ////////////////////////////////////////////////////////////////////////
         // if sticky tell this becomes quick...
-        String tellPlayer = plugin.getMetadataString(p, "MumbleChat.tell", plugin);
-        if (tellPlayer.length() > 0) {
-            //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
-            Player tp = plugin.getServer().getPlayer(tellPlayer);
-            if (tp == null) {
-                p.sendMessage(tellPlayer + " is not available");
-                p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+        if(p.isPermissionSet(plugin.getChatChannelInfo().tellpermissions))
+        {
+            String tellPlayer = plugin.getMetadataString(p, "MumbleChat.tell", plugin);
 
-            } else {
-                //Check for Ignores....
-                String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
-                if (playerignorelist.length() > 0) {
-                    String curplayer = "";
-                    StringTokenizer st = new StringTokenizer(playerignorelist, ",");
-                    while (st.hasMoreTokens()) {
+            if (tellPlayer.length() > 0) {
+                //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
+                Player tp = plugin.getServer().getPlayer(tellPlayer);
+                if (tp == null) {
+                    p.sendMessage(tellPlayer + " is not available");
+                    p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
 
-                        curplayer = st.nextToken();
-                        if (curplayer.equalsIgnoreCase(p.getName())) {
-                            p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
-                            event.setCancelled(true);
-                            return;
+                } else {
+                    //Check for Ignores....
+                    String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
+                    if (playerignorelist.length() > 0) {
+                        String curplayer = "";
+                        StringTokenizer st = new StringTokenizer(playerignorelist, ",");
+                        while (st.hasMoreTokens()) {
+
+                            curplayer = st.nextToken();
+                            if (curplayer.equalsIgnoreCase(p.getName())) {
+                                p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
+                                event.setCancelled(true);
+                                return;
+                            }
                         }
+
                     }
-
+                    String filtered = cc.FilterChat(event.getMessage());
+                    String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
+                    tp.sendMessage(msg);
+                    p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
+                    plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getPlayerListName() +": "+ event.getMessage() );
+                    return;
                 }
-
-                String filtered = cc.FilterChat(event.getMessage());
-                String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
-                tp.sendMessage(msg);
-                p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
-
+                event.setCancelled(true);
+                return;
             }
-            event.setCancelled(true);   //Fixed bug.. this needs to be cancelled.
-            return;
-
         }
 
 
         String pFormatted = "";
-        //if (cc.usePrefix == true) {
-        
 
-            
-            pFormatted = plugin.getMetadataString(p, "chatnameformat", plugin);
-        //}
-
+        cc.SetPlayerDisplayName(p);  //This Should get the player's tag Each time they talk.
+        pFormatted = plugin.getMetadataString(p, "chatnameformat", plugin);
 
         evMessage = event.getMessage();
 
-        // plugin.getServer().getLogger().info("Filter ok?");
 
-
-        Location locreceip;
-        Location locsender = p.getLocation();
-        Location diff;
 
         Boolean filterthis = true;
         String curChannel = "";
@@ -179,16 +173,19 @@ public class ChatListener implements Listener {
         String ChannelColor = "WHITE";
         Channelformat = plugin.getMetadataString(p, "format", plugin);
 
-        //Get Distance from Channel...
+        ////////////////////////////////////////////
+        //Get Channel Information
+        ////////////////////////////////////////////
         for (ChatChannel ci : cc.getChannelsInfo()) {
             if (curChannel.equalsIgnoreCase(ci.getName())) {
             	
             	ChannelColor = ci.getColor().toUpperCase();
             	
                 if (ci.hasPermission()) {
-                    if (plugin.getMetadata(p, ci.getPermission(), plugin) == false) {
-                        //	 mama.getServer().getLogger().info(ci.getPermission()+" <== you don't have this");
-                        p.sendMessage(ChatColor.DARK_PURPLE + "You don't have permissions for this channel.");
+                    //if (plugin.getMetadata(p, ci.getPermission(), plugin) == false) {
+                    if(!p.isPermissionSet(ci.getPermission()))
+                    {
+                        p.sendMessage(ChatColor.DARK_PURPLE + "You don't have permissions for this channel..");
                         event.setCancelled(true);
                         return;
                     }
@@ -207,31 +204,63 @@ public class ChatListener implements Listener {
 
         /////////////////////////////////////////////////////
         //Apply the Filter is required
-        //   int t = 0;
         if (filterthis) {
             evMessage = cc.FilterChat(evMessage);
 
         }
 
-        //Add channel info
-        //evMessage = tempformat + evMessage;
-
+        //Player has listenChannel and its true...
+        //Getting Speakers Location..
+        Location locreceip;
+        Location locsender = p.getLocation();
+        Location diff;
 
         Player[] pl = event.getRecipients().toArray(new Player[0]);
         //Check each player to see who should receive message...
         for (Player rp : pl) {
             //mama.getServer().getLogger().info("["+mama.getName()+"] "+listenChannel);
 
+            //Are they Listening?
             if (!(rp.hasMetadata(listenChannel))) {
                 event.getRecipients().remove(rp);
-
-            } else {
-                if ((plugin.getMetadata(rp, listenChannel, plugin) == false)) {
+                continue;
+            }
+            else{
+                if ((!plugin.getMetadata(rp, listenChannel, plugin))) {
                     event.getRecipients().remove(rp);
+                    continue;
+            }
+                
+                /// Prevent Easedroppers...
+                //////////////////////////////////////////////////////////////////////////////
+                 ChatChannel cci = cc.getChannelInfo(curChannel);
+                 if(cci == null)
+                 {
+                	  p.sendMessage("UKNOWN CHANNEL " + curChannel + " Please choose a channel! /ch [channelname] - /chlist for channel list");
+                      event.setCancelled(true);
+                      return;
+                 }
+                if( cci.hasPermission() )
+                {
+                	//if (plugin.getMetadata(p, cci.getPermission(), plugin) == false) {
+                    if(!rp.isPermissionSet(cci.getPermission()))
+                    {
+                        plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent",rp.getPlayerListName() + " Removed from Channel "+cci.getAlias() +" -  No Permissions");
+                		 rp.removeMetadata("listenchannel." + listenChannel,plugin);
+                		 event.getRecipients().remove(rp);
+
+                         //If this is the Sender, then they need to be kicked out and told.
+                         if(rp.getPlayerListName().compareToIgnoreCase(p.getPlayerListName())==0)
+                         {
+                             p.sendMessage(ChatColor.DARK_PURPLE + "You don't have permissions for this channel...");
+                         }
+                		 continue;
+                	}
                 }
+                ///////////////////////////////////////////////////////////////////////////////////
             }
 
-            //Player has listenChannel and its true...
+            //Distance Channel. Check to make sure on the Same World and inside the Box.
             if (chDistance > (double) 0) {
                 locreceip = rp.getLocation();
                 if ((locreceip.getWorld() == p.getWorld())) {
@@ -252,42 +281,36 @@ public class ChatListener implements Listener {
 
         }
 
-        if (event.getRecipients().size() == 1) {
-            p.sendMessage(ChatColor.GOLD + "No one is listening to you");
-        }
-
-
-        if (cc.usePrefix == true) {
         	  try {
-                  if (p.hasPermission("mumblechat.cancolor") == true) {
+                  if (p.isPermissionSet(plugin.getChatChannelInfo().colorpermissions)) {
                       //Rainbow Colored Skittles here... :)
                       evMessage = cc.FormatString(evMessage);
                   }
+
+
                   event.setMessage(evMessage);
 
-                  //event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
+
                   if(cc.bChannelInfront)
                       event.setFormat(Channelformat + pFormatted  + ChatColor.valueOf(ChannelColor)+ ": " + "%s"  ); //+" ");
                   else
                       event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
-              
-                 // plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{"listenchannel:", listenChannel}));
-                 
-                  //event.setMessage("");
-                  plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
+
+
+                  plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
               } catch (IllegalFormatException ex) {
                   plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
                   event.setMessage(Channelformat + evMessage);
               }
-          } else {
-        	  if(cc.bChannelInfront)
-        	  	  event.setFormat(Channelformat +" " +pFormatted + ChatColor.valueOf(ChannelColor)+ ": " + "%s"); //+" ");
-        	  else
-        		  event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
-        	  
+
               event.setMessage( evMessage);
-          }
-        return;
+
+        if (event.getRecipients().size() == 1) {
+//             String fullMessage = String.format(event.getFormat(),p.getDisplayName(),evMessage);
+//            p.sendMessage(fullMessage);
+            p.sendMessage(ChatColor.GOLD + "There is no one in this channel to hear you.");
+        }
+
 
     }
 
@@ -308,7 +331,7 @@ public class ChatListener implements Listener {
 	                 continue;
 	
 	             } else {
-	                 if ((plugin.getMetadata(pr, listenChannel, plugin) == false)) {
+	                 if ((!plugin.getMetadata(pr, listenChannel, plugin))) {
 	                     continue;
 	                 }
 	             }

@@ -128,8 +128,11 @@ filters:
 - vulva,peach
 - \blag,awesome
 - rain,sunshine
-mute:
-  permissions: mumblechat.canmute
+permissions:
+  mute: mumblechat.mute
+  unmute: mumblechat.unmute
+  tell: mumblechat.tell
+  color: mumblechat.color
 loglevel: info
 saveplayerdata: true
 usePrefix: false

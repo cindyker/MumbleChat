@@ -1,10 +1,10 @@
 name: MumbleChat
-version: 1.4.7
+version: 1.6.2
 main: net.muttsworld.mumblechat.MumbleChat
 depend: [Vault]
 author: cindy_k
 authors: [net_creator,mumblerit]
-description: Chat with Channels (1.4.7 level)
+description: Chat with Channels (1.6.2 level)
 website: www.muttsworldmine.com
 commands:
     mute:
@@ -12,11 +12,21 @@ commands:
         aliases: [mp]
         description: Mute player in a channel so they cannot talk.
         permission-message: You don't have <permission>
+    chmute:
+        usage: /chmute [player] [channel]
+        aliases: [cmp]
+        description: Mute player in a channel so they cannot talk.
+        permission-message: You don't have <permission>
     unmute:
         usage: /unmute [player] [channel]
         aliases: [ump]
         description: Unmute player in a channel so they can talk again.
         permission-message: You don't have <permission>
+    chunmute:
+       usage: /unmute [player] [channel]
+       aliases: [ump]
+       description: Unmute player in a channel so they can talk again.
+       permission-message: You don't have <permission>
     tell:
         usage: /tell [player] [msg]
         description: Send message to player
@@ -54,6 +64,10 @@ commands:
         aliases: [chw]
         description: Allows players to see a listing of who is listening on a channel
         permission-message: You don't have <permission>
-    
+    chversion:
+        usage: /chversion
+        description: Displays Description text for Ops
+        permission-message: You don't have <permission>
+        
         
         

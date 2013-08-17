@@ -39,7 +39,16 @@ public class MuteCommandExecutor implements CommandExecutor {
 		 {
 		   admin = (Player)sender;
 		 }
-	
+
+        if(admin==null)
+        {
+            //This shouldn't happen, but if it does we need to bail.
+            return false;
+        }
+
+
+
+
 // Future Development!
 // Want to be able force in and force out
 //		if(cmd.getName().equalsIgnoreCase("force"))
@@ -76,135 +85,129 @@ public class MuteCommandExecutor implements CommandExecutor {
 //		}
 		
 		
-		//Need to check for permission before checking for command
-		if(cmd.getName().equalsIgnoreCase("mute"))
+
+		if( (cmd.getName().equalsIgnoreCase("mute")) || (cmd.getName().equalsIgnoreCase("chmute")))
 		{
-			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
-			{
-				//	plugin.getServer().getLogger().info("Got Mute!");	
-				
-					if (args.length < 2)
-					{
-		//				 plugin.getServer().getLogger().info("Command is /derpmute [player] [channel]");
-		//				 if (!(admin==null))
-		//				 {
-		//					 admin.sendMessage("Command is /derpmute [player] [channel]");
-		//				 
-		//				 }
-						admin.sendMessage(ChatColor.WHITE+"Invalid command: /mute [player] [channel]");
-						 return false;
-					}
-				
-					 Player player = null;
-					 player = sender.getServer().getPlayerExact(args[0]);
-					 if(player == null)
-					 {
-				//		 plugin.getServer().getLogger().info("Can't mute. Player "+ args[0] + " doesn't exist.");
-						 if (!(admin==null))
-						 {
-							 admin.sendMessage(ChatColor.RED+"Can't mute. Player "+ args[0] + " doesn't exist.");
-						 
-						 }
-						 return false;
-					 
-					 }
-					 
-					 for(ChatChannel c:cc.getChannelsInfo())
-					 {
-						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]) )
-						 {
-							 if(c.isMuteable())
-							 {
-								 plugin.logme(LOG_LEVELS.INFO ,"Muting Player", " In Channel : " + c.getName() + " Player Name: " + args[0] );
-								 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
-								 admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ args[0] + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
-								 player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
-								
-							 }
-							 else
-							   admin.sendMessage(ChatColor.RED + "You cannot mute players in this channel: "  + c.getName());
-														 
-							 return true;
-						 }
-						 
-							 
-					 }
-					 
-				
-				 
-				
-			//	 plugin.getServer().getLogger().info("Can't mute. Channel "+ args[1] + " doesn't exist. global or local");
-				 if (!(admin==null))
-				 {
-					 admin.sendMessage(ChatColor.RED+"Can't mute. Channel "+ args[1] + " doesn't exist.");
-				 
-				 }
-				return false;
-			}//Has permissions...
-			else
-			{
-				admin.sendMessage(ChatColor.DARK_PURPLE+"You do not have permission for this command.");
-				return true;
-			}
-		}
+            if (args.length < 2) {
+                admin.sendMessage(ChatColor.WHITE+"Invalid command. Try: /chmute [player] [channel]");
+                return true;
+            }
+            Player player = null;
+            player = sender.getServer().getPlayerExact(args[0]);
+            String channel = args[1];
+            return HandleMute(admin,player,channel);
+        }
 		
-		if(cmd.getName().equalsIgnoreCase("unmute"))
+		if((cmd.getName().equalsIgnoreCase("unmute")) ||(cmd.getName().equalsIgnoreCase("chunmute")) )
 		{
-			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
-			{
-				   plugin.logme(LOG_LEVELS.DEBUG ,"Unmute command", "Got Command..." );
-				
-									
-					if (args.length < 2)
-					{
-						 return false;
-					}
-				
-					 Player player = null;
-					 player = sender.getServer().getPlayerExact(args[0]);
-					 if(player == null)
-					 {
-				//		 plugin.getServer().getLogger().info("Can't mute. Player "+ args[0] + " doesn't exist.");
-						 if (!(admin==null))
-						 {
-							 admin.sendMessage(ChatColor.RED+"Can't unmute. Player "+ args[0] + " doesn't exist.");
-						 
-						 }
-						 return false;
-					 
-					 }
-					 
-					 for(ChatChannel c:cc.getChannelsInfo())
-					 {
-						 if(c.getName().equalsIgnoreCase(args[1])|| c.getAlias().equalsIgnoreCase(args[1]))
-						 { 
-							 plugin.logme(LOG_LEVELS.INFO ,"Unmuting Player", " In Channel : " + c.getName() + " Player Name: " + args[0] );
-							 player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,false));
-							 admin.sendMessage(ChatColor.RED+"unMuted Player "+ args[0] + " in "+  ChatColor.valueOf(c.getColor().toUpperCase())  +c.getName());
-							 player.sendMessage(ChatColor.RED+"You have just been unmuted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
-							 return true;
-						 }
-					 }
-					 
-				
-				 
-				
-			//	 plugin.getServer().getLogger().info("Can't mute. Channel "+ args[1] + " doesn't exist. global or local");
-				 if (!(admin==null))
-				 {
-					 admin.sendMessage(ChatColor.RED+"Can't unmute. Channel "+ args[1] + " doesn't exist.");
-				 
-				 }
-				return false;
-			}//Has permissions...
-			else
-			{
-				admin.sendMessage(ChatColor.DARK_PURPLE+"You do not have permission for this command.");
-				return true;
-			}
+            if (args.length < 2)
+            {
+                admin.sendMessage(ChatColor.WHITE+"Invalid command. Try: /chunmute [player] [channel]");
+                return false;
+            }
+            Player player = null;
+            player = sender.getServer().getPlayerExact(args[0]);
+            String channel = args[1];
+            return HandleUnMute(admin,player,channel);
 		}
 		
 		return false;
 	}
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Handle Mute Function
+    /////////////////////////////////////////////////////////////////////////////////////
+    boolean HandleMute(Player admin, Player player, String channel)
+    {
+        if(admin.isPermissionSet(plugin.getChatChannelInfo().mutepermissions))
+        {
+            String playername = "";
+
+            if(player == null) {
+
+                if(player.getPlayerListName()!= null)
+                    playername = player.getPlayerListName();
+                else
+                    playername = "";
+
+                admin.sendMessage(ChatColor.RED+"Can't mute. Player "+ playername + " doesn't exist.");
+
+                return true;
+            }
+            //Check for Channels
+            for(ChatChannel c:cc.getChannelsInfo())
+            {
+                //Channel Name or Alias is OK
+                if(c.getName().equalsIgnoreCase(channel)|| c.getAlias().equalsIgnoreCase(channel) )
+                {
+                    if(c.isMuteable()) {
+                        plugin.logme(LOG_LEVELS.INFO ,"Muting Player", " In Channel : " + c.getName() + " Player Name: " + playername );
+                        player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
+                        admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ playername + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+                        player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+                    }
+                    else
+                        admin.sendMessage(ChatColor.RED + "You cannot mute players in this channel: "  + c.getName());
+
+                    return true;
+                }
+            }
+
+            //If we left the channel check without finding a channel, then it doesn't exist.
+            admin.sendMessage(ChatColor.RED+"Can't mute. Channel "+ channel+ " doesn't exist.");
+            return true;
+
+        }//Has permissions...
+        else{
+            admin.sendMessage(ChatColor.DARK_PURPLE+"You do not have permission for this command.");
+            return true;
+        }
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Handle UnMute Function
+    /////////////////////////////////////////////////////////////////////////////////////
+    boolean HandleUnMute(Player admin, Player player, String channel)
+    {
+        if(admin.isPermissionSet(plugin.getChatChannelInfo().unmutepermissions))
+        {
+
+            String playername = "";
+
+            if(player == null) {
+
+                if(player.getPlayerListName()!= null)
+                    playername = player.getPlayerListName();
+                else
+                    playername = "";
+
+                admin.sendMessage(ChatColor.RED+"Can't unmute. Player "+ playername + " doesn't exist.");
+
+                return true;
+            }
+            for(ChatChannel c:cc.getChannelsInfo())
+            {
+                if(c.getName().equalsIgnoreCase(channel)|| c.getAlias().equalsIgnoreCase(channel))
+                {
+                    plugin.logme(LOG_LEVELS.INFO ,"Unmuting Player", " In Channel : " + c.getName() + " Player Name: " +playername );
+                    player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,false));
+                    admin.sendMessage(ChatColor.RED+"unMuted Player "+playername + " in "+  ChatColor.valueOf(c.getColor().toUpperCase())  +c.getName());
+                    player.sendMessage(ChatColor.RED+"You have just been unmuted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+                    return true;
+                }
+            }
+
+            admin.sendMessage(ChatColor.RED+"Can't unmute. Channel "+ channel + " doesn't exist.");
+            return true;
+
+        }//Has permissions...
+        else
+        {
+            admin.sendMessage(ChatColor.DARK_PURPLE+"You do not have permission for this command.");
+            return true;
+        }
+
+    }
 
 }

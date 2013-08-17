@@ -196,6 +196,11 @@ public class TellCommandExecutor implements CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("tell") || cmd.getName().equalsIgnoreCase("whisper"))
 		{
+			if(!admin.hasPermission(plugin.getChatChannelInfo().tellpermissions))
+			{
+				 admin.sendMessage(ChatColor.RED+"You are not allowed to send tells.");				
+				return true;
+			}
 	
 			//	plugin.getServer().getLogger().info("Got Tell!");	
 			plugin.logme(LOG_LEVELS.DEBUG, "tell", "Tell or Whisper command called: "+ cmd.getName() );

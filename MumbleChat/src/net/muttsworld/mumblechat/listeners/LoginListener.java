@@ -223,49 +223,9 @@ public class LoginListener implements Listener {
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Player");
              
         cc.SetPlayerDisplayName(pl);
-      
-//        if (cc.usePrefix == true) {
-//        	
-//        	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
-//        	 
-//            //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
-//            pFormatted = cc.FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
-//                    "%s", MumbleChat.chat.getPlayerSuffix(pl)+cc.GetClanTag(pl));
-//            
-//           // plugin.logme(LOG_LEVELS.ERROR, "Player Format:", pFormatted);
-//            //pl.sendMessage(pFormatted);
-//            //pl.getPlayerListName()
-//            //So it shows when you login.
-//            //However this is bad.. as it makes who impossible....
-//            //pl.setDisplayName(pFormatted);
-//
-//            //put player tag in metadata... this way we don't keep calling permissionex in chatlistener.
-//            pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
-//        }
-//        else
-//        {
-//        	  pFormatted = "%s"; 
-//        	  pl.setMetadata("chatnameformat", new FixedMetadataValue(plugin, pFormatted));
-//        }
         
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After Format");
-   
-        //Set up Player Permissions FIRST
-        for (ChatChannel c : cc.getChannelsInfo()) {
-            //	mama.getServer().getLogger().info("Find Stuff  " + c.getName() + " " + c.getPermission());
-            if (c.hasPermission()) {
-                //	mama.getServer().getLogger().info("Perms Exist!" + c.getPermission());
 
-                if (pl.isPermissionSet(c.getPermission())) {
-                    //mama.getServer().getLogger().info("And I can use them!!!" + c.getPermission());
-                    pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, true));
-                } else {
-                    pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, false));
-                }
-            }
-        }
-        
-                
         if (cc.saveplayerdata) {
             customConfig = getCustomConfig();
             plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We have saved player data");
@@ -274,63 +234,27 @@ public class LoginListener implements Listener {
             ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
             if (cs != null) {
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Player's data has been found");
-             
+
+                //=========SET PLAYER's Current CHANNEL
                 curChannel = cs.getString("default", defaultChannel);
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, curChannel));
                 if(curChannel.length()<2) //If for some reason an empty string is here. 
                 {
                 	pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
                 }
-                
 
+                //========SET PLAYER's Ignore List
                 //Get the Ignore list.. if they have one.
                 String ignores = cs.getString("ignores", "");
                 pl.setMetadata("MumbleChat.ignore", new FixedMetadataValue(plugin, ignores));
 
+                //=======Set PLAYER's Listening Channels
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for listen channels");
                 //check for channels to listen too...
                 String listenChannels = cs.getString("listen", "");
+                SetPlayerListenChannels( pl, listenChannels);
 
-                plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Listenchannels:" + listenChannels);
-                if (listenChannels.length() > 0) {
-                    //String[] pparse = new String[2];
-
-                    StringTokenizer st = new StringTokenizer(listenChannels, ",");
-                    while (st.hasMoreTokens()) {
-
-                        String chname = st.nextToken();
-                        ChatChannel c = cc.getChannelInfo(chname);
-                        if(c != null)
-                        {
-	                        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for each channel:" + c.getName());
-	                        //Check for Channel Permission before allowing player to use channel.
-	                        //Incase their permissions change.
-	                        if (c.hasPermission()) {
-	                            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
-	                            if (pl.isPermissionSet(c.getPermission())) {
-	                                pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
-	                            }
-	                        }
-	                        else {
-	                            pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
-	                        }
-                        }
-                        else
-                        { //Check for Clan listen channels.
-                           if(plugin.simplelclans){
-                        	   		if(chname.equalsIgnoreCase("ally")||chname.equalsIgnoreCase("clan"))
-                        	   		{
-                        	   			pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
-                        	   		}
-                               }
-                        }
-                    }
-                } else //if no channel is available to listen on... set it to default... they should listen on something.
-                {
-                    pl.sendMessage("You have no channels to listen to... setting listen to " + defaultChannel);
-                    pl.sendMessage("Check /chlist for a list of available channels.");
-                    pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
-                }
+                //========Set PLAYER's Mute Channels
                 //	mama.getServer().getLogger().info("before Mutes");
                 String muteChannels = cs.getString("mutes", "");
                 if (muteChannels.length() > 0) {
@@ -340,8 +264,6 @@ public class LoginListener implements Listener {
 
                     }
                 }
-
-
 
 
             } else {
@@ -403,21 +325,41 @@ public class LoginListener implements Listener {
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After format");
         
 
+        //ToDo: Remove this me thinks... Just Check the permission when the player goes to use it.
+        //Will stop the need to relog, when a player has changed.
         //====================================================================================
         // ---  Get Permissions for Special Commands here -----------------------------------
         //====================================================================================
-        if (pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
+        /*if (pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Mute permissions given...");
             pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
         }
+       
+        if (pl.isPermissionSet(cc.unmutepermissions))
+        {
+            plugin.getServer().getLogger().info("[" + plugin.getName() + "] can UnMute permissions given...");
+            pl.setMetadata("mumblechat.canunmute", new FixedMetadataValue(plugin, true));
+        }
         
-        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");
+        if(cc.tellpermissions.length()>0)
+        {
+        	if(pl.hasPermission(cc.tellpermissions))
+        	{
+                plugin.getServer().getLogger().info("[" + plugin.getName() + "] can use Tell - permissions given...");
+                pl.setMetadata("mumblechat.cantell", new FixedMetadataValue(plugin, true));
+        	}
+        }
+        else  //No Tell permissions in file. Everyone can tell then.
+        	 pl.setMetadata("mumblechat.cantell", new FixedMetadataValue(plugin, true));
+        
+        
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");*/
         
         //------------------------------------------------------------------------------
         // --  Get Color Text Permissions
         //------------------------------------------------------------------------------
-        if (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
+      /*  if (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] chat color permissions given...");
             pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, true));
@@ -429,7 +371,7 @@ public class LoginListener implements Listener {
         if (pl.isPermissionSet(cc.forcepermissions)) {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Force permissions given...");
             pl.setMetadata("mumblechat.canforce", new FixedMetadataValue(plugin, true));
-        }
+        }*/
 
        
 
@@ -438,6 +380,51 @@ public class LoginListener implements Listener {
 
         //mama.getServer().getLogger().info("End the Login Event");
     }
+
+
+    public void SetPlayerListenChannels(Player pl, String ListenChannelsList)
+    {
+        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Listenchannels:" + ListenChannelsList);
+        if (ListenChannelsList.length() > 0) {
+
+            StringTokenizer st = new StringTokenizer(ListenChannelsList, ",");
+            while (st.hasMoreTokens()) {
+
+                String chname = st.nextToken();
+                ChatChannel c = cc.getChannelInfo(chname);
+                if(c != null)
+                {
+                    plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Check for each channel:" + c.getName());
+                    //Check for Channel Permission before allowing player to use channel.
+                    //Incase their permissions change.
+                    if (c.hasPermission()) {
+                        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
+                        if (pl.isPermissionSet(c.getPermission())) {
+                            pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+                        }
+                    }
+                    else {
+                        pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+                    }
+                }
+                else
+                { //Check for Clan listen channels.
+                    if(plugin.simplelclans){
+                        if(chname.equalsIgnoreCase("ally")||chname.equalsIgnoreCase("clan"))
+                        {
+                            pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
+                        }
+                    }
+                }
+            }
+        } else //if no channel is available to listen on... set it to default... they should listen on something.
+        {
+            pl.sendMessage("You have no channels to listen to... setting listen to " + defaultChannel);
+            pl.sendMessage("Check /chlist for a list of available channels.");
+            pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
+        }
+    }
+
 
     public void reloadCustomConfig() {
 

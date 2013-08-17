@@ -174,6 +174,13 @@ public class ChatCommand implements CommandExecutor, Listener {
         }
 
         switch (comm) {
+            case "chversion":
+            {
+            	  if(player.isOp())
+            	  {
+            		  player.sendMessage("MumbleChat Version:" + plugin.getDescription());
+            	  }
+            }
             case "join":
             case "channel": {
                 if (args[0].length() > 0)
@@ -348,6 +355,14 @@ public class ChatCommand implements CommandExecutor, Listener {
                         player.sendMessage(ChatColor.valueOf(chname.getColor().toUpperCase()) + chname.getName() + " : " + chname.getAlias());
                     }
                 }
+                
+                if(plugin.simplelclans)
+            	{
+                	player.sendMessage(ChatColor.AQUA+ "ally : Need to be in a clan");
+                	player.sendMessage(ChatColor.AQUA+ "clan : Need to be in a clan");
+                	
+                	
+            	}
                 return true;
             }
 
