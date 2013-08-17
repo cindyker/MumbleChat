@@ -54,6 +54,7 @@ public class ChatListener implements Listener {
         String evMessage;
 
         if (event.isCancelled()) {
+            plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Cancelled",event.getMessage() );
             return;
         }
 
@@ -94,6 +95,7 @@ public class ChatListener implements Listener {
                     tp.sendMessage(msg);
                     p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
                     plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getPlayerListName() +": "+ event.getMessage() );
+                    event.setCancelled(true);
                     return;
                 }
                 event.setCancelled(true);
@@ -125,7 +127,6 @@ public class ChatListener implements Listener {
             //	plugin.getServer().getLogger().info("Talking Sticky");
             curChannel = plugin.getMetadataString(p, "currentchannel", plugin);
         } else {
-        	 plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent","Temp Talk");
             curChannel = insertchannel;
             p.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
 
@@ -159,12 +160,30 @@ public class ChatListener implements Listener {
         
         //if they are not muted and they want to talk on the channel...
         //they need to listen on the channel.
-        if (plugin.getMetadata(p, "MumbleMute." + curChannel, plugin) == true) {
+        if (plugin.getMetadata(p, "MumbleMute." + curChannel, plugin)) {
             p.sendMessage(ChatColor.DARK_PURPLE + "You are muted in this channel: " + curChannel);
             event.setCancelled(true);
             return;
         } else {
-            p.setMetadata(listenChannel, new FixedMetadataValue(plugin, true));
+            if(cc.getChannelInfo(curChannel).hasPermission())
+            {
+                if(p.hasPermission(cc.getChannelInfo(curChannel).getPermission()))
+                {
+                    plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent","Set listen channel");
+                     p.setMetadata(listenChannel, new FixedMetadataValue(plugin, true));
+                }
+                else
+                {
+                    p.sendMessage(ChatColor.DARK_PURPLE + "You don't have permissions for this channel..");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            else
+            {
+
+                p.setMetadata(listenChannel, new FixedMetadataValue(plugin, true));
+            }
         }
 
         Double chDistance = (double) 0;
@@ -222,11 +241,13 @@ public class ChatListener implements Listener {
 
             //Are they Listening?
             if (!(rp.hasMetadata(listenChannel))) {
+
                 event.getRecipients().remove(rp);
                 continue;
             }
             else{
                 if ((!plugin.getMetadata(rp, listenChannel, plugin))) {
+                    plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent",rp.getPlayerListName() + " Removed from Channel "+listenChannel +" -  Not Listening");
                     event.getRecipients().remove(rp);
                     continue;
             }
@@ -245,7 +266,7 @@ public class ChatListener implements Listener {
                 	//if (plugin.getMetadata(p, cci.getPermission(), plugin) == false) {
                     if(!rp.isPermissionSet(cci.getPermission()))
                     {
-                        plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent",rp.getPlayerListName() + " Removed from Channel "+cci.getAlias() +" -  No Permissions");
+                        plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent",rp.getPlayerListName() + " Removed from Channel "+cci.getAlias() +" -  No Permissions");
                 		 rp.removeMetadata("listenchannel." + listenChannel,plugin);
                 		 event.getRecipients().remove(rp);
 
@@ -281,14 +302,14 @@ public class ChatListener implements Listener {
 
         }
 
-        	  try {
-                  if (p.isPermissionSet(plugin.getChatChannelInfo().colorpermissions)) {
-                      //Rainbow Colored Skittles here... :)
-                      evMessage = cc.FormatString(evMessage);
-                  }
+          try {
+              if (p.isPermissionSet(plugin.getChatChannelInfo().colorpermissions)) {
+                  //Rainbow Colored Skittles here... :)
+                  evMessage = cc.FormatString(evMessage);
+              }
 
+               event.setMessage(evMessage);
 
-                  event.setMessage(evMessage);
 
 
                   if(cc.bChannelInfront)
@@ -297,7 +318,7 @@ public class ChatListener implements Listener {
                       event.setFormat(pFormatted + " " + Channelformat + "%s"); //+" ");
 
 
-                  plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
+                  plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format:%s::%s:%s",pFormatted, Channelformat,evMessage));
               } catch (IllegalFormatException ex) {
                   plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
                   event.setMessage(Channelformat + evMessage);
@@ -308,6 +329,23 @@ public class ChatListener implements Listener {
         if (event.getRecipients().size() == 1) {
 //             String fullMessage = String.format(event.getFormat(),p.getDisplayName(),evMessage);
 //            p.sendMessage(fullMessage);
+            plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", "In One! " + event.getMessage());
+            if(event.isCancelled())
+            {
+                plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", "One and Event Cancelled...");
+                String fullMessage = String.format(event.getFormat(),p.getDisplayName(),evMessage);
+                p.sendMessage(fullMessage);
+            }
+            plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", "ONE PERSON: "+ evMessage);
+            p.sendMessage(ChatColor.GOLD + "There is no one in this channel to hear you.");
+        }
+
+        if(event.getRecipients().size() == 0 )
+        {
+            //somehow I remove EVERYONE!
+            String fullMessage = String.format(event.getFormat(),p.getDisplayName(),evMessage);
+            p.sendMessage(fullMessage);
+            plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", "Format: "+ fullMessage);
             p.sendMessage(ChatColor.GOLD + "There is no one in this channel to hear you.");
         }
 

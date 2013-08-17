@@ -169,7 +169,10 @@ public class LoginListener implements Listener {
         		strListening += "clan"+",";
         				
         	}
-        	
+
+            cs.set("tag", plugin.getMetadata(pl, "MumbleChat.ClanTag", plugin));
+
+
         }
 
         //	mama.getServer().getLogger().info("After Section....2 ");
@@ -273,6 +276,10 @@ public class LoginListener implements Listener {
                 pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
             }
 
+            if(plugin.simplelclans){
+                pl.setMetadata("MumbleChat.ClanTag", new FixedMetadataValue(plugin,cs.getBoolean("tag",true )));
+            }
+
         } else {
             curChannel = defaultChannel;
             pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, defaultChannel));
@@ -306,6 +313,7 @@ public class LoginListener implements Listener {
                           	
         }
 
+
         
         //=========================================================
         // Set up Current Channel Format 
@@ -325,60 +333,6 @@ public class LoginListener implements Listener {
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After format");
         
 
-        //ToDo: Remove this me thinks... Just Check the permission when the player goes to use it.
-        //Will stop the need to relog, when a player has changed.
-        //====================================================================================
-        // ---  Get Permissions for Special Commands here -----------------------------------
-        //====================================================================================
-        /*if (pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
-        {
-            plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Mute permissions given...");
-            pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
-        }
-       
-        if (pl.isPermissionSet(cc.unmutepermissions))
-        {
-            plugin.getServer().getLogger().info("[" + plugin.getName() + "] can UnMute permissions given...");
-            pl.setMetadata("mumblechat.canunmute", new FixedMetadataValue(plugin, true));
-        }
-        
-        if(cc.tellpermissions.length()>0)
-        {
-        	if(pl.hasPermission(cc.tellpermissions))
-        	{
-                plugin.getServer().getLogger().info("[" + plugin.getName() + "] can use Tell - permissions given...");
-                pl.setMetadata("mumblechat.cantell", new FixedMetadataValue(plugin, true));
-        	}
-        }
-        else  //No Tell permissions in file. Everyone can tell then.
-        	 pl.setMetadata("mumblechat.cantell", new FixedMetadataValue(plugin, true));
-        
-        
-        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");*/
-        
-        //------------------------------------------------------------------------------
-        // --  Get Color Text Permissions
-        //------------------------------------------------------------------------------
-      /*  if (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
-        {
-            plugin.getServer().getLogger().info("[" + plugin.getName() + "] chat color permissions given...");
-            pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, true));
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-        //FUTURE FORCE CHANNEL CODE
-        ///////////////////////////////////////////////////////////////////////////////////////
-        if (pl.isPermissionSet(cc.forcepermissions)) {
-            plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Force permissions given...");
-            pl.setMetadata("mumblechat.canforce", new FixedMetadataValue(plugin, true));
-        }*/
-
-       
-
-        plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After forcechannel");
-        
-
-        //mama.getServer().getLogger().info("End the Login Event");
     }
 
 

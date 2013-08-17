@@ -100,6 +100,26 @@ public class ChatCommand implements CommandExecutor, Listener {
         		player.sendMessage("/chname to refresh your tag after you have changed it.");
         		return;
         	}
+
+            if(e.getMessage().toLowerCase().startsWith("/chtag"))
+            {
+                String newMsg = e.getMessage();
+                newMsg = newMsg.replaceFirst("/chtag ", "");
+
+                switch( newMsg)
+                {
+                    case "off":
+                        player.setMetadata("MumbleChat.ClanTag", new FixedMetadataValue(plugin, false));
+                        break;
+                    case "on":
+                        player.setMetadata("MumbleChat.ClanTag", new FixedMetadataValue(plugin, true));
+                        break;
+
+                    default:
+                        player.sendMessage("Invalid command: /chtag off  or  /chtag on");
+                }
+
+            }
         }
 
         for (ChatChannel ci : cc.getChannelsInfo()) {

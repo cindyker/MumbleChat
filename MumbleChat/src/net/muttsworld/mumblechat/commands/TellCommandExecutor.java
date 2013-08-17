@@ -217,7 +217,7 @@ public class TellCommandExecutor implements CommandExecutor {
 				 {
 					plugin.logme(LOG_LEVELS.DEBUG, "tell", "Can't find Player "+ args[0] + ".");
 					
-					 if (!(admin==null))
+					 if (admin!=null)
 					 {
 						 admin.sendMessage(ChatColor.RED+"Can't find Player "+ args[0] + ".");
 					 

@@ -338,7 +338,14 @@ public class ChatChannelInfo {
     	String strclantag = ""; 
 	    if(plugin.simplelclans)
 	    {
-	    	 
+
+            //If they have turned the clan tag off, don't show it.
+            if( pl.hasMetadata("MumbleChat.ClanTag"))
+            {
+               if(!plugin.getMetadata(pl, "MumbleChat.ClanTag", plugin))
+                   return strclantag;
+            }
+
 	    	 plugin.logme(LOG_LEVELS.DEBUG, "GetClanTag", "Simple Clans");
 	    	 ClanPlayer cp = plugin.sc.getClanPlayerManager().getClanPlayer(pl.getName());
 	    	//Incase they don't have a clan, we have to put it back.
