@@ -527,6 +527,7 @@ public class ChatCommand implements CommandExecutor, Listener {
         p.sendMessage(ChatColor.AQUA+"/chlist    : "+ ChatColor.WHITE +" Provides a list of Available Channels");
         p.sendMessage(ChatColor.AQUA+"/join [channel]"+ ChatColor.WHITE +" Join a channel to listen and talk in it");
         p.sendMessage(ChatColor.AQUA+"/lev [channel]"+ ChatColor.WHITE +" Leave a channel if you no longer want to see it");
+        p.sendMessage(ChatColor.AQUA+"/[channel] [Message]" + ChatColor.WHITE +" To talk in a channel.");
 
         if(p.hasPermission(plugin.getChatChannelInfo().whopermissions))
             p.sendMessage(ChatColor.AQUA+"/chwho [channel]"+ ChatColor.WHITE +" See who is in the channel (Red names are muted)");
