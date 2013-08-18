@@ -154,6 +154,7 @@ public class MumbleChat extends JavaPlugin {
         getCommand("chlist").setExecutor(chatExecutor);
         getCommand("chwho").setExecutor(chatExecutor);
         getCommand("chversion").setExecutor(chatExecutor);
+        getCommand("chhelp").setExecutor(chatExecutor);
         
         getCommand("chmute").setExecutor(muteExecutor);        
         getCommand("chunmute").setExecutor(muteExecutor);

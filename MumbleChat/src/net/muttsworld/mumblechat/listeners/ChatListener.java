@@ -62,47 +62,55 @@ public class ChatListener implements Listener {
 
         ////////////////////////////////////////////////////////////////////////
         // if sticky tell this becomes quick...
-        if(p.isPermissionSet(plugin.getChatChannelInfo().tellpermissions))
+        //
+        String tellPlayer = plugin.getMetadataString(p, "MumbleChat.tell", plugin);
+
+        if (tellPlayer.length() > 0)
         {
-            String tellPlayer = plugin.getMetadataString(p, "MumbleChat.tell", plugin);
+            if(p.hasPermission(plugin.getChatChannelInfo().tellpermissions))
+            {
 
-            if (tellPlayer.length() > 0) {
-                //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
-                Player tp = plugin.getServer().getPlayer(tellPlayer);
-                if (tp == null) {
-                    p.sendMessage(tellPlayer + " is not available");
-                    p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+                    //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
+                    Player tp = plugin.getServer().getPlayer(tellPlayer);
+                    if (tp == null) {
+                        p.sendMessage(tellPlayer + " is not available");
+                        p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
 
-                } else {
-                    //Check for Ignores....
-                    String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
-                    if (playerignorelist.length() > 0) {
-                        String curplayer = "";
-                        StringTokenizer st = new StringTokenizer(playerignorelist, ",");
-                        while (st.hasMoreTokens()) {
+                    } else {
+                        //Check for Ignores....
+                        String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
+                        if (playerignorelist.length() > 0) {
+                            String curplayer = "";
+                            StringTokenizer st = new StringTokenizer(playerignorelist, ",");
+                            while (st.hasMoreTokens()) {
 
-                            curplayer = st.nextToken();
-                            if (curplayer.equalsIgnoreCase(p.getName())) {
-                                p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
-                                event.setCancelled(true);
-                                return;
+                                curplayer = st.nextToken();
+                                if (curplayer.equalsIgnoreCase(p.getName())) {
+                                    p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
+                                    event.setCancelled(true);
+                                    return;
+                                }
                             }
-                        }
 
+                        }
+                        String filtered = cc.FilterChat(event.getMessage());
+                        String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
+                        tp.sendMessage(msg);
+                        p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
+                        plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getPlayerListName() +": "+ event.getMessage() );
+                        event.setCancelled(true);
+                        return;
                     }
-                    String filtered = cc.FilterChat(event.getMessage());
-                    String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
-                    tp.sendMessage(msg);
-                    p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
-                    plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getPlayerListName() +": "+ event.getMessage() );
                     event.setCancelled(true);
                     return;
                 }
-                event.setCancelled(true);
-                return;
-            }
-        }
-
+                else
+                {
+                    p.sendMessage(ChatColor.YELLOW +"You do not have permission to send tells.");
+                    event.setCancelled(true);
+                    return;
+                }
+         }
 
         String pFormatted = "";
 

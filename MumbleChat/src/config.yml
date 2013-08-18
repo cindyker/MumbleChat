@@ -133,6 +133,7 @@ permissions:
   unmute: mumblechat.unmute
   tell: mumblechat.tell
   color: mumblechat.color
+  who: mumblechat.who
 loglevel: info
 saveplayerdata: true
 usePrefix: false

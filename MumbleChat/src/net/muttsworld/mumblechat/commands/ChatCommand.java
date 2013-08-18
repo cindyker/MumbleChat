@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 public class ChatCommand implements CommandExecutor, Listener {
 
@@ -59,7 +60,7 @@ public class ChatCommand implements CommandExecutor, Listener {
                     
                     if (cc.broadcastPlayer) {
                     	String pName= "";
-                    	 if (cc.usePrefix == true) {
+                    	 if (cc.usePrefix) {
                              pName = String.format(plugin.getMetadataString(player, "chatnameformat", plugin),player.getDisplayName());
                          }
                     	 else
@@ -198,8 +199,12 @@ public class ChatCommand implements CommandExecutor, Listener {
             {
             	  if(player.isOp())
             	  {
-            		  player.sendMessage("MumbleChat Version:" + plugin.getDescription());
+                      PluginDescriptionFile pdf = plugin.getDescription(); //Gets plugin.yml
+                      //Gets the version
+            		  player.sendMessage("MumbleChat Version: " +  pdf.getVersion());
             	  }
+                return true;
+
             }
             case "join":
             case "channel": {
@@ -345,7 +350,7 @@ public class ChatCommand implements CommandExecutor, Listener {
 
                         //Figure out how many channels the player is listening too..
                         //they need at least one.
-                        if (plugin.getMetadata(player, "listenchannel." + chname.getName(), plugin) == true) {
+                        if (plugin.getMetadata(player, "listenchannel." + chname.getName(), plugin)) {
                             listenchannelcount++;
                         }
                     }
@@ -387,7 +392,7 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "chwho": {
-            	if(player.hasPermission("mumblechat.who"))
+            	if(player.hasPermission(plugin.getChatChannelInfo().whopermissions))
             	{
 	                String lstchan = "listenchannel.";
 	                String playerlist = "";
@@ -403,7 +408,7 @@ public class ChatCommand implements CommandExecutor, Listener {
 	                        //Does this channel have permissions?
 	                        if (cinfo.hasPermission()) {
 	
-	                            if (!player.isPermissionSet(cinfo.getPermission())) {
+	                            if (!player.hasPermission(cinfo.getPermission())) {
 	                                //Command pre processor may have added listener, need to turn it off.
 	                                player.setMetadata("listenchannel." + cinfo.getName(), new FixedMetadataValue(plugin, false));
 	                                player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission to look at this channel");
@@ -473,6 +478,12 @@ public class ChatCommand implements CommandExecutor, Listener {
             		return true;
             	}
             } //end of chwho
+
+            case "chhelp":
+            {
+                ShowHelpInfo(player);
+                return true;
+            }
         }
 
         return false;
@@ -506,5 +517,28 @@ public class ChatCommand implements CommandExecutor, Listener {
         }
 
         return true;
+    }
+
+
+    void  ShowHelpInfo(Player p)
+    {
+        p.sendMessage(ChatColor.AQUA+"MumbleChat Quick Help");
+        p.sendMessage(ChatColor.AQUA+"-- Commands --");
+        p.sendMessage(ChatColor.AQUA+"/chlist    : "+ ChatColor.WHITE +" Provides a list of Available Channels");
+        p.sendMessage(ChatColor.AQUA+"/join [channel]"+ ChatColor.WHITE +" Join a channel to listen and talk in it");
+        p.sendMessage(ChatColor.AQUA+"/lev [channel]"+ ChatColor.WHITE +" Leave a channel if you no longer want to see it");
+
+        if(p.hasPermission(plugin.getChatChannelInfo().whopermissions))
+            p.sendMessage(ChatColor.AQUA+"/chwho [channel]"+ ChatColor.WHITE +" See who is in the channel (Red names are muted)");
+
+        if(p.hasPermission(plugin.getChatChannelInfo().tellpermissions))
+            p.sendMessage(ChatColor.AQUA+"/tell [player] [message]"+ ChatColor.WHITE +" Send a private message to a player");
+
+        if(p.hasPermission(plugin.getChatChannelInfo().mutepermissions))
+            p.sendMessage(ChatColor.AQUA+"/chmute [player] [channel]"+ ChatColor.WHITE +" Mute player in the channel, so they can't talk");
+
+        if(p.hasPermission(plugin.getChatChannelInfo().unmutepermissions))
+            p.sendMessage(ChatColor.AQUA+"/chunmute [player] [channel]"+ ChatColor.WHITE +" Unmute a player in the channel, so they may talk again");
+
     }
 }

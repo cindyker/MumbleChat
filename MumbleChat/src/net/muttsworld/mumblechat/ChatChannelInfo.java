@@ -28,6 +28,7 @@ public class ChatChannelInfo {
     public String tellpermissions;
     public String forcepermissions;
     public String colorpermissions;
+    public String whopermissions;
     public Boolean saveplayerdata;
     public Boolean usePrefix;
     public Boolean useSuffix;
@@ -70,6 +71,8 @@ public class ChatChannelInfo {
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
         tellpermissions = plugin.getConfig().getString("permissions.tell","");
+
+        whopermissions = plugin.getConfig().getString("permissions.who","");
         
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         
