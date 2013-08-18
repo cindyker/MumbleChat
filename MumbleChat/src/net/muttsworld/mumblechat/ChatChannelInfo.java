@@ -184,7 +184,6 @@ public class ChatChannelInfo {
 
     public List<String> getAutojoinList() {
         List<String> joinlist = new ArrayList<String>();
-        ;
 
         for (ChatChannel c : cc) {
             if (c.getAutojoin()) {
@@ -378,7 +377,7 @@ public class ChatChannelInfo {
 		    	
 		 	   plugin.logme(LOG_LEVELS.DEBUG, "SetPlayerDisplayName", "Got Prefix");
 
-               plugin.logme(LOG_LEVELS.INFO,"SetPlayerDisplayName","Vault Player Prefix: " + MumbleChat.chat.getPlayerPrefix(pl));
+               plugin.logme(LOG_LEVELS.DEBUG,"SetPlayerDisplayName","Vault Player Prefix: " + MumbleChat.chat.getPlayerPrefix(pl));
 
 		     //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
 		     pFormatted = FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
