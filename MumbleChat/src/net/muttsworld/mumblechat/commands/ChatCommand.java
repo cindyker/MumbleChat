@@ -17,6 +17,11 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.PluginDescriptionFile;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class ChatCommand implements CommandExecutor, Listener {
 
     private MumbleChat plugin;
@@ -484,9 +489,100 @@ public class ChatCommand implements CommandExecutor, Listener {
                 ShowHelpInfo(player);
                 return true;
             }
+
+            case "who":
+            case"online":
+            {
+                ShowWhoInfo(player);
+                return true;
+            }
+
         }
 
         return false;
+    }
+
+    //////////////////////////////////////////
+    // Implementing my on /Who for Groups
+    // Commandbook doesn't support Vault Groups
+    // and the /who was bugged.
+    //
+    // However I did borrow just modify their function here
+    // so thank you sk89q team.
+    // https://github.com/sk89q/commandbook/blob/master/src/main/java/com/sk89q/commandbook/OnlineListComponent.java
+    ///////////////////////////////////////////
+    void ShowWhoInfo(Player player)
+    {
+        StringBuilder out = new StringBuilder();
+
+        Player[] plist = plugin.getServer().getOnlinePlayers();
+
+        if(plist.length==0){
+            player.sendMessage("0 players are online.");
+            return;
+        }
+
+        int onlineCount = plist.length;
+        out.append(ChatColor.GRAY + "Online (");
+        for (Player pl : plist) {
+             if (!(player.canSee(pl))) {
+                    onlineCount--;
+
+            }
+        }
+        out.append(onlineCount);
+
+        out.append("/");
+        out.append(plugin.getServer().getMaxPlayers());
+
+        out.append("): ");
+        out.append(ChatColor.WHITE);
+
+        //Groups
+        Map<String, List<Player>> groups = new HashMap<String, List<Player>>();
+
+        for (Player pl : plist) {
+
+                if (!(player.canSee(pl))) {
+                    continue;
+                }
+
+            String playerGroup = MumbleChat.permission.getPrimaryGroup( pl);
+
+            String group = playerGroup.length() > 0 ? playerGroup : "Default";
+
+            if (groups.containsKey(group)) {
+                groups.get(group).add(pl);
+            } else {
+                List<Player> list = new ArrayList<Player>();
+                list.add(pl);
+                groups.put(group, list);
+            }
+        }
+
+        for (Map.Entry<String, List<Player>> entry : groups.entrySet()) {
+            out.append("\n");
+            out.append(ChatColor.WHITE).append(entry.getKey());
+            out.append(": ");
+
+            // To keep track of commas
+            boolean first = true;
+
+            for (Player pl : entry.getValue()) {
+                if (!first) {
+                    out.append(", ");
+                }
+                out.append(pl.getDisplayName()).append(ChatColor.WHITE);
+                first = false;
+            }
+        }
+
+        String[] lines = out.toString().split("\n");
+
+        for (String line : lines) {
+            player.sendMessage(line);
+        }
+
     }
 
     Boolean isPlayerWithinDistance(Player p1, Player p2, double Distance) {
@@ -536,7 +632,7 @@ public class ChatCommand implements CommandExecutor, Listener {
             p.sendMessage(ChatColor.AQUA+"/tell [player] [message]"+ ChatColor.WHITE +" Send a private message to a player");
 
         if(p.hasPermission(plugin.getChatChannelInfo().mutepermissions))
-            p.sendMessage(ChatColor.AQUA+"/chmute [player] [channel]"+ ChatColor.WHITE +" Mute player in the channel, so they can't talk");
+            p.sendMessage(ChatColor.AQUA + "/chmute [player] [channel]" + ChatColor.WHITE + " Mute player in the channel, so they can't talk");
 
         if(p.hasPermission(plugin.getChatChannelInfo().unmutepermissions))
             p.sendMessage(ChatColor.AQUA+"/chunmute [player] [channel]"+ ChatColor.WHITE +" Unmute a player in the channel, so they may talk again");
