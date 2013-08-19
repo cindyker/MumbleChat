@@ -72,6 +72,11 @@ commands:
         usage: /chhelp
         description: Help information for users
         permission-message: You don't have <permission>
+    who:
+        usage: /who
+        aliases: [online]
+        description: Help information for users
+        permission-message: You don't have <permission>
         
         
         

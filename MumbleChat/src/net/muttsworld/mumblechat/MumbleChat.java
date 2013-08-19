@@ -3,6 +3,8 @@ package net.muttsworld.mumblechat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.sk89q.commandbook.CommandBook;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
@@ -33,6 +35,7 @@ public class MumbleChat extends JavaPlugin {
     public ChatListener chatListener;
     public LoginListener loginListener;
     public SimpleClans sc;
+   // public CommandBook cb;
 
     // Executors --------------------------------
     private ChatCommand chatExecutor;
@@ -45,6 +48,9 @@ public class MumbleChat extends JavaPlugin {
     FileConfiguration fc;
     MumblePermissions mp;
     public boolean simplelclans=false;
+
+  //  public boolean cmdbook_msg=false;
+   // public boolean cmdbook_onlinelist=false;
     private static final Logger log = Logger.getLogger("Minecraft");
 
     // Vault --------------------------------
@@ -83,7 +89,14 @@ public class MumbleChat extends JavaPlugin {
         	
         
         }
-        
+
+     /*   Plugin cmdbook = getServer().getPluginManager().getPlugin("CommandBook");
+        if(cmdbook!=null)
+        {
+            cb = ((CommandBook) cmdbook);
+            //if(cb..getComponentManager().)
+        }*/
+
         setupChat();
 
         
@@ -155,6 +168,7 @@ public class MumbleChat extends JavaPlugin {
         getCommand("chwho").setExecutor(chatExecutor);
         getCommand("chversion").setExecutor(chatExecutor);
         getCommand("chhelp").setExecutor(chatExecutor);
+        getCommand("who").setExecutor(chatExecutor);
         
         getCommand("chmute").setExecutor(muteExecutor);        
         getCommand("chunmute").setExecutor(muteExecutor);

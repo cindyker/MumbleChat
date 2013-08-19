@@ -138,10 +138,10 @@ public class MuteCommandExecutor implements CommandExecutor {
                 if(c.getName().equalsIgnoreCase(channel)|| c.getAlias().equalsIgnoreCase(channel) )
                 {
                     if(c.isMuteable()) {
-                        plugin.logme(LOG_LEVELS.INFO ,"Muting Player", " In Channel : " + channel + " Player Name: " + playername );
-                        player.setMetadata("MumbleMute."+channel,new FixedMetadataValue(plugin,true));
-                        admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ playername + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + channel);
-                        player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  +channel);
+                        plugin.logme(LOG_LEVELS.INFO ,"Muting Player", " In Channel : " + c.getName() + " Player Name: " + playername );
+                        player.setMetadata("MumbleMute."+c.getName(),new FixedMetadataValue(plugin,true));
+                        admin.sendMessage(ChatColor.RED + "Muted player: "+ChatColor.WHITE+" "+ playername + ChatColor.RED + " in: " +  ChatColor.valueOf(c.getColor().toUpperCase())  + c.getName());
+                        player.sendMessage(ChatColor.RED+"You have just been muted in " +  ChatColor.valueOf(c.getColor().toUpperCase())  +c.getName());
                     }
                     else
                         admin.sendMessage(ChatColor.RED + "You cannot mute players in this channel: "  + c.getName());
