@@ -35,6 +35,7 @@ public class MumbleChat extends JavaPlugin {
     public ChatListener chatListener;
     public LoginListener loginListener;
     public SimpleClans sc;
+    public PlayerData playerdata;
    // public CommandBook cb;
 
     // Executors --------------------------------
@@ -99,6 +100,10 @@ public class MumbleChat extends JavaPlugin {
 
         setupChat();
 
+        playerdata = new PlayerData(this);
+        playerdata.reloadCustomConfig();
+        //This is to fix capitalization that is in the current player data.
+        playerdata.OneTimeFileCleanUp();
         
         // Log completion of initialization
         getLogger().info(String.format("[%s] - Enabled with version %s", getDescription().getName(), getDescription().getVersion()));
@@ -167,6 +172,7 @@ public class MumbleChat extends JavaPlugin {
         getCommand("chlist").setExecutor(chatExecutor);
         getCommand("chwho").setExecutor(chatExecutor);
         getCommand("chversion").setExecutor(chatExecutor);
+        getCommand("chlookup").setExecutor(chatExecutor);
         getCommand("chhelp").setExecutor(chatExecutor);
         getCommand("who").setExecutor(chatExecutor);
         
@@ -202,7 +208,7 @@ public class MumbleChat extends JavaPlugin {
     @Override
     public void onDisable() {
         //getLogger().info("Your plugin has been disabled!");
-        loginListener.SaveItToDisk();
+        playerdata.SaveItToDisk();
         //System.out.println("Temp Chat Disabled");
         log.info("MumbleChat has been disabled.");
     }
@@ -240,6 +246,19 @@ public class MumbleChat extends JavaPlugin {
     {
         return ccInfo;
     }
+    public boolean CheckPermission(Player pl, String permission)
+    {
+
+        if(permission.length() > 0)
+        {
+            if(pl.hasPermission(permission))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
 
     public void logme(LOG_LEVELS level, String location, String logline) {
         //Get LogLevel from Config...

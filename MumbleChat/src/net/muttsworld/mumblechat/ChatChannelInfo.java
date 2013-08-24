@@ -29,6 +29,7 @@ public class ChatChannelInfo {
     public String forcepermissions;
     public String colorpermissions;
     public String whopermissions;
+    public String lookuppermissions;
     public Boolean saveplayerdata;
     public Boolean usePrefix;
     public Boolean useSuffix;
@@ -40,6 +41,7 @@ public class ChatChannelInfo {
     public String broadcastDisplayTag;
     public Boolean broadcastPlayer;
     public String broadcastPermissions;
+    public String lookupdatepermissions;
     
     public Boolean bChannelInfront;
     public Boolean bDisplayAlias;
@@ -68,12 +70,15 @@ public class ChatChannelInfo {
         
         forcepermissions = plugin.getConfig().getString("permissions.force", "");
         colorpermissions = plugin.getConfig().getString("permissions.color","");
+
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
         tellpermissions = plugin.getConfig().getString("permissions.tell","");
 
         whopermissions = plugin.getConfig().getString("permissions.who","");
-        
+        lookuppermissions = plugin.getConfig().getString("permissions.lookup","");
+        lookupdatepermissions =  plugin.getConfig().getString("permissions.lookupDate","");
+
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         
         usePrefix = false;
@@ -332,8 +337,9 @@ public class ChatChannelInfo {
         return playerPrefix + playerDisplayName.trim() + playerSuffix;
 
     }
-    
-          
+
+
+
     
     public String GetClanTag(Player pl)
     {

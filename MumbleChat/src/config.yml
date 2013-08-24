@@ -134,6 +134,8 @@ permissions:
   tell: mumblechat.tell
   color: mumblechat.color
   who: mumblechat.who
+  lookup: mumblechat.lookup
+  lookupDate: mumblechat.lookupdate
 loglevel: info
 saveplayerdata: true
 usePrefix: false

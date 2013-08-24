@@ -36,19 +36,9 @@ public class LoginListener implements Listener {
     ChatChannelInfo cc;
     String defaultChannel;
     String defaultColor;
-    FileConfiguration customConfig = null;
-    File customConfigFile = null;
 
-    public void SaveItToDisk() {
-        //saveCustomConfig();
-        try {
-            customConfig.save(customConfigFile);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, e);
-            //	  logger.severe(PREFIX + " error writting configurations");
-            e.printStackTrace();
-        }
-    }
+
+
 
     public LoginListener(MumbleChat _plugin, ChatChannelInfo _cc) {
         plugin = _plugin;
@@ -59,7 +49,7 @@ public class LoginListener implements Listener {
                 defaultColor = c.getColor();
             }
         }
-        reloadCustomConfig();
+
     }
 
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
@@ -78,11 +68,13 @@ public class LoginListener implements Listener {
 
     void PlayerLeaving(Player pp) {
 
+        FileConfiguration customConfig = null;
+
     	plugin.logme(LOG_LEVELS.DEBUG, "Player Logout", "Function Start");
 
     
         //String curChannel;
-        customConfig = getCustomConfig();
+        customConfig = plugin.playerdata.getCustomConfig();
         Player pl = pp;
         
         //look up player in config
@@ -220,6 +212,7 @@ public class LoginListener implements Listener {
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     void onPlayerLogin(PlayerLoginEvent plog) {
         String curChannel;
+        FileConfiguration customConfig = null;
        // String pFormatted = "";
         Player pl = plog.getPlayer();
         
@@ -230,7 +223,7 @@ public class LoginListener implements Listener {
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After Format");
 
         if (cc.saveplayerdata) {
-            customConfig = getCustomConfig();
+            customConfig = plugin.playerdata.getCustomConfig();
             plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We have saved player data");
 
             //mama.getServer().getLogger().info("before Listen");
@@ -380,37 +373,5 @@ public class LoginListener implements Listener {
     }
 
 
-    public void reloadCustomConfig() {
 
-        //TODO: Consider that this is a hardcoded filename... ick.
-        if (customConfigFile == null) {
-            customConfigFile = new File(plugin.getDataFolder().getAbsolutePath(), "PlayerData.yml");
-        }
-        customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
-
-        /*  // Look for defaults in the jar
-        InputStream defConfigStream = mama.getResource("PlayerData.yml");
-        if (defConfigStream != null) {
-        YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-        customConfig.setDefaults(defConfig);
-        }*/
-    }
-
-    public FileConfiguration getCustomConfig() {
-        if (customConfig == null) {
-            this.reloadCustomConfig();
-        }
-        return customConfig;
-    }
-
-    public void saveCustomConfig() {
-        if (customConfig == null || customConfigFile == null) {
-            return;
-        }
-        try {
-            getCustomConfig().save(customConfigFile);
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
-        }
-    }
 }

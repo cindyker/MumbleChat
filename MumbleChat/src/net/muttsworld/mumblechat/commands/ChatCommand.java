@@ -7,20 +7,28 @@ import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.conversations.Conversable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.event.server.ServerEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
 public class ChatCommand implements CommandExecutor, Listener {
 
@@ -41,7 +49,7 @@ public class ChatCommand implements CommandExecutor, Listener {
         cc = chatchannel;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent e) {
 
         Player player = e.getPlayer();
@@ -159,6 +167,42 @@ public class ChatCommand implements CommandExecutor, Listener {
         e.setCancelled(true); // if you don't want another plugin to try to process the same command
         }*/
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public boolean onConsoleCommand(ServerCommandEvent sce)
+    {
+
+    //    plugin.getLogger().info("Get Command: "+sce.getCommand());
+
+
+        switch(sce.getCommand())
+        {
+            case "who":
+            case "online":
+              //  ShowWhoInfo((Player)sce.getSender());
+                Player[] plist = plugin.getServer().getOnlinePlayers();
+                String players = "Online Players: ";
+                for(Player p:plist)
+                {
+                    players+= p.getPlayerListName()+", ";
+                }
+
+                sce.getSender().sendMessage(players);
+                return true;
+
+            case "chversion":
+
+                    PluginDescriptionFile pdf = plugin.getDescription(); //Gets plugin.yml
+                    //Gets the version
+                    sce.getSender().sendMessage("MumbleChat Version: " + pdf.getVersion());
+                return true;
+
+
+        }
+
+        return false;
+    }
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -491,9 +535,24 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "who":
-            case"online":
+            case "online":
             {
                 ShowWhoInfo(player);
+                return true;
+            }
+            case "chlookup":
+            {
+                if(plugin.CheckPermission(player,cc.lookuppermissions))
+               // if(player.hasPermission(plugin.getChatChannelInfo().lookuppermissions))
+                 {
+                    if(!(args[0].length() > 1))
+                    {
+                      player.sendMessage("/chlookup [playername]");
+                      return true;
+                    }
+
+                    GetPlayerInfo(player,args[0]);
+                 }
                 return true;
             }
 
@@ -625,6 +684,7 @@ public class ChatCommand implements CommandExecutor, Listener {
         p.sendMessage(ChatColor.AQUA+"/lev [channel]"+ ChatColor.WHITE +" Leave a channel if you no longer want to see it");
         p.sendMessage(ChatColor.AQUA+"/[channel] [Message]" + ChatColor.WHITE +" To talk in a channel.");
 
+
         if(p.hasPermission(plugin.getChatChannelInfo().whopermissions))
             p.sendMessage(ChatColor.AQUA+"/chwho [channel]"+ ChatColor.WHITE +" See who is in the channel (Red names are muted)");
 
@@ -638,4 +698,78 @@ public class ChatCommand implements CommandExecutor, Listener {
             p.sendMessage(ChatColor.AQUA+"/chunmute [player] [channel]"+ ChatColor.WHITE +" Unmute a player in the channel, so they may talk again");
 
     }
+
+    void GetPlayerInfo(Player requestor,String playerName)
+    {
+        StringBuilder out = new StringBuilder();
+
+        FileConfiguration customConfig = null;
+
+        if(plugin.CheckPermission(requestor,cc.lookuppermissions))
+        {
+             requestor.sendMessage(ChatColor.AQUA+"Player: "+ChatColor.GOLD + playerName );
+
+            customConfig = plugin.playerdata.getCustomConfig();
+
+            ConfigurationSection cs = customConfig.getConfigurationSection("players." + (playerName.toLowerCase()));
+
+            if (cs != null) {
+
+                String muteChannels = cs.getString("mutes", "");
+
+                //If player is not Online get mutes from Config Data....
+                Player p = plugin.getServer().getPlayer(playerName) ;
+
+                out.append(ChatColor.AQUA+" Mutes: ");
+                if( p  == null)
+                {
+
+                    if (muteChannels.length() > 0) {
+                        out.append(ChatColor.RED + muteChannels+ "\n");
+                    }
+                }
+                else
+                {
+                    //get Mutes from MetaData
+                     for(ChatChannel ci: cc.getChannelsInfo())
+                     {
+                        if(plugin.getMetadata(p, "MumbleMute." + ci.getName(), plugin))
+                        {
+                            out.append(ChatColor.RED + ci.getName()+ ",");
+                        }
+                     }
+                    out.append(ChatColor.RED + "\n");
+                }
+
+
+                if(plugin.CheckPermission(requestor,cc.lookupdatepermissions))
+                {
+                    String strDate = cs.getString("date","");
+                    out.append(ChatColor.AQUA+"Last Seen: "+ChatColor.GOLD + strDate);
+                }
+
+                requestor.sendMessage(out.toString());
+            }
+            else
+            {
+                requestor.sendMessage("Player does not exist in the data.");
+            }
+        }
+       else
+        {
+            requestor.sendMessage("You do not have permission for this command.");
+        }
+
+        //Open Player Config
+
+        //Find PLayer Info
+
+        //Return Mutes
+
+        //return when last online.
+
+
+    }
+
+
 }
