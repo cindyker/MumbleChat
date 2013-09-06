@@ -85,36 +85,38 @@ public class MuteCommandExecutor implements CommandExecutor {
                             player.setMetadata("currentchannel",new FixedMetadataValue(plugin,ci.getName()));
 
                             admin.sendMessage("Forcing player "+player.getPlayerListName()+" into "+ ci.getName());
+                            player.sendMessage("You have been added to "+ ci.getName());
                             return true;
 
                         }
 
                         //FORCE OUT......
                         if(command.compareToIgnoreCase("out")==0)
-                        {   int listenchannelcount = 0;
+                        {
+                            int listenchannelcount = 0;
 
-                            if (args[0].length() > 0) {
+                            if (channelName.length() > 0) {
 
 
                                 if(plugin.simplelclans)
                                 {
 
-                                    if(args[0].equalsIgnoreCase("ally") || args[0].equalsIgnoreCase("clan"))
+                                    if(channelName.equalsIgnoreCase("ally") || channelName.equalsIgnoreCase("clan"))
                                     {
                                         //CLAN CHAT
-                                        player.setMetadata("listenchannel." + args[0].toLowerCase(), new FixedMetadataValue(plugin, false));
+                                        player.setMetadata("listenchannel." + channelName.toLowerCase(), new FixedMetadataValue(plugin, false));
 
 
                                         if (!cc.getAutojoinList().isEmpty())
                                         {
                                             player.setMetadata("listenchannel." + cc.getAutojoinList().get(0), new FixedMetadataValue(plugin, true));
                                             player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.getAutojoinList().get(0)));
-                                            player.sendMessage("Leaving "+args[0]+" Channel - Changing to: " +  cc.getAutojoinList().get(0));
+                                            player.sendMessage("Leaving "+channelName+" Channel - Changing to: " +  cc.getAutojoinList().get(0));
                                         }
                                         else
                                         {
                                             player.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
-                                            player.sendMessage("Leaving "+args[0]+" Channel - Changing to: " + cc.defaultChannel);
+                                            player.sendMessage("Leaving "+channelName+" Channel - Changing to: " + cc.defaultChannel);
                                             player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.defaultChannel));
                                         }
 
@@ -126,14 +128,14 @@ public class MuteCommandExecutor implements CommandExecutor {
 
                                 for (ChatChannel chname : cc.getChannelsInfo()) {
 
-                                    if (chname.getName().equalsIgnoreCase(args[0]) || chname.getAlias().equalsIgnoreCase(args[0])) {
+                                    if (chname.getName().equalsIgnoreCase(channelName) || chname.getAlias().equalsIgnoreCase(channelName)) {
 
                                         player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
 
                                         String format = ChatColor.valueOf(chname.getColor().toUpperCase()) + "[" + chname.getName() + "]";
                                         player.sendMessage("Leaving channel: " + format);
 
-                                        //	plugin.getServer().getLogger().info("Leaving Channel:" +chname.getName());
+                                        plugin.getServer().getLogger().info("Forcing Channel:" +chname.getName());
 
                                     }
 
