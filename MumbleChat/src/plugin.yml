@@ -27,6 +27,11 @@ commands:
        aliases: [ump]
        description: Unmute player in a channel so they can talk again.
        permission-message: You don't have <permission>
+    chforce:
+       usage: /chforce [in/out] [player] [channel]
+       aliases: [chf]
+       description: Force a player in or out of a channel.
+       permission-message: You don't have <permission>
     tell:
         usage: /tell [player] [msg]
         description: Send message to player

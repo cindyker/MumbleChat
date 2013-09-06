@@ -180,6 +180,7 @@ public class MumbleChat extends JavaPlugin {
         getCommand("chunmute").setExecutor(muteExecutor);
         getCommand("mute").setExecutor(muteExecutor);
         getCommand("unmute").setExecutor(muteExecutor);
+        getCommand("chforce").setExecutor(muteExecutor);
     }
 
     private boolean setupPermissions()

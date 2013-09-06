@@ -51,38 +51,126 @@ public class MuteCommandExecutor implements CommandExecutor {
 
 // Future Development!
 // Want to be able force in and force out
-//		if(cmd.getName().equalsIgnoreCase("force"))
-//		{
-//		
-//		
-//			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
-//			{
-//				
-//				
-//					if (args.length < 2)
-//					{
-//	
-//						 return false;
-//					}
-//					
-//					if(args.length == 2)
-//					{
-//						Player player = plugin.getServer().getPlayer(args [0]);
-//						if(player != null){
-//							for(ChatChannel chname:cc.getChannelsInfo())
-//							{
-//								
-//								
-//								player.setMetadata("listenchannel."+chname.getName(),new FixedMetadataValue(plugin,true));
-//								
-//								player.setMetadata("currentchannel",new FixedMetadataValue(plugin,chname.getName()));
-//								return true;
-//							}
-//						}
-//					}
-//			}
-//				
-//		}
+		if(cmd.getName().equalsIgnoreCase("chforce"))
+		{
+
+
+            if(plugin.CheckPermission((Player)admin,cc.forcepermissions))
+            {
+
+
+					if (args.length != 3)
+					{
+                         admin.sendMessage("/chforce [out/in] player channel");
+						 return true;
+					}
+
+                    Player player = plugin.getServer().getPlayer(args [1]);
+
+                    if(player != null){
+                        String command = args[0];
+                        String channelName = args[2];
+                        ChatChannel ci =  cc.getChannelInfo(channelName);
+                        if(ci==null)
+                        {
+                            admin.sendMessage("Can't Force to Invalid Channel: "+ channelName);
+                            return true;
+                        }
+
+                        ///FORCE IN......
+                        if(command.compareToIgnoreCase("in")==0)
+                        {
+
+                            player.setMetadata("listenchannel."+ci.getName(),new FixedMetadataValue(plugin,true));
+                            player.setMetadata("currentchannel",new FixedMetadataValue(plugin,ci.getName()));
+
+                            admin.sendMessage("Forcing player "+player.getPlayerListName()+" into "+ ci.getName());
+                            return true;
+
+                        }
+
+                        //FORCE OUT......
+                        if(command.compareToIgnoreCase("out")==0)
+                        {   int listenchannelcount = 0;
+
+                            if (args[0].length() > 0) {
+
+
+                                if(plugin.simplelclans)
+                                {
+
+                                    if(args[0].equalsIgnoreCase("ally") || args[0].equalsIgnoreCase("clan"))
+                                    {
+                                        //CLAN CHAT
+                                        player.setMetadata("listenchannel." + args[0].toLowerCase(), new FixedMetadataValue(plugin, false));
+
+
+                                        if (!cc.getAutojoinList().isEmpty())
+                                        {
+                                            player.setMetadata("listenchannel." + cc.getAutojoinList().get(0), new FixedMetadataValue(plugin, true));
+                                            player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.getAutojoinList().get(0)));
+                                            player.sendMessage("Leaving "+args[0]+" Channel - Changing to: " +  cc.getAutojoinList().get(0));
+                                        }
+                                        else
+                                        {
+                                            player.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
+                                            player.sendMessage("Leaving "+args[0]+" Channel - Changing to: " + cc.defaultChannel);
+                                            player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.defaultChannel));
+                                        }
+
+                                        return true;
+                                    }
+
+                                }
+
+
+                                for (ChatChannel chname : cc.getChannelsInfo()) {
+
+                                    if (chname.getName().equalsIgnoreCase(args[0]) || chname.getAlias().equalsIgnoreCase(args[0])) {
+
+                                        player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
+
+                                        String format = ChatColor.valueOf(chname.getColor().toUpperCase()) + "[" + chname.getName() + "]";
+                                        player.sendMessage("Leaving channel: " + format);
+
+                                        //	plugin.getServer().getLogger().info("Leaving Channel:" +chname.getName());
+
+                                    }
+
+                                    //Figure out how many channels the player is listening too..
+                                    //they need at least one.
+                                    if (plugin.getMetadata(player, "listenchannel." + chname.getName(), plugin)) {
+                                        listenchannelcount++;
+                                    }
+                                }
+
+                                if (listenchannelcount == 0) {
+                                    player.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
+                                    player.sendMessage("You need to be listening on at least one channel.");
+                                    player.sendMessage("Setting to listening to: " + cc.defaultChannel);
+                                }
+
+                            admin.sendMessage("Forcing player "+player.getPlayerListName()+" out of "+ ci.getName());
+                            return true;
+                        }
+
+                    }
+                    else
+                    {
+                        admin.sendMessage("Player "+ args[1]+" is not available.");
+                        return true;
+                    }
+
+                    return false;
+                }
+
+            }
+            else
+            {
+                admin.sendMessage("You do not have permissions to run this command.");
+                return true;
+            }
+
 		
 		
 
@@ -113,6 +201,9 @@ public class MuteCommandExecutor implements CommandExecutor {
 		
 		return false;
 	}
+
+        return false;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // Handle Mute Function

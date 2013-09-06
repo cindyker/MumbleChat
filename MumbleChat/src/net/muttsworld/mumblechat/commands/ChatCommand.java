@@ -441,6 +441,7 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "chwho": {
+                //TODO: Add Sort Here
             	if(player.hasPermission(plugin.getChatChannelInfo().whopermissions))
             	{
 	                String lstchan = "listenchannel.";
