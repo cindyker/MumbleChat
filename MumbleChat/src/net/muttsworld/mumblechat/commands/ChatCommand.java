@@ -133,6 +133,8 @@ public class ChatCommand implements CommandExecutor, Listener {
                         player.sendMessage("Invalid command: /chtag off  or  /chtag on");
                 }
 
+                return;
+
             }
         }
 
@@ -173,9 +175,14 @@ public class ChatCommand implements CommandExecutor, Listener {
     {
 
     //    plugin.getLogger().info("Get Command: "+sce.getCommand());
+        String fullcommand = sce.getCommand();
+
+        String[] args;
+
+        args = fullcommand.split(" ");
 
 
-        switch(sce.getCommand())
+        switch(args[0])
         {
             case "who":
             case "online":
@@ -195,6 +202,27 @@ public class ChatCommand implements CommandExecutor, Listener {
                     PluginDescriptionFile pdf = plugin.getDescription(); //Gets plugin.yml
                     //Gets the version
                     sce.getSender().sendMessage("MumbleChat Version: " + pdf.getVersion());
+                return true;
+
+            case "mute":
+            case "chmute":
+
+                //ToDo: Implement Mute from Console!
+                 if(args.length!=3)
+                 {
+                    sce.getSender().sendMessage("[MumbleChat] Wrong Parameters");
+                    sce.getSender().sendMessage("chmute [player] [channel]");
+
+                    return true;
+                 }
+
+
+
+                return true;
+
+            case "unmute":
+            case "chunmute":
+
                 return true;
 
 
@@ -557,6 +585,60 @@ public class ChatCommand implements CommandExecutor, Listener {
                 return true;
             }
 
+            case "chfilter":
+            {
+                if(plugin.CheckPermission(player,cc.filterpermissions))
+                {
+                    if(args.length == 1)
+                    {
+                        FilterInfo(player,args[0]);
+                        return true;
+                    }
+                    else
+                    {
+                        player.sendMessage("/chfilter [FilteredWord]");
+                        return true;
+                    }
+                }
+                else
+                {
+                    player.sendMessage("[MumbleChat] You do not have permission to use this command.");
+                    return true;
+                }
+            }
+
+
+            case "chsetfilter":
+            {
+                if(plugin.CheckPermission(player,cc.filterpermissions))
+                {
+                    if(args.length > 1)
+                    {
+                        String newFilter ="";
+
+                        for(int x = 1;x<args.length;x++)
+                        {
+                            newFilter += args[x];
+                            if(x+1<args.length)
+                                newFilter+=" ";
+                        }
+
+                        //cc.saveFilter(newFilter,args[0]);
+                        return true;
+                    }
+                    else
+                    {
+                        player.sendMessage("/chsetfilter [FilteredWord]");
+                        return true;
+                    }
+                }
+                else
+                {
+                    player.sendMessage("[MumbleChat] You do not have permission to use this command.");
+                    return true;
+                }
+            }
+
         }
 
         return false;
@@ -602,8 +684,8 @@ public class ChatCommand implements CommandExecutor, Listener {
         Map<String, List<Player>> groups = new HashMap<String, List<Player>>();
 
         for (Player pl : plist) {
-
-                if (!(player.canSee(pl))) {
+                //Op Can see everyone on who
+                if (!(player.canSee(pl)) && !player.isOp()) {
                     continue;
                 }
 
@@ -632,16 +714,22 @@ public class ChatCommand implements CommandExecutor, Listener {
                 if (!first) {
                     out.append(", ");
                 }
-                out.append(pl.getDisplayName()).append(ChatColor.WHITE);
+                if(!(player.canSee(pl)) && player.isOp() )   //If not visible and player is op, color name yellow.
+                     out.append(pl.getDisplayName()).append(ChatColor.YELLOW);
+                else
+                     out.append(pl.getDisplayName()).append(ChatColor.WHITE);
+
                 first = false;
             }
         }
 
-        String[] lines = out.toString().split("\n");
+        player.sendMessage(out.toString());
 
-        for (String line : lines) {
-            player.sendMessage(line);
-        }
+        //String[] lines = out.toString().split("\n");
+
+//        for (String line : lines) {
+  //          player.sendMessage(line);
+    //    }
 
     }
 
@@ -685,7 +773,6 @@ public class ChatCommand implements CommandExecutor, Listener {
         p.sendMessage(ChatColor.AQUA+"/lev [channel]"+ ChatColor.WHITE +" Leave a channel if you no longer want to see it");
         p.sendMessage(ChatColor.AQUA+"/[channel] [Message]" + ChatColor.WHITE +" To talk in a channel.");
 
-
         if(p.hasPermission(plugin.getChatChannelInfo().whopermissions))
             p.sendMessage(ChatColor.AQUA+"/chwho [channel]"+ ChatColor.WHITE +" See who is in the channel (Red names are muted)");
 
@@ -696,7 +783,10 @@ public class ChatCommand implements CommandExecutor, Listener {
             p.sendMessage(ChatColor.AQUA + "/chmute [player] [channel]" + ChatColor.WHITE + " Mute player in the channel, so they can't talk");
 
         if(p.hasPermission(plugin.getChatChannelInfo().unmutepermissions))
-            p.sendMessage(ChatColor.AQUA+"/chunmute [player] [channel]"+ ChatColor.WHITE +" Unmute a player in the channel, so they may talk again");
+            p.sendMessage(ChatColor.AQUA+"/chunmute [player] [channel]"+ ChatColor.WHITE +" Unmute a chhelplayer in the channel, so they may talk again");
+
+        if(p.hasPermission(plugin.getChatChannelInfo().filterpermissions))
+            p.sendMessage(ChatColor.AQUA+"/chfilter [FilteredWord]" + ChatColor.WHITE + "Display current filter for given word."  );
 
     }
 
@@ -728,6 +818,8 @@ public class ChatCommand implements CommandExecutor, Listener {
                     if (muteChannels.length() > 0) {
                         out.append(ChatColor.RED + muteChannels+ "\n");
                     }
+                    else
+                        out.append(ChatColor.WHITE + "None\n");
                 }
                 else
                 {
@@ -770,6 +862,28 @@ public class ChatCommand implements CommandExecutor, Listener {
         //return when last online.
 
 
+    }
+
+    boolean FilterInfo(Player pl, String badWord)
+    {
+        //Check Player != null
+        if(pl!=null)
+        {
+
+            String strFilter =  cc.getFilterWord(badWord);
+            if(strFilter!=null)
+            {
+                pl.sendMessage("[MumbleChat] Orig Word : " + badWord + " - Filter : "+strFilter );
+
+                return true;
+            }
+            else
+            {
+                pl.sendMessage("[MumbleChat] " + badWord + " is not filtered.");
+            }
+
+        }
+        return false;
     }
 
 

@@ -2,6 +2,9 @@ package net.muttsworld.mumblechat.listeners;
 
 import java.util.logging.Level;
 
+//import net.sacredlabyrinth.phaed.simpleclans.Clan;
+//import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import com.p000ison.dev.simpleclans2.api.SCCore;
 import com.p000ison.dev.simpleclans2.api.clan.Clan;
 import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 import org.bukkit.ChatColor;
@@ -97,7 +100,7 @@ public class ChatListener implements Listener {
                         String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
                         tp.sendMessage(msg);
                         p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
-                        plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getPlayerListName() +": "+ event.getMessage() );
+                        plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getName() +": "+ event.getMessage() );
                         event.setCancelled(true);
                         return;
                     }
@@ -404,7 +407,8 @@ public class ChatListener implements Listener {
 		        		// plugin.getLogger().log(Level.INFO, "Ally Chat");
 		        		 for(Clan A:clanreceiver.getClan().getAllies())
 		        		 {
-		        			if(tag.equalsIgnoreCase(A.getTag()))
+                          //  Clan Ally = plugin.sc.getClanManager().getClan(A);
+                            if(tag.equalsIgnoreCase(A.getTag()))
 		        			{
 		        				 //plugin.getLogger().log(Level..DEBUG, "Ally Found them");
 		        				 pr.sendMessage(ChatColor.AQUA+"["+currentChannel+"]"+pl.getDisplayName()+": "+ChatColor.GRAY+Message); 
@@ -437,10 +441,6 @@ public class ChatListener implements Listener {
      	    }
         	 
          }
-        	 
-         
-         
-        // format = plugin.removeRetrievers(receivers, clanPlayer, player);
 
 
     	

@@ -88,24 +88,29 @@ public class PlayerData {
                 ConfigurationSection cs = customConfig.getConfigurationSection("players");
                 ConfigurationSection ns;  //New Player Section
 
-                Set<String> keys = cs.getKeys(false);//Get All id's for items under Warps
-                for(String key : keys){
+                if(cs!=null)
+                {
+                    Set<String> keys = cs.getKeys(false);//Get All id's for items under Warps
+                    for(String key : keys){
 
-                    plugin.getLogger().log(Level.INFO, "Cleaning: " + key);
-                    String PlayerString =  key.toLowerCase();// Get the string with the location data
-                    ConfigurationSection playersection = cs.getConfigurationSection(key);
+                        plugin.getLogger().log(Level.INFO, "Cleaning: " + key);
+                        String PlayerString =  key.toLowerCase();// Get the string with the location data
+                        ConfigurationSection playersection = cs.getConfigurationSection(key);
 
-                    //THIS REMOVES THE NODE
-                    main.set("players."+key,null);
+                        //THIS REMOVES THE NODE
+                        main.set("players."+key,null);
 
-                    ns = main.createSection("players." +PlayerString);
+                        ns = main.createSection("players." +PlayerString);
 
-                    for (String pKey:playersection.getKeys(false))
-                    {
-                      //  plugin.getLogger().log(Level.INFO, "New Key: " + pKey);
-                        ns.set(pKey,playersection.getString(pKey)) ;
+                        for (String pKey:playersection.getKeys(false))
+                        {
+                          //  plugin.getLogger().log(Level.INFO, "New Key: " + pKey);
+                            ns.set(pKey,playersection.getString(pKey)) ;
+                        }
+
+
+
                     }
-
                 }
                 main.set("Cleaned",true);
 

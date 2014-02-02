@@ -5,15 +5,22 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import com.p000ison.dev.simpleclans2.api.clan.Clan;
+import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
 
+//import net.sacredlabyrinth.phaed.simpleclans.Clan;
+//import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import com.p000ison.dev.simpleclans2.api.SCCore;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.p000ison.dev.simpleclans2.api.clan.Clan;
-import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
+//import net.sacredlabyrinth.phaed.simpleclans.api.events.SimpleClansClanCreateEvent;
+//import net.sacredlabyrinth.phaed.simpleclans.SimpleClans.*;
+//import com.p000ison.dev.simpleclans2.api.clan.Clan;
+//import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 
 public class ChatChannelInfo {
 
@@ -30,21 +37,25 @@ public class ChatChannelInfo {
     public String colorpermissions;
     public String whopermissions;
     public String lookuppermissions;
-    public Boolean saveplayerdata;
-    public Boolean usePrefix;
-    public Boolean useSuffix;
+    public String filterpermissions;
+    public boolean saveplayerdata;
+    public boolean usePrefix;
+    public boolean useSuffix;
     public String tellColor;
     public String defaultChannel; //There can be only one :)
     //Broadcast Variables
     public String broadcastCommand; //also only one
     public String broadcastColor; //white
     public String broadcastDisplayTag;
-    public Boolean broadcastPlayer;
+    public boolean broadcastPlayer;
     public String broadcastPermissions;
     public String lookupdatepermissions;
     
-    public Boolean bChannelInfront;
-    public Boolean bDisplayAlias;
+    public boolean bChannelInfront;
+    public boolean bDisplayAlias;
+
+    public Boolean bUseWho;
+    ConfigurationSection cs;
 
    //@SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
@@ -62,22 +73,23 @@ public class ChatChannelInfo {
         Double _distance = (double) 0;
         Boolean _autojoin = false;
         tellColor = "gray";
-        ConfigurationSection cs = plugin.getConfig().getConfigurationSection("channels");
+        cs = plugin.getConfig().getConfigurationSection("channels");
 
 
-        mutepermissions = plugin.getConfig().getString("permissions.mute", "");
+        mutepermissions = plugin.getConfig().getString("permissions.mute", "mumblechat.mute");
         unmutepermissions = plugin.getConfig().getString("permissions.unmute",mutepermissions);
         
-        forcepermissions = plugin.getConfig().getString("permissions.force", "");
-        colorpermissions = plugin.getConfig().getString("permissions.color","");
+        forcepermissions = plugin.getConfig().getString("permissions.force", "mumblechat.force");
+        colorpermissions = plugin.getConfig().getString("permissions.color","mumblechat.color");
 
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
-        tellpermissions = plugin.getConfig().getString("permissions.tell","");
+        tellpermissions = plugin.getConfig().getString("permissions.tell","mumblechat.tell");
 
-        whopermissions = plugin.getConfig().getString("permissions.who","");
-        lookuppermissions = plugin.getConfig().getString("permissions.lookup","");
-        lookupdatepermissions =  plugin.getConfig().getString("permissions.lookupDate","");
+        whopermissions = plugin.getConfig().getString("permissions.who","mumblechat.who");
+        lookuppermissions = plugin.getConfig().getString("permissions.lookup","mumblechat.lookup");
+        lookupdatepermissions =  plugin.getConfig().getString("permissions.lookupDate","mumblechat.lookupDate");
+        filterpermissions = plugin.getConfig().getString("permissions.filterlookup","mumblechat.filterlookup");
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);
         
@@ -85,6 +97,11 @@ public class ChatChannelInfo {
         useSuffix = false;
         bChannelInfront = false;
         bDisplayAlias=false;
+        bUseWho=false;
+
+        bUseWho = plugin.getConfig().getBoolean("useWho",false);
+
+
         //Temporary support for backwards config compatability
         if(plugin.getConfig().getBoolean("usePexPrefix", false))
         {
@@ -187,6 +204,11 @@ public class ChatChannelInfo {
 
     }
 
+    public void SaveConfig()
+    {
+        plugin.saveDefaultConfig();
+
+    }
     public List<String> getAutojoinList() {
         List<String> joinlist = new ArrayList<String>();
 
@@ -263,6 +285,63 @@ public class ChatChannelInfo {
         return null;
     }
 
+    //=======================================================
+    //function: saveFilterWord
+    //
+    // Parameters: String filter
+    //             String badWord
+    //-------------------------------------------------------
+    public boolean saveFilterWord(String filter, String badWord)
+    {
+        String currentFilter = getFilterWord(badWord);
+
+        if(currentFilter != null)
+        {
+           for(int x=0;x<filters.size();x++)
+           {
+               String s =filters.get(x) ;
+               if(s.compareToIgnoreCase(currentFilter)==0)
+               {
+                  filters.set(x,badWord+","+filter);
+               }
+           }
+        }
+        else
+        {
+           filters.add(filter+","+badWord);
+        }
+
+        plugin.getConfig().set("Filters",filters);
+        return true;
+    }
+
+    public String getFilterWord(String badWord)
+    {
+        int t;
+        for(String s : filters)
+        {
+            t = 0;
+
+            String[] pparse = new String[2];
+            pparse[0] = " ";
+            pparse[1] = " ";
+            StringTokenizer st = new StringTokenizer(s, ",");
+            while (st.hasMoreTokens()) {
+                if (t < 2) {
+                    pparse[t++] = st.nextToken();
+                }
+            }
+
+            if(pparse[1].compareToIgnoreCase(badWord)==0)
+            {
+               return pparse[0];
+            }
+        }
+
+        return null;
+    }
+
+
     public String FilterChat(String msg) {
         /////////////////////////////////////////////////////
         //Apply the Filter is required
@@ -334,7 +413,7 @@ public class ChatChannelInfo {
             playerSuffix = chatItalicPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
             playerSuffix = chatResetPattern.matcher(playerSuffix).replaceAll("\u00A7$1");
         }
-        return playerPrefix + playerDisplayName.trim() + playerSuffix;
+        return playerPrefix +playerSuffix +playerDisplayName.trim() ;
 
     }
 
@@ -346,13 +425,14 @@ public class ChatChannelInfo {
     	String strclantag = ""; 
 	    if(plugin.simplelclans)
 	    {
-
+             plugin.getLogger().info("GetClanTag: simpleclans = true");
             //If they have turned the clan tag off, don't show it.
             if( pl.hasMetadata("MumbleChat.ClanTag"))
             {
                if(!plugin.getMetadata(pl, "MumbleChat.ClanTag", plugin))
                    return strclantag;
             }
+            plugin.getLogger().info("GetClanTag: Player has ClanTag metadata");
 
 	    	 plugin.logme(LOG_LEVELS.DEBUG, "GetClanTag", "Simple Clans");
 	    	 ClanPlayer cp = plugin.sc.getClanPlayerManager().getClanPlayer(pl.getName());

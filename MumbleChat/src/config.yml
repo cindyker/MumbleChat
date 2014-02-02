@@ -127,7 +127,7 @@ filters:
 - vullva,peach
 - vulva,peach
 - \blag,awesome
-- rain,sunshine
+- \brain\b,sunshine
 permissions:
   mute: mumblechat.mute
   unmute: mumblechat.unmute
@@ -136,9 +136,13 @@ permissions:
   who: mumblechat.who
   lookup: mumblechat.lookup
   lookupDate: mumblechat.lookupdate
+  filterLookup: mumblechat.filterlookup
+  filterUpdate: mumblechat.filterupdate
 loglevel: info
 saveplayerdata: true
 usePrefix: false
+#MumbleChat who for those not using commandbook compatiable permission groups
+useWho: false
 channelInFront: true
 tellcolor: white
 broadcast:

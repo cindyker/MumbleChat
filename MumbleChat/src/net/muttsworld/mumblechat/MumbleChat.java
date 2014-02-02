@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.p000ison.dev.simpleclans2.api.SCCore;
 import com.sk89q.commandbook.CommandBook;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
@@ -24,7 +25,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.p000ison.dev.simpleclans2.SimpleClans;
+
+//import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
 //TODO: Add SQL so player data can be stored there
 @SuppressWarnings("unused")
@@ -34,7 +36,8 @@ public class MumbleChat extends JavaPlugin {
     // Listeners --------------------------------
     public ChatListener chatListener;
     public LoginListener loginListener;
-    public SimpleClans sc;
+ //   public SimpleClans sc;
+    public SCCore sc;
     public PlayerData playerdata;
    // public CommandBook cb;
 
@@ -66,7 +69,13 @@ public class MumbleChat extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+
         log.info(String.format("[%s] - Initializing...", getDescription().getName()));
+
+
+
+
 
         log.info(String.format("[%s] - Checking for Vault...", getDescription().getName()));
         
@@ -74,6 +83,7 @@ public class MumbleChat extends JavaPlugin {
         if(!setupPermissions()) {
             log.info(String.format("[%s] - Could not find Vault dependency, disabling.", getDescription().getName()));
         }
+
         
         log.info(String.format("[%s] - Checking for SimpleClans...", getDescription().getName()));
         
@@ -86,7 +96,7 @@ public class MumbleChat extends JavaPlugin {
         else
         {
         	simplelclans=true;
-        	sc = ((SimpleClans) plug);
+        	sc = ((SCCore) plug);
         	
         
         }
@@ -162,10 +172,6 @@ public class MumbleChat extends JavaPlugin {
         muteExecutor = new MuteCommandExecutor(this, ccInfo);
         tellExecutor = new TellCommandExecutor(this, ccInfo);
 
-        getCommand("tell").setExecutor(tellExecutor);
-        getCommand("ignore").setExecutor(tellExecutor);
-        getCommand("whisper").setExecutor(tellExecutor);
-
         getCommand("channel").setExecutor(chatExecutor);
         getCommand("leave").setExecutor(chatExecutor);
         getCommand("join").setExecutor(chatExecutor);
@@ -174,13 +180,24 @@ public class MumbleChat extends JavaPlugin {
         getCommand("chversion").setExecutor(chatExecutor);
         getCommand("chlookup").setExecutor(chatExecutor);
         getCommand("chhelp").setExecutor(chatExecutor);
-        getCommand("who").setExecutor(chatExecutor);
+
+        //Future..............
+        //getCommand("chfilter").setExecutor(chatExecutor);
+        //getCommand("chsetfilter").setExecutor(chatExecutor);
         
         getCommand("chmute").setExecutor(muteExecutor);        
         getCommand("chunmute").setExecutor(muteExecutor);
         getCommand("mute").setExecutor(muteExecutor);
         getCommand("unmute").setExecutor(muteExecutor);
         getCommand("chforce").setExecutor(muteExecutor);
+
+        getCommand("tell").setExecutor(tellExecutor);
+        getCommand("ignore").setExecutor(tellExecutor);
+        getCommand("whisper").setExecutor(tellExecutor);
+        getCommand("reply").setExecutor(tellExecutor);
+
+        if(ccInfo.bUseWho)
+            getCommand("who").setExecutor(chatExecutor);
     }
 
     private boolean setupPermissions()

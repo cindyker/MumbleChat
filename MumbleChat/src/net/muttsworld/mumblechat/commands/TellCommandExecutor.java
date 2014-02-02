@@ -43,7 +43,63 @@ public class TellCommandExecutor implements CommandExecutor {
 		   admin = (Player)sender;
 		 }
 		
-		
+		if(cmd.getName().equalsIgnoreCase("reply"))
+        {
+            //Send Message to PLayer in Mumblechat.reply metadata.
+            if(args.length == 0)
+            {
+                admin.sendMessage("[MumbleChat] Invalid Command Usage: /reply [message]");
+                return true;
+            }
+
+            Player player = null;
+            String playername;
+            playername = plugin.getMetadataString(admin,"MumbleChat.reply",plugin)   ;
+            player = sender.getServer().getPlayer(playername);
+            if(player == null)
+            {
+                plugin.logme(LOG_LEVELS.DEBUG, "reply", "Can't find Player "+ playername + ".");
+
+                if (admin!=null)
+                {
+                    admin.sendMessage(ChatColor.RED+"[MumbleChat] Can't reply to "+ playername + ". They are no longer online.");
+                }
+
+                plugin.logme(LOG_LEVELS.DEBUG, "rely Command:onCommand:reply", "Returned True");
+                return true;
+
+            }
+            //Ok.. we have a player.. lets see if they are ignoring us...
+            if(isIgnoring(admin,player))
+            {
+                admin.sendMessage(ChatColor.YELLOW +"[MumbleChat] "+ args[0] + " is currently ignoring your tells.");
+                return true;
+            }
+
+
+            //Ok, they are not ignoring you....
+
+            String msg = "";
+            if (args[0].length() > 0)
+            {
+
+                //for(String s:args)
+                for(int r = 0; r < args.length; r++)
+                    msg +=" " + args[r];
+
+                //ChatColor.GRAY
+                String echo = "Reply to " + player.getDisplayName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;
+                msg = admin.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
+                msg = cc.FilterChat(msg);
+                player.sendMessage(msg);
+                admin.sendMessage(echo);
+                //plugin.getServer().getLogger().info("Called Staff Chat... Commands!");
+            }
+
+
+        }
+
+
 		if(cmd.getName().equalsIgnoreCase("ignore"))
 		{
 			
@@ -53,7 +109,9 @@ public class TellCommandExecutor implements CommandExecutor {
 			{
 				plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "No Arguements");
 				plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Returned False");
-				return false;
+
+                admin.sendMessage(ChatColor.AQUA+"[MumbleChat]: Try /ignore ? for help.");
+				return true;
 			}
 			 
 			 if(args.length == 1)
@@ -198,7 +256,7 @@ public class TellCommandExecutor implements CommandExecutor {
 		{
 			if(!admin.hasPermission(plugin.getChatChannelInfo().tellpermissions))
 			{
-				 admin.sendMessage(ChatColor.RED+"You are not allowed to send tells.");				
+				 admin.sendMessage(ChatColor.RED+"[MumbleChat] You do not have permission to send tells.");
 				return true;
 			}
 	
@@ -219,7 +277,7 @@ public class TellCommandExecutor implements CommandExecutor {
 					
 					 if (admin!=null)
 					 {
-						 admin.sendMessage(ChatColor.RED+"Can't find Player "+ args[0] + ".");
+						 admin.sendMessage(ChatColor.RED+"[MumbleChat] Can't find Player "+ args[0] + ".");
 					 
 					 }
 					 
@@ -229,24 +287,13 @@ public class TellCommandExecutor implements CommandExecutor {
 				 }
 				 
 				 //Ok.. we have a player.. lets see if they are ignoring us...
-				 String playerignorelist = plugin.getMetadataString(player, "MumbleChat.ignore", plugin);				 
-				 if(playerignorelist.length() > 0)
-				 {		        
-					String curplayer = "";
-                    StringTokenizer st = new StringTokenizer(playerignorelist, ",");
-                    ignorecount = st.countTokens();
-                    while (st.hasMoreTokens()) {
-                       		                        
-                    	curplayer=st.nextToken();
-                        if(curplayer.equalsIgnoreCase(admin.getName()))
-                        {
-                        	admin.sendMessage(ChatColor.YELLOW + args[0] + " is currently ignoring your tells.");
-                            return true;                       	
-                        }
-                    }
-		                   
-		         }              
-				
+				  if(isIgnoring(admin,player))
+                  {
+                    admin.sendMessage(ChatColor.YELLOW + args[0] + " is currently ignoring your tells.");
+                    return true;
+                  }
+
+
 				 //Ok, they are not ignoring you....
 				 if(args.length >= 2)
 					{
@@ -261,7 +308,7 @@ public class TellCommandExecutor implements CommandExecutor {
 							//ChatColor.GRAY
 							String echo = "you tell " + player.getDisplayName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;							
 							msg = admin.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
-							
+                            player.setMetadata("MumbleChat.reply", new FixedMetadataValue(plugin,admin.getPlayerListName()));
 							msg = cc.FilterChat(msg);
 							player.sendMessage(msg);
 							admin.sendMessage(echo);
@@ -277,6 +324,7 @@ public class TellCommandExecutor implements CommandExecutor {
 					 {
 						 plugin.logme(LOG_LEVELS.DEBUG,"Sticky Tell", "tell::" + args[0]);
 						 admin.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin,args[0]));
+                         player.setMetadata("MumbleChat.reply", new FixedMetadataValue(plugin,admin.getPlayerListName()));
 						 admin.sendMessage("You are now chatting with " + args[0]);
 					 }
 				 
@@ -289,5 +337,29 @@ public class TellCommandExecutor implements CommandExecutor {
 		 plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:tell", "Returned False");
 		return false;
 	}
+
+
+
+    boolean isIgnoring(Player speaker, Player receiver)
+    {
+        int ignorecount;
+        //Ok.. we have a player.. lets see if they are ignoring us...
+        String playerignorelist = plugin.getMetadataString(receiver, "MumbleChat.ignore", plugin);
+        if(playerignorelist.length() > 0)
+        {
+            String curplayer = "";
+            StringTokenizer st = new StringTokenizer(playerignorelist, ",");
+            ignorecount = st.countTokens();
+            while (st.hasMoreTokens()) {
+
+                curplayer=st.nextToken();
+                if(curplayer.equalsIgnoreCase(speaker.getName()))
+                    return true;
+            }
+
+        }
+
+        return false;
+    }
 
 }

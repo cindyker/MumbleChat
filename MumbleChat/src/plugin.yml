@@ -1,11 +1,11 @@
 name: MumbleChat
-version: 1.6.2
+version: 1.6.4
 main: net.muttsworld.mumblechat.MumbleChat
 depend: [Vault]
 author: cindy_k
-authors: [net_creator,mumblerit]
-description: Chat with Channels (1.6.2 level)
-website: www.muttsworldmine.com
+authors: [net_creator]
+description: Chat with Channels (1.6.4 level)
+website: www.minecats.com
 commands:
     mute:
         usage: /mute [player] [channel]
@@ -35,6 +35,11 @@ commands:
     tell:
         usage: /tell [player] [msg]
         description: Send message to player
+        permission-message: You don't have <permission>
+    reply:
+        usage: /reply [msg]
+        aliases: [mr]
+        description: Send message to player you last sent a tell to
         permission-message: You don't have <permission>
     ignore:
         usage: /ignore [player] or /ignore ? for more information
@@ -73,6 +78,14 @@ commands:
         usage: /chversion
         description: Displays Description text for Ops
         permission-message: You don't have <permission>
+    chfilter:
+          usage: /chfilter [FilteredWord]
+          description: Displays Filter for the given word.
+          permission-message: You don't have <permission>
+    chsetfilter:
+          usage: /chsetfilter [FilteredWord] [Filter]
+          description: Sets Filter for the given word.
+          permission-message: You don't have <permission>
     chlookup:
         usage: /chlookup
         description: Displays Player Info, such as mutes and last on.

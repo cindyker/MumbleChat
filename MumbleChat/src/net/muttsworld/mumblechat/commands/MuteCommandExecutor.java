@@ -57,19 +57,31 @@ public class MuteCommandExecutor implements CommandExecutor {
 
             if(plugin.CheckPermission((Player)admin,cc.forcepermissions))
             {
+                Player player;
+                String channelName;
+                boolean silent = false;
 
-
-					if (args.length != 3)
+					if (args.length > 4)
 					{
-                         admin.sendMessage("/chforce [out/in] player channel");
+                         admin.sendMessage("/chforce [out/in] [-s] player channel");
 						 return true;
 					}
 
-                    Player player = plugin.getServer().getPlayer(args [1]);
+                    if(args[1].compareToIgnoreCase("-s")==0)
+                    {
+                        player = plugin.getServer().getPlayer(args [2]);
+                        channelName   = args[3];
+                        silent = true;
+                    }
+                    else
+                    {
+                        player = plugin.getServer().getPlayer(args [1]);
+                        channelName = args[2];
+                    }
 
                     if(player != null){
                         String command = args[0];
-                        String channelName = args[2];
+
                         ChatChannel ci =  cc.getChannelInfo(channelName);
                         if(ci==null)
                         {
@@ -85,7 +97,8 @@ public class MuteCommandExecutor implements CommandExecutor {
                             player.setMetadata("currentchannel",new FixedMetadataValue(plugin,ci.getName()));
 
                             admin.sendMessage("Forcing player "+player.getPlayerListName()+" into "+ ci.getName());
-                            player.sendMessage("You have been added to "+ ci.getName());
+                            if(!silent)
+                                player.sendMessage("You have been added to "+ ci.getName());
                             return true;
 
                         }
@@ -95,76 +108,40 @@ public class MuteCommandExecutor implements CommandExecutor {
                         {
                             int listenchannelcount = 0;
 
-                            if (channelName.length() > 0) {
 
 
-                                if(plugin.simplelclans)
+                                if(player.hasMetadata("listenchannel."+ci.getName()))
+                                         player.setMetadata("listenchannel." + ci.getName(), new FixedMetadataValue(plugin, false));
+
+                                //If they are currently typing on this channel remove them.
+                                if(player.hasMetadata("currentchannel"))
                                 {
-
-                                    if(channelName.equalsIgnoreCase("ally") || channelName.equalsIgnoreCase("clan"))
-                                    {
-                                        //CLAN CHAT
-                                        player.setMetadata("listenchannel." + channelName.toLowerCase(), new FixedMetadataValue(plugin, false));
-
-
-                                        if (!cc.getAutojoinList().isEmpty())
-                                        {
-                                            player.setMetadata("listenchannel." + cc.getAutojoinList().get(0), new FixedMetadataValue(plugin, true));
-                                            player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.getAutojoinList().get(0)));
-                                            player.sendMessage("Leaving "+channelName+" Channel - Changing to: " +  cc.getAutojoinList().get(0));
-                                        }
-                                        else
-                                        {
-                                            player.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
-                                            player.sendMessage("Leaving "+channelName+" Channel - Changing to: " + cc.defaultChannel);
-                                            player.setMetadata("currentchannel", new FixedMetadataValue(plugin, cc.defaultChannel));
-                                        }
-
-                                        return true;
-                                    }
-
+                                    String currChan =  plugin.getMetadataString(player,"currentchannel",plugin);
+                                    if(currChan.compareToIgnoreCase(ci.getName())==0)
+                                        player.setMetadata("currentchannel", new FixedMetadataValue(plugin, ""));
                                 }
 
+                                String format = ChatColor.valueOf(ci.getColor().toUpperCase()) + "[" + ci.getName() + "]";
 
-                                for (ChatChannel chname : cc.getChannelsInfo()) {
+                                if(!silent)
+                                    player.sendMessage("Leaving channel: " + format);
 
-                                    if (chname.getName().equalsIgnoreCase(channelName) || chname.getAlias().equalsIgnoreCase(channelName)) {
+                                plugin.getServer().getLogger().info("[MumbleChat] Forcing player "+player.getPlayerListName()+" out of channel: " +ci.getName());
 
-                                        player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
 
-                                        String format = ChatColor.valueOf(chname.getColor().toUpperCase()) + "[" + chname.getName() + "]";
-                                        player.sendMessage("Leaving channel: " + format);
+                                admin.sendMessage("Forcing player "+player.getPlayerListName()+" out of "+ ci.getName());
+                                return true;
 
-                                        plugin.getServer().getLogger().info("Forcing Channel:" +chname.getName());
-
-                                    }
-
-                                    //Figure out how many channels the player is listening too..
-                                    //they need at least one.
-                                    if (plugin.getMetadata(player, "listenchannel." + chname.getName(), plugin)) {
-                                        listenchannelcount++;
-                                    }
-                                }
-
-                                if (listenchannelcount == 0) {
-                                    player.setMetadata("listenchannel." + cc.defaultChannel, new FixedMetadataValue(plugin, true));
-                                    player.sendMessage("You need to be listening on at least one channel.");
-                                    player.sendMessage("Setting to listening to: " + cc.defaultChannel);
-                                }
-
-                            admin.sendMessage("Forcing player "+player.getPlayerListName()+" out of "+ ci.getName());
-                            return true;
                         }
-
                     }
                     else
                     {
-                        admin.sendMessage("Player "+ args[1]+" is not available.");
+                        admin.sendMessage("Player "+ player.getPlayerListName() +" is not available.");
                         return true;
                     }
 
                     return false;
-                }
+
 
             }
             else
@@ -173,7 +150,7 @@ public class MuteCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-		
+        }
 		
 
 		if( (cmd.getName().equalsIgnoreCase("mute")) || (cmd.getName().equalsIgnoreCase("chmute")))
@@ -201,8 +178,6 @@ public class MuteCommandExecutor implements CommandExecutor {
             return HandleUnMute(admin,player,channel);
 		}
 		
-		return false;
-	}
 
         return false;
     }
@@ -218,14 +193,19 @@ public class MuteCommandExecutor implements CommandExecutor {
 
             if(player == null) {
 
-                admin.sendMessage(ChatColor.RED+"Can't mute. Player "+ playername + " doesn't exist.");
+                admin.sendMessage(ChatColor.RED+"Can't mute. Player doesn't exist.");
 
                 return true;
             }
             if(player.getPlayerListName()!= null)
                   playername = player.getPlayerListName();
+            else
+                return false;
             //Check for Channels
-            for(ChatChannel c:cc.getChannelsInfo())
+            ChatChannel c;
+
+            c=cc.getChannelInfo(channel);
+            if(c!=null)
             {
                 //Channel Name or Alias is OK
                 if(c.getName().equalsIgnoreCase(channel)|| c.getAlias().equalsIgnoreCase(channel) )
@@ -276,7 +256,10 @@ public class MuteCommandExecutor implements CommandExecutor {
                 playername = player.getPlayerListName();
             else
                 playername = "";
-            for(ChatChannel c:cc.getChannelsInfo())
+
+            ChatChannel c;
+            c=cc.getChannelInfo(channel);
+            if(c!=null)
             {
                 if(c.getName().equalsIgnoreCase(channel)|| c.getAlias().equalsIgnoreCase(channel))
                 {

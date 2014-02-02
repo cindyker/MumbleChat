@@ -37,9 +37,6 @@ public class LoginListener implements Listener {
     String defaultChannel;
     String defaultColor;
 
-
-
-
     public LoginListener(MumbleChat _plugin, ChatChannelInfo _cc) {
         plugin = _plugin;
         cc = _cc;
@@ -78,7 +75,7 @@ public class LoginListener implements Listener {
         Player pl = pp;
         
         //look up player in config
-        ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
+        ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getName().toLowerCase());
         
         //If the player doesn't have a section already, then we want to do this...
         if (cs == null) {
@@ -125,7 +122,7 @@ public class LoginListener implements Listener {
             if (ps == null) {
                 cs = customConfig.createSection("players");
             }
-            cs = customConfig.createSection("players." + pl.getPlayerListName());
+            cs = customConfig.createSection("players." + pl.getName().toLowerCase());
 
         }
 
@@ -162,7 +159,8 @@ public class LoginListener implements Listener {
         				
         	}
 
-            cs.set("tag", plugin.getMetadata(pl, "MumbleChat.ClanTag", plugin));
+            if(cs != null)
+                cs.set("tag", plugin.getMetadata(pl, "MumbleChat.ClanTag", plugin));
 
 
         }
@@ -199,8 +197,8 @@ public class LoginListener implements Listener {
         //Do we want this Disk IO on every logout..or do we
         //just want to wait for server stop.
         // Lets just do it on server stop.
-       //  saveCustomConfig();
-       //  reloadCustomConfig();
+          plugin.playerdata.saveCustomConfig();
+          plugin.playerdata.reloadCustomConfig();
     }
 
     ///////////////////////////////////////////
@@ -227,7 +225,7 @@ public class LoginListener implements Listener {
             plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We have saved player data");
 
             //mama.getServer().getLogger().info("before Listen");
-            ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getPlayerListName());
+            ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getName().toLowerCase());
             if (cs != null) {
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Player's data has been found");
 
@@ -260,18 +258,24 @@ public class LoginListener implements Listener {
 
                     }
                 }
-
+                if(plugin.simplelclans)
+                    {
+                        pl.setMetadata("MumbleChat.ClanTag", new FixedMetadataValue(plugin,cs.getBoolean("tag",true )));
+                    }
 
             } else {
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login","No Player Data Found");
                 curChannel = defaultChannel;
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, defaultChannel));
                 pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));
+                if(plugin.simplelclans) //SHow Tag for new Players...
+                {
+                    pl.setMetadata("MumbleChat.ClanTag", new FixedMetadataValue(plugin,true ));
+                }
+
             }
 
-            if(plugin.simplelclans){
-                pl.setMetadata("MumbleChat.ClanTag", new FixedMetadataValue(plugin,cs.getBoolean("tag",true )));
-            }
+
 
         } else {
             curChannel = defaultChannel;
@@ -307,7 +311,7 @@ public class LoginListener implements Listener {
         }
 
 
-        
+
         //=========================================================
         // Set up Current Channel Format 
         //=========================================================
