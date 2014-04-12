@@ -28,7 +28,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 //import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
-//TODO: Add SQL so player data can be stored there
 @SuppressWarnings("unused")
 public class MumbleChat extends JavaPlugin {
 
@@ -192,7 +191,7 @@ public class MumbleChat extends JavaPlugin {
         getCommand("chforce").setExecutor(muteExecutor);
 
         getCommand("tell").setExecutor(tellExecutor);
-        getCommand("ignore").setExecutor(tellExecutor);
+        getCommand("chignore").setExecutor(tellExecutor);
         getCommand("whisper").setExecutor(tellExecutor);
         getCommand("reply").setExecutor(tellExecutor);
 
