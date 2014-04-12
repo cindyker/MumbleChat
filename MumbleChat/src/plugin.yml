@@ -1,6 +1,6 @@
 name: MumbleChat
-version: 1.6.4
-main: net.minecatsumblechat.MumbleChat
+version: 1.8
+main: net.minecats.mumblechat.MumbleChat
 depend: [Vault]
 author: cindy_k
 authors: [net_creator]
