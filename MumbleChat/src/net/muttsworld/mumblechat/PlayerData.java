@@ -79,6 +79,7 @@ public class PlayerData {
         //FileConfiguration curconfig;
        // curconfig = getCustomConfig();
 
+        //If there is old file.. BLOW it away. UUID's are here.. sorry charlie.
         Boolean cleaned = customConfig.getBoolean("Cleaned",false);
 
         if(!cleaned)
@@ -99,14 +100,14 @@ public class PlayerData {
 
                         //THIS REMOVES THE NODE
                         main.set("players."+key,null);
-
-                        ns = main.createSection("players." +PlayerString);
-
-                        for (String pKey:playersection.getKeys(false))
-                        {
-                          //  plugin.getLogger().log(Level.INFO, "New Key: " + pKey);
-                            ns.set(pKey,playersection.getString(pKey)) ;
-                        }
+//
+//                        ns = main.createSection("players." +PlayerString);
+//
+//                        for (String pKey:playersection.getKeys(false))
+//                        {
+//                          //  plugin.getLogger().log(Level.INFO, "New Key: " + pKey);
+//                            ns.set(pKey,playersection.getString(pKey)) ;
+//                        }
 
 
 
