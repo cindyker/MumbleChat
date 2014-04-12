@@ -63,6 +63,7 @@ public class ChatListener implements Listener {
 
         Player p = event.getPlayer();
 
+
         ////////////////////////////////////////////////////////////////////////
         // if sticky tell this becomes quick...
         //

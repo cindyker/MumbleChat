@@ -15,6 +15,7 @@ import net.muttsworld.mumblechat.MumbleChat;
 import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -75,7 +76,8 @@ public class LoginListener implements Listener {
         Player pl = pp;
         
         //look up player in config
-        ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getName().toLowerCase());
+        //ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getName().toLowerCase());
+        ConfigurationSection cs = customConfig.getConfigurationSection("players."+ pl.getUniqueId().toString());
         
         //If the player doesn't have a section already, then we want to do this...
         if (cs == null) {
@@ -122,8 +124,8 @@ public class LoginListener implements Listener {
             if (ps == null) {
                 cs = customConfig.createSection("players");
             }
-            cs = customConfig.createSection("players." + pl.getName().toLowerCase());
-
+            //cs = customConfig.createSection("players." + pl.getName().toLowerCase());
+            cs = customConfig.createSection("players." + pl.getUniqueId().toString());
         }
 
         //Otherwise lets always save these people, they are in there already. 
@@ -225,7 +227,14 @@ public class LoginListener implements Listener {
             plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We have saved player data");
 
             //mama.getServer().getLogger().info("before Listen");
-            ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getName().toLowerCase());
+
+           // Its chat not bans, reset file and start again. Life sucks blame mojang. :)
+
+            ConfigurationSection cs = customConfig.getConfigurationSection("players."+pl.getUniqueId().toString());
+
+            //ConfigurationSection cs = customConfig.getConfigurationSection("players." + pl.getName().toLowerCase());
+
+
             if (cs != null) {
                 plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Player's data has been found");
 
