@@ -778,6 +778,9 @@ public class ChatCommand implements CommandExecutor, Listener {
         if(p.hasPermission(plugin.getChatChannelInfo().unmutepermissions))
             p.sendMessage(ChatColor.AQUA+"/chunmute [player] [channel]"+ ChatColor.WHITE +" Unmute a chhelplayer in the channel, so they may talk again");
 
+        if(p.hasPermission(plugin.getChatChannelInfo().forcepermissions))
+            p.sendMessage(ChatColor.AQUA+"/chforce [in/out] [player] [channel]" + ChatColor.WHITE + " Force a player into or out of a chatchannel. ");
+
         if(p.hasPermission(plugin.getChatChannelInfo().filterpermissions))
             p.sendMessage(ChatColor.AQUA+"/chfilter [FilteredWord]" + ChatColor.WHITE + "Display current filter for given word."  );
 
