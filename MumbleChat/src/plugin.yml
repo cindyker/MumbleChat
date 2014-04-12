@@ -41,9 +41,10 @@ commands:
         aliases: [mr]
         description: Send message to player you last sent a tell to
         permission-message: You don't have <permission>
-    ignore:
-        usage: /ignore [player] or /ignore ? for more information
-        description: This allows you to prevent a player from sending you a tell /ignore ? for more info
+    chignore:
+        usage: /chignore [player] or /chignore ? for more information
+        aliases: [cig]
+        description: This allows you to prevent a player from sending you a tell /chignore ? for more info
         permission-message: You don't have <permission>
     whisper:
         usage: /whisper [player] [msg]
