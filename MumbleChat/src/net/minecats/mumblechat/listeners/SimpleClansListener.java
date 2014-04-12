@@ -1,11 +1,8 @@
-package net.muttsworld.mumblechat.listeners;
+package net.minecats.mumblechat.listeners;
 
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import net.minecats.mumblechat.ChatChannelInfo;
+import net.minecats.mumblechat.MumbleChat;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 //import com.p000ison.dev.simpleclans2.api.events.ClanPlayerKillEvent;

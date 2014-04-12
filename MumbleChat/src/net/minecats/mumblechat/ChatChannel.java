@@ -1,4 +1,4 @@
-package net.muttsworld.mumblechat;
+package net.minecats.mumblechat;
 
 public class ChatChannel {
 

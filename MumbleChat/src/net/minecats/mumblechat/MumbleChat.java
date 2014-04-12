@@ -1,26 +1,24 @@
-package net.muttsworld.mumblechat;
+package net.minecats.mumblechat;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.p000ison.dev.simpleclans2.api.SCCore;
-import com.sk89q.commandbook.CommandBook;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
-import net.muttsworld.mumblechat.listeners.LoginListener;
-import net.muttsworld.mumblechat.listeners.ChatListener;
-import net.muttsworld.mumblechat.listeners.SimpleClansListener;
-import net.muttsworld.mumblechat.permissions.MumblePermissions;
-import net.muttsworld.mumblechat.commands.MuteCommandExecutor;
-import net.muttsworld.mumblechat.commands.TellCommandExecutor;
-import net.muttsworld.mumblechat.commands.ChatCommand;
+import net.minecats.mumblechat.listeners.LoginListener;
+import net.minecats.mumblechat.listeners.ChatListener;
+import net.minecats.mumblechat.listeners.SimpleClansListener;
+import net.minecats.mumblechat.permissions.MumblePermissions;
+import net.minecats.mumblechat.commands.MuteCommandExecutor;
+import net.minecats.mumblechat.commands.TellCommandExecutor;
+import net.minecats.mumblechat.commands.ChatCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;

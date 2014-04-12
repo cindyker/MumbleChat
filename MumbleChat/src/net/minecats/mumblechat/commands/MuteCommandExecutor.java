@@ -1,9 +1,9 @@
-package net.muttsworld.mumblechat.commands;
+package net.minecats.mumblechat.commands;
 
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import net.minecats.mumblechat.ChatChannel;
+import net.minecats.mumblechat.ChatChannelInfo;
+import net.minecats.mumblechat.MumbleChat;
+import net.minecats.mumblechat.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

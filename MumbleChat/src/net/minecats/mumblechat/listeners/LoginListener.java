@@ -1,24 +1,19 @@
-package net.muttsworld.mumblechat.listeners;
+package net.minecats.mumblechat.listeners;
 
 //import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import net.minecats.mumblechat.ChatChannel;
+import net.minecats.mumblechat.ChatChannelInfo;
+import net.minecats.mumblechat.MumbleChat;
+import net.minecats.mumblechat.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

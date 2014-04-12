@@ -1,33 +1,26 @@
-package net.muttsworld.mumblechat.commands;
+package net.minecats.mumblechat.commands;
 
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import net.minecats.mumblechat.ChatChannel;
+import net.minecats.mumblechat.ChatChannelInfo;
+import net.minecats.mumblechat.MumbleChat;
+import net.minecats.mumblechat.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.conversations.Conversable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.event.server.ServerEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import java.io.File;
 import java.util.*;
 
 public class ChatCommand implements CommandExecutor, Listener {

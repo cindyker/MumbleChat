@@ -1,10 +1,9 @@
-package net.muttsworld.mumblechat.listeners;
+package net.minecats.mumblechat.listeners;
 
 import java.util.logging.Level;
 
 //import net.sacredlabyrinth.phaed.simpleclans.Clan;
 //import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
-import com.p000ison.dev.simpleclans2.api.SCCore;
 import com.p000ison.dev.simpleclans2.api.clan.Clan;
 import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 import org.bukkit.ChatColor;
@@ -20,10 +19,10 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import net.minecats.mumblechat.ChatChannel;
+import net.minecats.mumblechat.ChatChannelInfo;
+import net.minecats.mumblechat.MumbleChat;
+import net.minecats.mumblechat.MumbleChat.LOG_LEVELS;
 
 public class ChatListener implements Listener {
     MumbleChat plugin;

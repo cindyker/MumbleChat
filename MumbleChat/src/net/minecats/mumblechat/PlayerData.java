@@ -1,4 +1,4 @@
-package net.muttsworld.mumblechat;
+package net.minecats.mumblechat;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

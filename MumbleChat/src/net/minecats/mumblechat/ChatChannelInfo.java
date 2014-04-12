@@ -1,4 +1,4 @@
-package net.muttsworld.mumblechat;
+package net.minecats.mumblechat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,11 +7,10 @@ import java.util.regex.Pattern;
 
 import com.p000ison.dev.simpleclans2.api.clan.Clan;
 import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import net.minecats.mumblechat.MumbleChat.LOG_LEVELS;
 
 //import net.sacredlabyrinth.phaed.simpleclans.Clan;
 //import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
-import com.p000ison.dev.simpleclans2.api.SCCore;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
