@@ -93,6 +93,8 @@ public class TellCommandExecutor implements CommandExecutor {
                 msg = cc.FilterChat(msg);
                 player.sendMessage(msg);
                 admin.sendMessage(echo);
+
+                return true;
                 //plugin.getServer().getLogger().info("Called Staff Chat... Commands!");
             }
 
@@ -100,7 +102,7 @@ public class TellCommandExecutor implements CommandExecutor {
         }
 
 
-		if(cmd.getName().equalsIgnoreCase("ignore"))
+		if(cmd.getName().equalsIgnoreCase("chignore"))
 		{
 			
 			plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Entered");
@@ -110,7 +112,7 @@ public class TellCommandExecutor implements CommandExecutor {
 				plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "No Arguements");
 				plugin.logme(LOG_LEVELS.DEBUG, "TellCommand:onCommand:ignore", "Returned False");
 
-                admin.sendMessage(ChatColor.AQUA+"[MumbleChat]: Try /ignore ? for help.");
+                admin.sendMessage(ChatColor.AQUA+"[MumbleChat]: Try /chignore ? for help.");
 				return true;
 			}
 			 
@@ -122,10 +124,10 @@ public class TellCommandExecutor implements CommandExecutor {
 				 	if(args[0].equalsIgnoreCase("?"))
 				 	{
 				 		 admin.sendMessage("\n"+ChatColor.AQUA+"-->Ignore Information<--");
-				 		 admin.sendMessage(ChatColor.AQUA+"    /ignore [playername]");
+				 		 admin.sendMessage(ChatColor.AQUA+"    /chignore [playername]");
 						 admin.sendMessage(ChatColor.AQUA+"This will prevent players from sending you tells. ");
 						 admin.sendMessage(ChatColor.AQUA+"You may only have 20 players ignored at a time");
-						 admin.sendMessage(ChatColor.AQUA+"To remove an ignore; use the ignore command again.");
+						 admin.sendMessage(ChatColor.AQUA+"To remove an ignore; use the chignore command again.");
 						 admin.sendMessage(ChatColor.AQUA+"------------------------------------------------");
 						 
 						 ignorelist = plugin.getMetadataString(admin, "MumbleChat.ignore", plugin);
@@ -223,9 +225,9 @@ public class TellCommandExecutor implements CommandExecutor {
 							 if (ignorecount >= 20)
 							 {
 								 admin.sendMessage(ChatColor.RED+"You cannot ignore more than 20 players at once");
-								 admin.sendMessage(ChatColor.RED+"/ignore ignoredplayername  ");
+								 admin.sendMessage(ChatColor.RED+"/chignore ignoredplayername  ");
 								 admin.sendMessage(ChatColor.RED+"to remove one from existing list.");
-								 admin.sendMessage(ChatColor.RED+" Use /ignore ? to see a list of ignored players.");
+								 admin.sendMessage(ChatColor.RED+" Use /chignore ? to see a list of ignored players.");
 								 return true;
 							 }
 							 //looks like they are online... lets add em to the list then.
