@@ -364,6 +364,12 @@ public class ChatChannelInfo {
 
         return msg;
     }
+    
+    
+    //ToDo: fix color matching : Just use [0-9A-FKLMNOR]
+    // ChatColor.translateAlternateColourCodes
+    // https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java#L205
+    
     //This will fix the color on a player's name with PEX format.
     // it has to be put into the SetFormat method on the chat event.
     protected static Pattern chatColorPattern = Pattern.compile("(?i)&([0-9A-F])");
