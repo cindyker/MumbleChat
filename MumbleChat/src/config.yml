@@ -141,6 +141,11 @@ permissions:
 loglevel: info
 saveplayerdata: true
 usePrefix: false
+#Set maxSpamScore to 0 to disable it
+#They get 1 point for each matching message in a row.
+#The points are cleared when a message doesn't match
+#and they expire after 2 minutes.
+maxSpamScore: 0
 #MumbleChat who for those not using commandbook compatiable permission groups
 useWho: false
 channelInFront: true

@@ -1,5 +1,6 @@
 package net.minecats.mumblechat.listeners;
 
+import java.util.Calendar;
 import java.util.logging.Level;
 
 //import net.sacredlabyrinth.phaed.simpleclans.Clan;
@@ -48,6 +49,58 @@ public class ChatListener implements Listener {
 
     }
 
+
+   void SendTell(Player p, String tellPlayer,String message)
+    {
+        if(p.hasPermission(plugin.getChatChannelInfo().tellpermissions))
+        {
+
+            //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
+            Player tp = plugin.getServer().getPlayer(tellPlayer);
+            if (tp == null) {
+                p.sendMessage(tellPlayer + " is not available");
+                p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
+
+            } else {
+                //Check for Ignores....
+                String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
+                if (playerignorelist.length() > 0) {
+                    String curplayer = "";
+                    StringTokenizer st = new StringTokenizer(playerignorelist, ",");
+                    while (st.hasMoreTokens()) {
+
+                        curplayer = st.nextToken();
+                        if (curplayer.equalsIgnoreCase(p.getName())) {
+                            p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
+
+                            return;
+                        }
+                    }
+
+                }
+                String filtered = cc.FilterChat(message);
+                String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
+                tp.sendMessage(msg);
+                p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
+                plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getName() +": "+ message) ;
+
+                return;
+            }
+
+            return;
+        }
+        else
+        {
+            p.sendMessage(ChatColor.YELLOW +"You do not have permission to send tells.");
+
+            return;
+        }
+
+    }
+
+
+
+
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         // boolean globalmsg = false;
@@ -70,50 +123,13 @@ public class ChatListener implements Listener {
 
         if (tellPlayer.length() > 0)
         {
-            if(p.hasPermission(plugin.getChatChannelInfo().tellpermissions))
-            {
-
-                    //plugin.getServer().getLogger().info("tell to player" + tellPlayer);
-                    Player tp = plugin.getServer().getPlayer(tellPlayer);
-                    if (tp == null) {
-                        p.sendMessage(tellPlayer + " is not available");
-                        p.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin, ""));
-
-                    } else {
-                        //Check for Ignores....
-                        String playerignorelist = plugin.getMetadataString(tp, "MumbleChat.ignore", plugin);
-                        if (playerignorelist.length() > 0) {
-                            String curplayer = "";
-                            StringTokenizer st = new StringTokenizer(playerignorelist, ",");
-                            while (st.hasMoreTokens()) {
-
-                                curplayer = st.nextToken();
-                                if (curplayer.equalsIgnoreCase(p.getName())) {
-                                    p.sendMessage(ChatColor.YELLOW + tellPlayer + " is currently ignoring your tells.");
-                                    event.setCancelled(true);
-                                    return;
-                                }
-                            }
-
-                        }
-                        String filtered = cc.FilterChat(event.getMessage());
-                        String msg = p.getDisplayName() + " tells you: " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered;
-                        tp.sendMessage(msg);
-                        p.sendMessage("You tell " + tellPlayer + ": " + ChatColor.valueOf(cc.tellColor.toUpperCase()) + filtered);
-                        plugin.logme(LOG_LEVELS.INFO,"AsyncChat:Tell",p.getDisplayName() + " tells " + tp.getName() +": "+ event.getMessage() );
-                        event.setCancelled(true);
-                        return;
-                    }
-                    event.setCancelled(true);
-                    return;
-                }
-                else
-                {
-                    p.sendMessage(ChatColor.YELLOW +"You do not have permission to send tells.");
-                    event.setCancelled(true);
-                    return;
-                }
+            SendTell(p,tellPlayer,event.getMessage());
+            event.setCancelled(true);
+            return;
          }
+         /////////////////////////////////////////////////////////////////////
+
+
 
         String pFormatted = "";
 
@@ -122,6 +138,63 @@ public class ChatListener implements Listener {
 
         evMessage = event.getMessage();
 
+
+        ////// SPAM FILTER //////
+        // Disable is maxSpamScore is 0
+        // SpamScore
+        // SpamTime
+        // TempMute
+        // TempExpire
+        // LastMessage
+        //////////////////////////
+        if(plugin.getChatChannelInfo().maxSpamScore > 0)
+        {
+            if(p.hasMetadata("MumbleChat.LastMessage"))
+            {
+                String lastmessage = plugin.getMetadataString(p,"MumbleChat.LastMessage",plugin);
+
+                if(p.hasMetadata("MumbleChat.SpamTime"))
+                {
+                    String Time = plugin.getMetadataString(p,"MumbleChat.SpamTime",plugin);
+                    long lTime = Long.parseLong(Time);
+                    Calendar expireca = Calendar.getInstance();
+                    expireca.setTimeInMillis(lTime);
+
+                    Calendar rightnow = Calendar.getInstance();
+
+                    plugin.getLogger().info("Has SpamTime - until " + lTime + " Currently : " + rightnow.getTimeInMillis());
+
+                    if(lTime < rightnow.getTimeInMillis())
+                    {
+                        p.removeMetadata("MumbleChat.SpamTime",plugin);
+                    }
+                    else
+                    {
+                        plugin.getLogger().info("Player is running from the guards, cancelling teleport!");
+                        p.sendMessage(ChatColor.LIGHT_PURPLE + "You can not escape the guards so easily!");
+                        event.setCancelled(true);
+                    }
+                }
+
+
+                if(evMessage.compareToIgnoreCase(lastmessage)==0)
+                {
+                    //DAT SPAM...
+                    if(p.hasMetadata("MumbleChat.SpamScore"))
+                    {
+                        //how old is the SCORE?
+
+                        int spamscore = Integer.parseInt(plugin.getMetadataString(p, "MumbleChat.SpamScore", plugin));
+                        if(spamscore > plugin.getChatChannelInfo().maxSpamScore)
+                        {
+                            //Mute this player
+
+                        }
+                    }
+                }
+
+            }
+        }
 
 
         Boolean filterthis = true;

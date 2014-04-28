@@ -61,11 +61,12 @@ public class MuteCommandExecutor implements CommandExecutor {
                 String channelName;
                 boolean silent = false;
 
-					if (args.length > 4)
+					if ((args.length > 4)||(args.length < 3))
 					{
                          admin.sendMessage("/chforce [out/in] [-s] player channel");
 						 return true;
 					}
+
 
                     if(args[1].compareToIgnoreCase("-s")==0)
                     {

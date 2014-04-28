@@ -49,6 +49,8 @@ public class ChatChannelInfo {
     public boolean broadcastPlayer;
     public String broadcastPermissions;
     public String lookupdatepermissions;
+
+    public int maxSpamScore;
     
     public boolean bChannelInfront;
     public boolean bDisplayAlias;
@@ -115,6 +117,8 @@ public class ChatChannelInfo {
         }
         
         plugin.setLogLevel(plugin.getConfig().getString("loglevel", "INFO").toUpperCase());
+
+        plugin.getConfig().getInt("maxSpamLevel",0);
 
         bChannelInfront = plugin.getConfig().getBoolean("channelInFront",false);
         tellColor = plugin.getConfig().getString("tellcolor", "gray");
