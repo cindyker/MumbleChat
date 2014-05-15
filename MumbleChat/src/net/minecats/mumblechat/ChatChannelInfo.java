@@ -12,6 +12,7 @@ import net.minecats.mumblechat.MumbleChat.LOG_LEVELS;
 //import net.sacredlabyrinth.phaed.simpleclans.Clan;
 //import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -26,7 +27,7 @@ public class ChatChannelInfo {
     MumbleChat plugin;
     // String[] Filters;
     List<String> filters;
-    List<String> filterexceptions;
+   // List<String> filterexceptions;
     //List<chatChannel> cc;
     ChatChannel[] cc;
     public String mutepermissions;
@@ -55,14 +56,43 @@ public class ChatChannelInfo {
     public boolean bChannelInfront;
     public boolean bDisplayAlias;
 
+    public Filters filtersList;
+
     public Boolean bUseWho;
     ConfigurationSection cs;
 
    //@SuppressWarnings("unchecked")
     ChatChannelInfo(MumbleChat _plugin) {
         plugin = _plugin;
-        filters = (List<String>) plugin.getConfig().getStringList("filters");
-        filterexceptions = (List<String>) plugin.getConfig().getStringList("filterexceptions");
+
+        filtersList = new Filters(_plugin);
+
+        ///==============================================================================================///
+        //CONVERSION CODE for FILTERS....
+        if(plugin.getConfig().getConfigurationSection("filters")!=null)
+        {
+            plugin.logme(LOG_LEVELS.INFO,"ChanChannelInfo","Found Old Filters Config List: Moving to New filters.yml file");
+
+            //Old Config! move it to filters.yml
+            filtersList.reloadCustomConfig();
+
+            filters = (List<String>) plugin.getConfig().getStringList("filters");
+
+            //Remove Default List
+            ConfigurationSection fmain = filtersList.getCustomConfig().getConfigurationSection("");
+            fmain.set("filters","");
+            //Add list from old config file
+            fmain.set("filters",filters);
+
+            ConfigurationSection main = plugin.getConfig().getConfigurationSection("");
+            main.set("filters","");
+
+        }
+        ///==============================================================================================///
+
+        filters = (List<String>) filtersList.getCustomConfig().getStringList("filters");
+
+      //  filterexceptions = (List<String>) plugin.getConfig().getStringList("filterexceptions");
 
         String _color = "";
         String _name = "";
@@ -400,6 +430,10 @@ public class ChatChannelInfo {
 
     }
 
+
+
+
+
     public String FormatPlayerName(String playerPrefix, String playerDisplayName, String playerSuffix) {
         if (usePrefix) {
 
@@ -446,7 +480,7 @@ public class ChatChannelInfo {
 	    	 plugin.logme(LOG_LEVELS.DEBUG, "GetClanTag", "Simple Clans");
 	    	 ClanPlayer cp = plugin.sc.getClanPlayerManager().getClanPlayer(pl.getName());
 	    	//Incase they don't have a clan, we have to put it back.
-	    	  pl.setDisplayName(pl.getPlayerListName());
+	    	  pl.setDisplayName(pl.getName());
 	         if (cp != null)
 	         {
 	        	
@@ -454,7 +488,7 @@ public class ChatChannelInfo {
 	            // pl.setPlayerListName(clan.getTag()+pl.getPlayerListName());               
 	             //plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set ListName to:" + pl.getPlayerListName());
 	             strclantag = clan.getTag()+ChatColor.WHITE+".";
-	             pl.setDisplayName(strclantag+pl.getPlayerListName());
+	             pl.setDisplayName(strclantag+pl.getName());
 	             plugin.logme(LOG_LEVELS.DEBUG, "GetClanTag", "Set DisplayName to:"+strclantag + pl.getDisplayName());
 	         }
 	        

@@ -82,8 +82,7 @@ public class LoginListener implements Listener {
         	if (plugin.getMetadata(pl, "listenchannel." + c.getName(), plugin)) {
 
                 //if they have more than the default
-                if (    !c.isDefaultchannel() 
-                		&& !c.getAutojoin())
+                if (    !c.isDefaultchannel()	)
                 {
                     nothingspecial = false;
                 }  
@@ -219,7 +218,7 @@ public class LoginListener implements Listener {
 
         if (cc.saveplayerdata) {
             customConfig = plugin.playerdata.getCustomConfig();
-            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "We have saved player data");
+            plugin.logme(LOG_LEVELS.INFO, "Player Login", "Looking for player: " + pl.getUniqueId().toString());
 
             //mama.getServer().getLogger().info("before Listen");
 
@@ -231,7 +230,7 @@ public class LoginListener implements Listener {
 
 
             if (cs != null) {
-                plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Player's data has been found");
+                plugin.logme(LOG_LEVELS.INFO, "Player Login", "Player's data has been found");
 
                 //=========SET PLAYER's Current CHANNEL
                 curChannel = cs.getString("default", defaultChannel);
@@ -268,7 +267,7 @@ public class LoginListener implements Listener {
                     }
 
             } else {
-                plugin.logme(LOG_LEVELS.DEBUG, "Player Login","No Player Data Found");
+                plugin.logme(LOG_LEVELS.INFO, "Player Login","No Player Data Found");
                 curChannel = defaultChannel;
                 pl.setMetadata("currentchannel", new FixedMetadataValue(plugin, defaultChannel));
                 pl.setMetadata("listenchannel." + defaultChannel, new FixedMetadataValue(plugin, true));

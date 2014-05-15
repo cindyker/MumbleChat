@@ -30,9 +30,8 @@ public class PlayerData {
 
     public void reloadCustomConfig() {
 
-        //TODO: Consider that this is a hardcoded filename... ick.
         if (customConfigFile == null) {
-            customConfigFile = new File(plugin.getDataFolder().getAbsolutePath(), "PlayerData.yml");
+            customConfigFile = new File(plugin.getDataFolder().getAbsolutePath(), "resources/PlayerData.yml");
         }
         customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
 

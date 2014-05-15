@@ -1,12 +1,13 @@
 package net.minecats.mumblechat.listeners;
 
-import java.util.Calendar;
+import java.util.*;
 import java.util.logging.Level;
 
 //import net.sacredlabyrinth.phaed.simpleclans.Clan;
 //import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import com.p000ison.dev.simpleclans2.api.clan.Clan;
 import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,9 +17,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import java.util.IllegalFormatException;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import net.minecats.mumblechat.ChatChannel;
 import net.minecats.mumblechat.ChatChannelInfo;
@@ -100,7 +98,26 @@ public class ChatListener implements Listener {
 
 
 
+    //Future Enhancement possibility.
+    public void MuteClick(String message, Player p, String channel)
+    {
 
+        cc.SetPlayerDisplayName(p);
+        String formatting = "tellraw "+p.getName()+" {text:\""+p.getDisplayName()+"\",clickEvent:{ action:run_command, value:\"/mute "+p.getName()+" "+channel+"\"}, extra:[\"" +message+"\"]}";
+
+        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),formatting);
+        //p.sendRawMessage(formatting);
+
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //*****************************************************************************************
+    //             AsyncChat HERE
+    //
+    //*****************************************************************************************
+    ///////////////////////////////////////////////////////////////////////////////////////////
     @EventHandler(priority = EventPriority.LOW) // Makes your event Low priority
     public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
         // boolean globalmsg = false;
@@ -319,7 +336,14 @@ public class ChatListener implements Listener {
         Location diff;
 
         Player[] pl = event.getRecipients().toArray(new Player[0]);
-        //Check each player to see who should receive message...
+        List<Player> staff = new ArrayList<Player>();
+
+
+
+        ////////////////////////////////////////////////////////////////
+        // **************************************************************
+        //     Check each player to see who should receive message...
+        ////////////////////////////////////////////////////////////////
         for (Player rp : pl) {
             //mama.getServer().getLogger().info("["+mama.getName()+"] "+listenChannel);
 
@@ -331,7 +355,7 @@ public class ChatListener implements Listener {
             }
             else{
                 if ((!plugin.getMetadata(rp, listenChannel, plugin))) {
-                    plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent",rp.getPlayerListName() + " Removed from Channel "+listenChannel +" -  Not Listening");
+                    plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent",rp.getName() + " Removed from Channel "+listenChannel +" -  Not Listening");
                     event.getRecipients().remove(rp);
                     continue;
             }
@@ -350,12 +374,12 @@ public class ChatListener implements Listener {
                 	//if (plugin.getMetadata(p, cci.getPermission(), plugin) == false) {
                     if(!rp.isPermissionSet(cci.getPermission()))
                     {
-                        plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent",rp.getPlayerListName() + " Removed from Channel "+cci.getAlias() +" -  No Permissions");
+                        plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent",rp.getName() + " Removed from Channel "+cci.getAlias() +" -  No Permissions");
                 		 rp.removeMetadata("listenchannel." + listenChannel,plugin);
                 		 event.getRecipients().remove(rp);
 
                          //If this is the Sender, then they need to be kicked out and told.
-                         if(rp.getPlayerListName().compareToIgnoreCase(p.getPlayerListName())==0)
+                         if(rp.getName().compareToIgnoreCase(p.getName())==0)
                          {
                              p.sendMessage(ChatColor.DARK_PURPLE + "You don't have permissions for this channel...");
                          }
@@ -383,6 +407,13 @@ public class ChatListener implements Listener {
                 }
 
             }
+
+//            if(rp.hasPermission("mumblechat.mute"))
+//            {
+//                //remove
+//                event.getRecipients().remove(rp);
+//                staff.add(rp);
+//            }
 
         }
 
@@ -432,6 +463,12 @@ public class ChatListener implements Listener {
             plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", "Format: "+ fullMessage);
             p.sendMessage(ChatColor.GOLD + "There is no one in this channel to hear you.");
         }
+
+//        if(staff.size()>0)
+//        {
+//            for(Player stp: staff)
+//                MuteClick(evMessage,stp,curChannel);
+//        }
 
 
     }

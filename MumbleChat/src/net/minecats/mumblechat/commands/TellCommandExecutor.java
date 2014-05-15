@@ -88,8 +88,8 @@ public class TellCommandExecutor implements CommandExecutor {
                     msg +=" " + args[r];
 
                 //ChatColor.GRAY
-                String echo = "Reply to " + player.getDisplayName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;
-                msg = admin.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
+                String echo = "Reply to " + player.getName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;
+                msg = admin.getName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
                 msg = cc.FilterChat(msg);
                 player.sendMessage(msg);
                 admin.sendMessage(echo);
@@ -308,9 +308,9 @@ public class TellCommandExecutor implements CommandExecutor {
 								msg +=" " + args[r];
 							
 							//ChatColor.GRAY
-							String echo = "you tell " + player.getDisplayName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;							
-							msg = admin.getDisplayName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
-                            player.setMetadata("MumbleChat.reply", new FixedMetadataValue(plugin,admin.getPlayerListName()));
+							String echo = "you tell " + player.getName() + ChatColor.valueOf(cc.tellColor.toUpperCase())  + ": " + msg;
+							msg = admin.getName()  +" tells you: "+ ChatColor.valueOf(cc.tellColor.toUpperCase())  + msg;
+                            player.setMetadata("MumbleChat.reply", new FixedMetadataValue(plugin,admin.getName()));
 							msg = cc.FilterChat(msg);
 							player.sendMessage(msg);
 							admin.sendMessage(echo);
@@ -326,7 +326,7 @@ public class TellCommandExecutor implements CommandExecutor {
 					 {
 						 plugin.logme(LOG_LEVELS.DEBUG,"Sticky Tell", "tell::" + args[0]);
 						 admin.setMetadata("MumbleChat.tell", new FixedMetadataValue(plugin,args[0]));
-                         player.setMetadata("MumbleChat.reply", new FixedMetadataValue(plugin,admin.getPlayerListName()));
+                         player.setMetadata("MumbleChat.reply", new FixedMetadataValue(plugin,admin.getName()));
 						 admin.sendMessage("You are now chatting with " + args[0]);
 					 }
 				 

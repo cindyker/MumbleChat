@@ -97,7 +97,7 @@ public class MuteCommandExecutor implements CommandExecutor {
                             player.setMetadata("listenchannel."+ci.getName(),new FixedMetadataValue(plugin,true));
                             player.setMetadata("currentchannel",new FixedMetadataValue(plugin,ci.getName()));
 
-                            admin.sendMessage("Forcing player "+player.getPlayerListName()+" into "+ ci.getName());
+                            admin.sendMessage("Forcing player "+player.getName()+" into "+ ci.getName());
                             if(!silent)
                                 player.sendMessage("You have been added to "+ ci.getName());
                             return true;
@@ -127,17 +127,17 @@ public class MuteCommandExecutor implements CommandExecutor {
                                 if(!silent)
                                     player.sendMessage("Leaving channel: " + format);
 
-                                plugin.getServer().getLogger().info("[MumbleChat] Forcing player "+player.getPlayerListName()+" out of channel: " +ci.getName());
+                                plugin.getServer().getLogger().info("[MumbleChat] Forcing player "+player.getName()+" out of channel: " +ci.getName());
 
 
-                                admin.sendMessage("Forcing player "+player.getPlayerListName()+" out of "+ ci.getName());
+                                admin.sendMessage("Forcing player "+player.getName()+" out of "+ ci.getName());
                                 return true;
 
                         }
                     }
                     else
                     {
-                        admin.sendMessage("Player "+ player.getPlayerListName() +" is not available.");
+                        admin.sendMessage("Player "+ player.getName() +" is not available.");
                         return true;
                     }
 
@@ -198,8 +198,8 @@ public class MuteCommandExecutor implements CommandExecutor {
 
                 return true;
             }
-            if(player.getPlayerListName()!= null)
-                  playername = player.getPlayerListName();
+            if(player.getName()!= null)
+                  playername = player.getName();
             else
                 return false;
             //Check for Channels
@@ -253,8 +253,8 @@ public class MuteCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            if(player.getPlayerListName()!= null)
-                playername = player.getPlayerListName();
+            if(player.getName()!= null)
+                playername = player.getName();
             else
                 playername = "";
 
