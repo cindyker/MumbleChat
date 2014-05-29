@@ -68,6 +68,13 @@ public class MumbleChat extends JavaPlugin {
             this.getPluginLoader().disablePlugin(this);
             return;
         }
+
+        //Check for CommandBook... Our Mutes clash big time.
+        Plugin plugCB = getServer().getPluginManager().getPlugin("CommandBook");
+        if(plugCB!=null)
+        {
+            log.info(String.format("[%s] - WARNING!!!! You need to disable CommandBook messaging or Mutes will error everytime.", getDescription().getName()));
+        }
         
         log.info(String.format("[%s] - Checking for SimpleClans...", getDescription().getName()));
         
