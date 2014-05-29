@@ -65,6 +65,7 @@ public class MumbleChat extends JavaPlugin {
         // Set up Vault
         if(!setupPermissions()) {
             log.info(String.format("[%s] - Could not find Vault dependency, disabling.", getDescription().getName()));
+            this.getServer().getPluginManager().disablePlugin(this);
         }
         
         log.info(String.format("[%s] - Checking for SimpleClans...", getDescription().getName()));
@@ -162,6 +163,10 @@ public class MumbleChat extends JavaPlugin {
 
     private boolean setupPermissions()
     {
+        Plugin plug = getServer().getPluginManager().getPlugin("Vault");
+        if(plug == null)
+            return false;
+
         RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
         if (permissionProvider != null) {
             permission = permissionProvider.getProvider();
