@@ -1,7 +1,10 @@
-package net.muttsworld.mumblechat.listeners;
+package com.minecats.cindyk.listeners;
 
 import java.util.logging.Level;
 
+import com.minecats.cindyk.ChatChannel;
+import com.minecats.cindyk.ChatChannelInfo;
+import com.minecats.cindyk.MumbleChat;
 import com.p000ison.dev.simpleclans2.api.clan.Clan;
 import com.p000ison.dev.simpleclans2.api.clanplayer.ClanPlayer;
 import org.bukkit.ChatColor;
@@ -16,11 +19,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
 
 public class ChatListener implements Listener {
     MumbleChat plugin;
@@ -131,7 +129,7 @@ public class ChatListener implements Listener {
             //	plugin.getServer().getLogger().info("Talking Sticky");
             curChannel = plugin.getMetadataString(p, "currentchannel", plugin);
         } else {
-        	 plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent","Temp Talk");
+        	 plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "AsyncChatEvent","Temp Talk");
             curChannel = insertchannel;
             p.setMetadata("insertchannel", new FixedMetadataValue(plugin, "NONE"));
 
@@ -259,7 +257,7 @@ public class ChatListener implements Listener {
 
         if (cc.usePrefix == true) {
         	  try {
-                  if (p.hasPermission("mumblechat.cancolor") == true) {
+                  if (p.hasPermission("cindyk.cancolor") == true) {
                       //Rainbow Colored Skittles here... :)
                       evMessage = cc.FormatString(evMessage);
                   }
@@ -274,7 +272,7 @@ public class ChatListener implements Listener {
                  // plugin.logme(LOG_LEVELS.INFO, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{"listenchannel:", listenChannel}));
                  
                   //event.setMessage("");
-                  plugin.logme(LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
+                  plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "AsyncChatEvent", String.format("Format?:{0}::{1}", new Object[]{pFormatted, Channelformat}));
               } catch (IllegalFormatException ex) {
                   plugin.getLogger().log(Level.INFO, "Message Format issue: {0}:{1}", new Object[]{ex.getMessage(), evMessage});
                   event.setMessage(Channelformat + evMessage);

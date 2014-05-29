@@ -1,11 +1,11 @@
 name: MumbleChat
-version: 1.4.7
-main: net.muttsworld.mumblechat.MumbleChat
+version: 1.7.8
+main: com.minecats.cindyk.MumbleChat
 depend: [Vault]
 author: cindy_k
-authors: [net_creator,mumblerit]
-description: Chat with Channels (1.4.7 level)
-website: www.muttsworldmine.com
+authors: [net_creator]
+description: Chat with Channels (1.7.8 level)
+website: www.minecats.com
 commands:
     mute:
         usage: /mute [player] [channel]

@@ -1,9 +1,8 @@
-package net.muttsworld.mumblechat.commands;
+package com.minecats.cindyk.commands;
 
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import com.minecats.cindyk.MumbleChat;
+import com.minecats.cindyk.ChatChannel;
+import com.minecats.cindyk.ChatChannelInfo;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -354,7 +353,7 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "chwho": {
-            	if(player.hasPermission("mumblechat.who"))
+            	if(player.hasPermission("cindyk.who"))
             	{
 	                String lstchan = "listenchannel.";
 	                String playerlist = "";
@@ -381,12 +380,12 @@ public class ChatCommand implements CommandExecutor, Listener {
 	                        lstchan += cinfo.getName();
 	                        Player pl[] = plugin.getServer().getOnlinePlayers();
 	
-	                        plugin.logme(LOG_LEVELS.DEBUG, "ChWho","Count of player:" + pl.length);
+	                        plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "ChWho","Count of player:" + pl.length);
 	
 	
 	                        long linecount = plugin.getLineLength();
 	                        for (Player p : pl) {
-	                            plugin.logme(LOG_LEVELS.DEBUG, "ChWho:", "player:" + p.getDisplayName() + " " + p.isOnline());
+	                            plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "ChWho:", "player:" + p.getDisplayName() + " " + p.isOnline());
 	                            if (plugin.getMetadata(p, lstchan, plugin)) {
 	
 	
@@ -398,7 +397,7 @@ public class ChatCommand implements CommandExecutor, Listener {
 	
 	                                //Wrapping the text on the screen...
 	                                if ((playerlist.length() + p.getName().length() > linecount)) {
-	                                	 plugin.logme(LOG_LEVELS.DEBUG, "ChWho","linecount:" + linecount + "listlength:" + playerlist.length());
+	                                	 plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "ChWho","linecount:" + linecount + "listlength:" + playerlist.length());
 	                                    playerlist += "\n";
 	                                    linecount = linecount + plugin.getLineLength();
 	                                }

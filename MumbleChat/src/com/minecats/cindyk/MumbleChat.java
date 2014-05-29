@@ -1,23 +1,22 @@
-package net.muttsworld.mumblechat;
+package com.minecats.cindyk;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.minecats.cindyk.commands.MuteCommandExecutor;
+import com.minecats.cindyk.commands.TellCommandExecutor;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
-import net.muttsworld.mumblechat.listeners.LoginListener;
-import net.muttsworld.mumblechat.listeners.ChatListener;
-import net.muttsworld.mumblechat.listeners.SimpleClansListener;
-import net.muttsworld.mumblechat.permissions.MumblePermissions;
-import net.muttsworld.mumblechat.commands.MuteCommandExecutor;
-import net.muttsworld.mumblechat.commands.TellCommandExecutor;
-import net.muttsworld.mumblechat.commands.ChatCommand;
+import com.minecats.cindyk.listeners.LoginListener;
+import com.minecats.cindyk.listeners.ChatListener;
+import com.minecats.cindyk.permissions.MumblePermissions;
+import com.minecats.cindyk.commands.ChatCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;

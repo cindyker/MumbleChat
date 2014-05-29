@@ -1,10 +1,10 @@
-package net.muttsworld.mumblechat.commands;
+package com.minecats.cindyk.commands;
 
 import java.util.StringTokenizer;
 
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import com.minecats.cindyk.ChatChannelInfo;
+import com.minecats.cindyk.MumbleChat;
+import com.minecats.cindyk.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

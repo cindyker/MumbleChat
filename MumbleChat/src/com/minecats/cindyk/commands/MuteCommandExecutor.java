@@ -1,9 +1,9 @@
-package net.muttsworld.mumblechat.commands;
+package com.minecats.cindyk.commands;
 
-import net.muttsworld.mumblechat.ChatChannel;
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import com.minecats.cindyk.ChatChannel;
+import com.minecats.cindyk.ChatChannelInfo;
+import com.minecats.cindyk.MumbleChat;
+import com.minecats.cindyk.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -46,7 +46,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 //		{
 //		
 //		
-//			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
+//			if(plugin.getMetadata(admin, "cindyk.canmute", plugin)==true)
 //			{
 //				
 //				
@@ -79,7 +79,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 		//Need to check for permission before checking for command
 		if(cmd.getName().equalsIgnoreCase("mute"))
 		{
-			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
+			if(plugin.getMetadata(admin, "cindyk.canmute", plugin)==true)
 			{
 				//	plugin.getServer().getLogger().info("Got Mute!");	
 				
@@ -150,7 +150,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("unmute"))
 		{
-			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin)==true)
+			if(plugin.getMetadata(admin, "cindyk.canmute", plugin)==true)
 			{
 				   plugin.logme(LOG_LEVELS.DEBUG ,"Unmute command", "Got Command..." );
 				

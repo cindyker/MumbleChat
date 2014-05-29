@@ -130,6 +130,9 @@ filters:
 - rain,sunshine
 mute:
   permissions: mumblechat.canmute
+permissions:
+  mute: mumblechat.canmute
+  color: mumblechat.cancolor
 loglevel: info
 saveplayerdata: true
 usePrefix: false
@@ -138,8 +141,8 @@ tellcolor: white
 broadcast:
   color: red
   displayplayername: false
-  permissions: mumblechat.adminchannel
-  command: alert
+  permissions: mumblechat.broadcast
+  command: ale
   displaytag: '<Alert>'
 channels:
   global:

@@ -1,4 +1,4 @@
-package net.muttsworld.mumblechat;
+package com.minecats.cindyk;
 
 public class ChatChannel {
 

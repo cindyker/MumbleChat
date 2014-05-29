@@ -1,10 +1,9 @@
-package net.muttsworld.mumblechat.permissions;
+package com.minecats.cindyk.permissions;
 
 import java.lang.reflect.*;
 
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import com.minecats.cindyk.MumbleChat;
+import com.minecats.cindyk.ChatChannelInfo;
 
 public class MumblePermissions {
 
@@ -26,12 +25,12 @@ public class MumblePermissions {
             Class c = Class.forName("ru.tehkode.permissions.bukkit.PermissionsEx");
             Method m[] = c.getDeclaredMethods();
             for (int i = 0; i < m.length; i++) {
-                plugin.logme(LOG_LEVELS.DEBUG, "PermissionsExAvailable", m[i].toString());
+                plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "PermissionsExAvailable", m[i].toString());
             }
 
             return true;
         } catch (Throwable e) {
-            plugin.logme(LOG_LEVELS.ERROR, "PermissionsExAvailable", e.getMessage());
+            plugin.logme(MumbleChat.LOG_LEVELS.ERROR, "PermissionsExAvailable", e.getMessage());
         }
 
 

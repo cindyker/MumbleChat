@@ -1,8 +1,8 @@
-package net.muttsworld.mumblechat.listeners;
+package com.minecats.cindyk.listeners;
 
-import net.muttsworld.mumblechat.ChatChannelInfo;
-import net.muttsworld.mumblechat.MumbleChat;
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
+import com.minecats.cindyk.ChatChannelInfo;
+import com.minecats.cindyk.MumbleChat;
+import com.minecats.cindyk.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

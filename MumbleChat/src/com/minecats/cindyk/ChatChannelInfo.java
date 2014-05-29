@@ -1,11 +1,9 @@
-package net.muttsworld.mumblechat;
+package com.minecats.cindyk;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-
-import net.muttsworld.mumblechat.MumbleChat.LOG_LEVELS;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -333,7 +331,7 @@ public class ChatChannelInfo {
 	    if(plugin.simplelclans)
 	    {
 	    	 
-	    	 plugin.logme(LOG_LEVELS.INFO, "Player Login", "Simple Clans");
+	    	 plugin.logme(MumbleChat.LOG_LEVELS.INFO, "Player Login", "Simple Clans");
 	    	 ClanPlayer cp = plugin.sc.getClanPlayerManager().getClanPlayer(pl.getName());
 	    	//Incase they don't have a clan, we have to put it back.
 	    	  pl.setDisplayName(pl.getPlayerListName());
@@ -345,7 +343,7 @@ public class ChatChannelInfo {
 	             //plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set ListName to:" + pl.getPlayerListName());
 	             strclantag = clan.getTag()+ChatColor.WHITE+".";
 	             pl.setDisplayName(strclantag+pl.getPlayerListName());
-	             plugin.logme(LOG_LEVELS.INFO, "Player Login", "Set DisplayName to:"+strclantag + pl.getDisplayName());
+	             plugin.logme(MumbleChat.LOG_LEVELS.INFO, "Player Login", "Set DisplayName to:"+strclantag + pl.getDisplayName());
 	         }
 	        
 	        
@@ -360,7 +358,7 @@ public class ChatChannelInfo {
     	   GetClanTag(pl);
 		    if (usePrefix == true) {
 		    	
-		 	   plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
+		 	   plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "Player Login", "Got Prefix");
 		 	 
 		     //http://www.minecraftwiki.net/wiki/Classic_server_protocol#Color_Codes
 		     pFormatted = FormatPlayerName(MumbleChat.chat.getPlayerPrefix(pl),
