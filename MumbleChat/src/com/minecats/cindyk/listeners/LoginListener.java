@@ -416,11 +416,11 @@ public class LoginListener implements Listener {
         if (MumbleChat.permission.has(pl,cc.mutepermissions))//(pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Mute permissions given...");
-            pl.setMetadata("cindyk.canmute", new FixedMetadataValue(plugin, true));
+            pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
         }
         else  //MetaData does not clear on logoff / logons
         {
-            pl.setMetadata("cindyk.canmute", new FixedMetadataValue(plugin, false));
+            pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, false));
         }
         
         plugin.logme(MumbleChat.LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");
@@ -431,11 +431,11 @@ public class LoginListener implements Listener {
         if(MumbleChat.permission.has(pl,cc.colorpermissions))// (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] chat color permissions given...");
-            pl.setMetadata("cindyk.cancolor", new FixedMetadataValue(plugin, true));
+            pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, true));
         }
         else
         {
-            pl.setMetadata("cindyk.cancolor", new FixedMetadataValue(plugin, false));
+            pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, false));
         }
 
 
@@ -445,7 +445,7 @@ public class LoginListener implements Listener {
         ///////////////////////////////////////////////////////////////////////////////////////
         if (pl.isPermissionSet(cc.forcepermissions)) {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Force permissions given...");
-            pl.setMetadata("cindyk.canforce", new FixedMetadataValue(plugin, true));
+            pl.setMetadata("mumblechat.canforce", new FixedMetadataValue(plugin, true));
         }
 
        
