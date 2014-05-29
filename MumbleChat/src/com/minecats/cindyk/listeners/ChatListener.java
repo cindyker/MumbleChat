@@ -254,13 +254,15 @@ public class ChatListener implements Listener {
             p.sendMessage(ChatColor.GOLD + "No one is listening to you");
         }
 
+        //Set Color Here.. so it gets with or without Prefix.
+        if(MumbleChat.permission.has(p,cc.colorpermissions)){ //(p.hasPermission(cc.colorpermissions)) {
+            //Rainbow Colored Skittles here... :)
+            evMessage = cc.FormatString(evMessage);
+        }
 
         if (cc.usePrefix == true) {
         	  try {
-                  if (p.hasPermission("cindyk.cancolor") == true) {
-                      //Rainbow Colored Skittles here... :)
-                      evMessage = cc.FormatString(evMessage);
-                  }
+
                   event.setMessage(evMessage);
 
                   //event.setFormat(pFormatted+" "+Channelformat+evMessage+"%s"); //+" ");
@@ -278,6 +280,7 @@ public class ChatListener implements Listener {
                   event.setMessage(Channelformat + evMessage);
               }
           } else {
+
         	  if(cc.bChannelInfront)
         	  	  event.setFormat(Channelformat +" " +pFormatted + ChatColor.valueOf(ChannelColor)+ ": " + "%s"); //+" ");
         	  else
