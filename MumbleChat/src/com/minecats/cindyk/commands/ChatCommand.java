@@ -353,7 +353,7 @@ public class ChatCommand implements CommandExecutor, Listener {
             }
 
             case "chwho": {
-            	if(player.hasPermission("cindyk.who"))
+            	if (MumbleChat.permission.has(player,cc.whopermissions))//(player.hasPermission(cc.whopermissions))
             	{
 	                String lstchan = "listenchannel.";
 	                String playerlist = "";

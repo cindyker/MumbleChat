@@ -24,6 +24,7 @@ public class ChatChannelInfo {
     public String mutepermissions;
     public String forcepermissions;
     public String colorpermissions;
+    public String whopermissions;
     public Boolean saveplayerdata;
     public Boolean usePrefix;
     public Boolean useSuffix;
@@ -61,6 +62,11 @@ public class ChatChannelInfo {
         mutepermissions = plugin.getConfig().getString("mute.permissions", "");
         forcepermissions = plugin.getConfig().getString("force.permissions", "");
         colorpermissions = plugin.getConfig().getString("inchat_color_permissions","");
+
+        whopermissions =  plugin.getConfig().getString("permissions.who", "mumblechat.who");
+        mutepermissions = plugin.getConfig().getString("permissions.mute", "mumblechat.mute");
+        colorpermissions = plugin.getConfig().getString("permissions.color","mumblechat.color");
+
         //plugin.getServer().getLogger().info("["+plugin.getName()+"] " + mutepermissions);
 
         saveplayerdata = plugin.getConfig().getBoolean("saveplayerdata", true);

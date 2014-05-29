@@ -79,7 +79,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 		//Need to check for permission before checking for command
 		if(cmd.getName().equalsIgnoreCase("mute"))
 		{
-			if(plugin.getMetadata(admin, "cindyk.canmute", plugin)==true)
+			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin))
 			{
 				//	plugin.getServer().getLogger().info("Got Mute!");	
 				
@@ -150,7 +150,7 @@ public class MuteCommandExecutor implements CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("unmute"))
 		{
-			if(plugin.getMetadata(admin, "cindyk.canmute", plugin)==true)
+			if(plugin.getMetadata(admin, "mumblechat.canmute", plugin))
 			{
 				   plugin.logme(LOG_LEVELS.DEBUG ,"Unmute command", "Got Command..." );
 				
