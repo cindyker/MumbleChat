@@ -256,7 +256,7 @@ public class LoginListener implements Listener {
             if (c.hasPermission()) {
                 //	mama.getServer().getLogger().info("Perms Exist!" + c.getPermission());
 
-                if (pl.isPermissionSet(c.getPermission())) {
+                if (MumbleChat.permission.has(pl,c.getPermission())){//(pl.isPermissionSet(c.getPermission())) {
                     //mama.getServer().getLogger().info("And I can use them!!!" + c.getPermission());
                     pl.setMetadata(c.getPermission(), new FixedMetadataValue(plugin, true));
                 } else {
@@ -307,9 +307,13 @@ public class LoginListener implements Listener {
 	                        //Incase their permissions change.
 	                        if (c.hasPermission()) {
 	                            plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
-	                            if (pl.isPermissionSet(c.getPermission())) {
+	                            if (MumbleChat.permission.has(pl,c.getPermission())){//(pl.isPermissionSet(c.getPermission())) {
 	                                pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
 	                            }
+                                else
+                                {
+                                    pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, false));
+                                }
 	                        }
 	                        else {
 	                            pl.setMetadata("listenchannel." + chname, new FixedMetadataValue(plugin, true));
@@ -374,8 +378,12 @@ public class LoginListener implements Listener {
             	 //Incase their permissions change.
                 if (c.hasPermission()) {
                     plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "Channel has permissions");
-                    if (pl.isPermissionSet(c.getPermission())) {
+                    if (MumbleChat.permission.has(pl,c.getPermission())){// (pl.isPermissionSet(c.getPermission())) {
                         pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, true));
+                    }
+                    else
+                    {
+                        pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, false));
                     }
                 } else {
                     pl.setMetadata("listenchannel." + s, new FixedMetadataValue(plugin, true));
@@ -406,10 +414,14 @@ public class LoginListener implements Listener {
         //====================================================================================
         // ---  Get Permissions for Special Commands here -----------------------------------
         //====================================================================================
-        if (pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
+        if (MumbleChat.permission.has(pl,cc.mutepermissions))//(pl.isPermissionSet(cc.mutepermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] can Mute permissions given...");
             pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, true));
+        }
+        else  //MetaData does not clear on logoff / logons
+        {
+            pl.setMetadata("mumblechat.canmute", new FixedMetadataValue(plugin, false));
         }
         
         plugin.logme(LOG_LEVELS.DEBUG, "Player Login", "After mute permissions");
@@ -417,11 +429,17 @@ public class LoginListener implements Listener {
         //------------------------------------------------------------------------------
         // --  Get Color Text Permissions
         //------------------------------------------------------------------------------
-        if (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
+        if(MumbleChat.permission.has(pl,cc.colorpermissions))// (pl.isPermissionSet(cc.colorpermissions)) //pl.hasPermission(cc.mutepermissions))
         {
             plugin.getServer().getLogger().info("[" + plugin.getName() + "] chat color permissions given...");
             pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, true));
         }
+        else
+        {
+            pl.setMetadata("mumblechat.cancolor", new FixedMetadataValue(plugin, false));
+        }
+
+
 
         ////////////////////////////////////////////////////////////////////////////////////////
         //FUTURE FORCE CHANNEL CODE

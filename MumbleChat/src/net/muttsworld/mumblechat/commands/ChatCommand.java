@@ -213,7 +213,9 @@ public class ChatCommand implements CommandExecutor, Listener {
                     //for (ChatChannel chname : cc.getChannelsInfo()) {
                         //player.sendMessage("channels: " + chname.getName()+ "=" + args[0]);
                     if (chname.hasPermission()) {
-                        if (!player.isPermissionSet(chname.getPermission())) {
+                        //if (!player.isPermissionSet(chname.getPermission()))
+                        if(!MumbleChat.permission.has(player,chname.getPermission()))
+                        {
                             //Command pre processor may have added listener, need to turn it off.
                             player.setMetadata("listenchannel." + chname.getName(), new FixedMetadataValue(plugin, false));
                             //	plugin.getServer().getLogger().info("["+plugin.getName() +"]"+ " Permission missing: "+chname.getPermission());	
@@ -341,7 +343,7 @@ public class ChatCommand implements CommandExecutor, Listener {
                 for (ChatChannel chname : cc.getChannelsInfo()) {
 
                     if (chname.hasPermission()) {
-                        if (player.isPermissionSet(chname.getPermission())) {
+                        if (MumbleChat.permission.has(player,chname.getPermission())) {// (player.isPermissionSet(chname.getPermission())) {
                             player.sendMessage(ChatColor.valueOf(chname.getColor().toUpperCase()) + chname.getName() + " : " + chname.getAlias() + " - required permission");
                         }
                     } else {
@@ -368,7 +370,7 @@ public class ChatCommand implements CommandExecutor, Listener {
 	                        //Does this channel have permissions?
 	                        if (cinfo.hasPermission()) {
 	
-	                            if (!player.isPermissionSet(cinfo.getPermission())) {
+	                            if (!MumbleChat.permission.has(player,cinfo.getPermission())){//(!player.isPermissionSet(cinfo.getPermission())) {
 	                                //Command pre processor may have added listener, need to turn it off.
 	                                player.setMetadata("listenchannel." + cinfo.getName(), new FixedMetadataValue(plugin, false));
 	                                player.sendMessage(ChatColor.DARK_PURPLE + "You do not have permission to look at this channel");
