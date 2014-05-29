@@ -65,7 +65,8 @@ public class MumbleChat extends JavaPlugin {
         // Set up Vault
         if(!setupPermissions()) {
             log.info(String.format("[%s] - Could not find Vault dependency, disabling.", getDescription().getName()));
-            this.getServer().getPluginManager().disablePlugin(this);
+            this.getPluginLoader().disablePlugin(this);
+            return;
         }
         
         log.info(String.format("[%s] - Checking for SimpleClans...", getDescription().getName()));
